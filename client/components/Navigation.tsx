@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
-import { Menu, X, User, LogIn } from "lucide-react";
+import { Menu, X, User, LogIn, ChevronDown } from "lucide-react";
 
 const navigationItems = [
   { name: "Accueil", href: "/" },
@@ -16,6 +16,7 @@ const navigationItems = [
 
 export function Navigation() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const location = useLocation();
 
   const isActive = (href: string) => {
@@ -26,7 +27,7 @@ export function Navigation() {
   };
 
   return (
-    <nav className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+    <nav className="bg-amani-primary border-b border-amani-primary/20 sticky top-0 z-50 shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16 lg:h-20">
           {/* Logo */}
@@ -35,7 +36,7 @@ export function Navigation() {
               <img
                 src="https://cdn.builder.io/api/v1/image/assets%2Fa7441c9084eb43e6855cf7e960c5c609%2F6ebebc1a91e8447db48a68aa5b391a28?format=webp&width=800"
                 alt="Amani - African Market & News Insights"
-                className="h-12 lg:h-16 w-auto group-hover:opacity-90 transition-opacity"
+                className="h-12 lg:h-16 w-auto group-hover:opacity-90 transition-opacity brightness-0 invert"
               />
             </Link>
           </div>
@@ -49,33 +50,50 @@ export function Navigation() {
                   to={item.href}
                   className={`px-3 xl:px-4 py-2 text-sm xl:text-base font-medium transition-all duration-300 rounded-lg relative overflow-hidden group ${
                     isActive(item.href)
-                      ? "text-amani-primary bg-amani-secondary/50"
-                      : "text-gray-700 hover:text-amani-primary hover:bg-amani-secondary/30"
+                      ? "text-white bg-white/20"
+                      : "text-white/80 hover:text-white hover:bg-white/10"
                   }`}
                 >
                   <span className="relative z-10">{item.name}</span>
                   {isActive(item.href) && (
-                    <div className="absolute bottom-0 left-0 w-full h-0.5 bg-amani-primary"></div>
+                    <div className="absolute bottom-0 left-0 w-full h-0.5 bg-white"></div>
                   )}
                 </Link>
               ))}
 
-              {/* Login Button */}
-              <div className="ml-6 flex items-center space-x-3">
-                <Link
-                  to="/login"
-                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-amani-primary border border-amani-primary rounded-lg hover:bg-amani-primary hover:text-white transition-all duration-200"
-                >
-                  <LogIn className="w-4 h-4" />
-                  Connexion
-                </Link>
-                <Link
-                  to="/register"
-                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-amani-primary rounded-lg hover:bg-amani-primary/90 transition-all duration-200"
+              {/* User Dropdown */}
+              <div className="ml-6 relative">
+                <button
+                  onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-white/10 rounded-lg hover:bg-white/20 transition-all duration-200"
                 >
                   <User className="w-4 h-4" />
-                  S'inscrire
-                </Link>
+                  <ChevronDown
+                    className={`w-4 h-4 transition-transform duration-200 ${isUserDropdownOpen ? "rotate-180" : ""}`}
+                  />
+                </button>
+
+                {/* Dropdown Menu */}
+                {isUserDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                    <Link
+                      to="/login"
+                      onClick={() => setIsUserDropdownOpen(false)}
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                      <LogIn className="w-4 h-4" />
+                      Connexion
+                    </Link>
+                    <Link
+                      to="/register"
+                      onClick={() => setIsUserDropdownOpen(false)}
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                      <User className="w-4 h-4" />
+                      S'inscrire
+                    </Link>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -84,7 +102,7 @@ export function Navigation() {
           <div className="lg:hidden">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-lg text-gray-400 hover:text-amani-primary hover:bg-amani-secondary/30 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-amani-primary transition-colors duration-200"
+              className="inline-flex items-center justify-center p-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white transition-colors duration-200"
               aria-expanded={isMobileMenuOpen}
             >
               <span className="sr-only">
@@ -111,7 +129,7 @@ export function Navigation() {
           isMobileMenuOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0"
         }`}
       >
-        <div className="px-4 pt-4 pb-6 space-y-2 bg-gradient-to-b from-white to-gray-50 border-t border-gray-200">
+        <div className="px-4 pt-4 pb-6 space-y-2 bg-gradient-to-b from-amani-primary to-amani-primary/90 border-t border-white/20">
           {navigationItems.map((item, index) => (
             <Link
               key={item.name}
@@ -119,8 +137,8 @@ export function Navigation() {
               onClick={() => setIsMobileMenuOpen(false)}
               className={`block px-4 py-3 text-base font-medium rounded-xl transition-all duration-200 transform ${
                 isActive(item.href)
-                  ? "text-amani-primary bg-amani-secondary/50 shadow-sm scale-105"
-                  : "text-gray-700 hover:text-amani-primary hover:bg-amani-secondary/30 hover:scale-105"
+                  ? "text-white bg-white/20 shadow-sm scale-105"
+                  : "text-white/80 hover:text-white hover:bg-white/10 hover:scale-105"
               }`}
               style={{
                 animationDelay: isMobileMenuOpen ? `${index * 50}ms` : "0ms",
@@ -131,11 +149,11 @@ export function Navigation() {
           ))}
 
           {/* Mobile Login Buttons */}
-          <div className="pt-4 space-y-2 border-t border-gray-200 mt-4">
+          <div className="pt-4 space-y-2 border-t border-white/20 mt-4">
             <Link
               to="/login"
               onClick={() => setIsMobileMenuOpen(false)}
-              className="flex items-center gap-2 px-4 py-3 text-base font-medium text-amani-primary border border-amani-primary rounded-xl hover:bg-amani-primary hover:text-white transition-all duration-200"
+              className="flex items-center gap-2 px-4 py-3 text-base font-medium text-white border border-white/30 rounded-xl hover:bg-white/10 transition-all duration-200"
             >
               <LogIn className="w-4 h-4" />
               Connexion
@@ -143,7 +161,7 @@ export function Navigation() {
             <Link
               to="/register"
               onClick={() => setIsMobileMenuOpen(false)}
-              className="flex items-center gap-2 px-4 py-3 text-base font-medium text-white bg-amani-primary rounded-xl hover:bg-amani-primary/90 transition-all duration-200"
+              className="flex items-center gap-2 px-4 py-3 text-base font-medium text-amani-primary bg-white rounded-xl hover:bg-white/90 transition-all duration-200"
             >
               <User className="w-4 h-4" />
               S'inscrire
