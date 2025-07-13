@@ -15,6 +15,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import NewArticle from "./pages/NewArticle";
+import Analytics from "./pages/Analytics";
 import Users from "./pages/Users";
 import NewUser from "./pages/NewUser";
 import EditUser from "./pages/EditUser";
