@@ -287,7 +287,10 @@ export default function Users() {
               </p>
             </div>
             <div className="flex gap-3">
-              <button className="flex items-center gap-2 px-4 py-2 border border-amani-primary text-amani-primary rounded-lg hover:bg-amani-secondary/30 transition-colors">
+              <button
+                onClick={handleExportUsers}
+                className="flex items-center gap-2 px-4 py-2 border border-amani-primary text-amani-primary rounded-lg hover:bg-amani-secondary/30 transition-colors"
+              >
                 <Download className="w-4 h-4" />
                 Exporter
               </button>
