@@ -84,7 +84,7 @@ export default function Index() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h1 className="text-4xl lg:text-6xl font-bold mb-6">�� la une</h1>
+              <h1 className="text-4xl lg:text-6xl font-bold mb-6">À la une</h1>
               <h2 className="text-2xl lg:text-3xl font-semibold mb-4">
                 Le Mali lance son plus grand projet d'infrastructure
               </h2>
@@ -298,7 +298,30 @@ export default function Index() {
                 Votre source d'information économique pour le Sahel et le Tchad.
               </p>
               <div className="flex gap-4">
-                {/* Social media icons would go here */}
+                <a
+                  href="#"
+                  className="text-gray-300 hover:text-white transition-colors"
+                >
+                  <Facebook className="w-5 h-5" />
+                </a>
+                <a
+                  href="#"
+                  className="text-gray-300 hover:text-white transition-colors"
+                >
+                  <Twitter className="w-5 h-5" />
+                </a>
+                <a
+                  href="#"
+                  className="text-gray-300 hover:text-white transition-colors"
+                >
+                  <Linkedin className="w-5 h-5" />
+                </a>
+                <a
+                  href="#"
+                  className="text-gray-300 hover:text-white transition-colors"
+                >
+                  <Youtube className="w-5 h-5" />
+                </a>
               </div>
             </div>
             <div>
