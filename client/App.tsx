@@ -17,6 +17,7 @@ import Dashboard from "./pages/Dashboard";
 import NewArticle from "./pages/NewArticle";
 import Analytics from "./pages/Analytics";
 import Moderation from "./pages/Moderation";
+import Settings from "./pages/Settings";
 import Users from "./pages/Users";
 import NewUser from "./pages/NewUser";
 import EditUser from "./pages/EditUser";
