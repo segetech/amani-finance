@@ -15,6 +15,7 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import NewArticle from "./pages/NewArticle";
 import Users from "./pages/Users";
+import NewUser from "./pages/NewUser";
 import Marche from "./pages/Marche";
 import Economie from "./pages/Economie";
 import EconomieNews from "./pages/EconomieNews";
