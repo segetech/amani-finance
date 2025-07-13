@@ -22,6 +22,9 @@ import {
   MoreHorizontal,
   CheckCircle,
   XCircle,
+  X,
+  Lock,
+  AlertCircle,
 } from "lucide-react";
 
 export default function Users() {
