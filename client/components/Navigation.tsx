@@ -33,7 +33,7 @@ export function Navigation() {
           <div className="flex-shrink-0">
             <Link to="/" className="flex items-center group">
               <img
-                src="https://cdn.builder.io/api/v1/image/assets%2Fa7441c9084eb43e6855cf7e960c5c609%2Fc510645f45b34ee68e7dbc8d72abb1d7?format=webp&width=800"
+                src="https://cdn.builder.io/api/v1/image/assets%2Fa7441c9084eb43e6855cf7e960c5c609%2F6ebebc1a91e8447db48a68aa5b391a28?format=webp&width=800"
                 alt="Amani - African Market & News Insights"
                 className="h-12 lg:h-16 w-auto group-hover:opacity-90 transition-opacity"
               />
