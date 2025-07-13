@@ -284,10 +284,16 @@ export default function Users() {
                 {selectedUsers.length} utilisateur(s) sélectionné(s)
               </span>
               <div className="flex gap-2">
-                <button className="px-4 py-2 bg-white/20 rounded-lg hover:bg-white/30 transition-colors">
+                <button
+                  onClick={handleBulkRoleChange}
+                  className="px-4 py-2 bg-white/20 rounded-lg hover:bg-white/30 transition-colors"
+                >
                   Modifier le rôle
                 </button>
-                <button className="px-4 py-2 bg-red-600 rounded-lg hover:bg-red-700 transition-colors">
+                <button
+                  onClick={handleBulkDelete}
+                  className="px-4 py-2 bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
+                >
                   Supprimer
                 </button>
               </div>
