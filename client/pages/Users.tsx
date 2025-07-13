@@ -95,27 +95,48 @@ export default function Users() {
 
   const handleViewUser = (userId: string) => {
     const userToView = demoAccounts.find((u) => u.id === userId);
-    setSelectedUser(userToView);
-    setShowUserModal(true);
+    if (userToView) {
+      setSelectedUser(userToView);
+      setShowUserModal(true);
+      info(
+        "Détails de l'utilisateur",
+        `Affichage des informations de ${userToView.firstName} ${userToView.lastName}`,
+      );
+    }
   };
 
   const handleEditUser = (userId: string) => {
-    // Navigate to edit user page or open edit modal
-    console.log("Editing user:", userId);
-    alert("Fonctionnalité d'édition à implémenter");
+    const userToEdit = demoAccounts.find((u) => u.id === userId);
+    if (userToEdit) {
+      navigate(`/dashboard/users/edit/${userId}`);
+      info(
+        "Modification",
+        `Redirection vers l'édition de ${userToEdit.firstName} ${userToEdit.lastName}`,
+      );
+    }
   };
 
   const handleDeleteUser = (userId: string) => {
     const userToDelete = demoAccounts.find((u) => u.id === userId);
-    setUserToDelete(userToDelete);
-    setShowDeleteConfirm(true);
+    if (userToDelete) {
+      setUserToDelete(userToDelete);
+      setShowDeleteConfirm(true);
+      warning(
+        "Suppression",
+        "Confirmation requise pour supprimer l'utilisateur",
+      );
+    }
   };
 
-  const confirmDeleteUser = () => {
+  const confirmDeleteUser = async () => {
     if (userToDelete) {
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       console.log("Deleting user:", userToDelete.id);
-      alert(
-        `Utilisateur ${userToDelete.firstName} ${userToDelete.lastName} supprimé avec succès!`,
+      success(
+        "Utilisateur supprimé",
+        `${userToDelete.firstName} ${userToDelete.lastName} a été supprimé avec succès`,
       );
       setShowDeleteConfirm(false);
       setUserToDelete(null);
@@ -123,28 +144,106 @@ export default function Users() {
   };
 
   const handleBulkRoleChange = () => {
-    alert(
-      `Modifier le rôle de ${selectedUsers.length} utilisateur(s) sélectionné(s)`,
+    if (selectedUsers.length === 0) {
+      warning(
+        "Aucune sélection",
+        "Veuillez sélectionner au moins un utilisateur",
+      );
+      return;
+    }
+    setShowBulkRoleModal(true);
+  };
+
+  const confirmBulkRoleChange = async () => {
+    // Simulate API call
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    console.log("Bulk role change:", selectedUsers, "to role:", newBulkRole);
+    success(
+      "Rôles modifiés",
+      `Le rôle de ${selectedUsers.length} utilisateur(s) a été modifié vers ${getRoleDisplayName(newBulkRole)}`,
     );
+    setShowBulkRoleModal(false);
+    setSelectedUsers([]);
   };
 
   const handleBulkDelete = () => {
+    if (selectedUsers.length === 0) {
+      warning(
+        "Aucune sélection",
+        "Veuillez sélectionner au moins un utilisateur",
+      );
+      return;
+    }
+
     if (
       confirm(
-        `Êtes-vous sûr de vouloir supprimer ${selectedUsers.length} utilisateur(s) ?`,
+        `Êtes-vous sûr de vouloir supprimer ${selectedUsers.length} utilisateur(s) ? Cette action est irréversible.`,
       )
     ) {
-      console.log("Bulk deleting users:", selectedUsers);
-      alert(`${selectedUsers.length} utilisateur(s) supprimé(s) avec succès!`);
-      setSelectedUsers([]);
+      // Simulate API call
+      setTimeout(() => {
+        console.log("Bulk deleting users:", selectedUsers);
+        success(
+          "Utilisateurs supprimés",
+          `${selectedUsers.length} utilisateur(s) ont été supprimés avec succès`,
+        );
+        setSelectedUsers([]);
+      }, 1000);
     }
   };
 
-  const handleSendPasswordReset = (userId: string) => {
+  const handleSendPasswordReset = async (userId: string) => {
     const userToReset = demoAccounts.find((u) => u.id === userId);
     if (userToReset) {
-      alert(`Email de réinitialisation envoyé à ${userToReset.email}`);
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      success(
+        "Email envoyé",
+        `Un email de réinitialisation a été envoyé à ${userToReset.email}`,
+      );
     }
+  };
+
+  const handleSendMessage = (userId: string) => {
+    const userToMessage = demoAccounts.find((u) => u.id === userId);
+    if (userToMessage) {
+      info(
+        "Message",
+        `Fonctionnalité de messagerie avec ${userToMessage.firstName} ${userToMessage.lastName} en développement`,
+      );
+    }
+  };
+
+  const handleSuspendUser = async (userId: string) => {
+    const userToSuspend = demoAccounts.find((u) => u.id === userId);
+    if (userToSuspend) {
+      if (
+        confirm(
+          `Êtes-vous sûr de vouloir suspendre le compte de ${userToSuspend.firstName} ${userToSuspend.lastName} ?`,
+        )
+      ) {
+        // Simulate API call
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
+        warning(
+          "Compte suspendu",
+          `Le compte de ${userToSuspend.firstName} ${userToSuspend.lastName} a été suspendu`,
+        );
+      }
+    }
+  };
+
+  const handleExportUsers = () => {
+    // Simulate export
+    setTimeout(() => {
+      success(
+        "Export terminé",
+        "La liste des utilisateurs a été exportée au format CSV",
+      );
+    }, 1500);
+    info("Export en cours", "Génération du fichier CSV en cours...");
   };
 
   const roles = [
