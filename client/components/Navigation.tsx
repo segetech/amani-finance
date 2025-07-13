@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, User, LogIn } from "lucide-react";
 
 const navigationItems = [
   { name: "Accueil", href: "/" },
@@ -61,6 +61,24 @@ export function Navigation() {
                   )}
                 </Link>
               ))}
+
+              {/* Login Button */}
+              <div className="ml-6 flex items-center space-x-3">
+                <Link
+                  to="/login"
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-amani-primary border border-amani-primary rounded-lg hover:bg-amani-primary hover:text-white transition-all duration-200"
+                >
+                  <LogIn className="w-4 h-4" />
+                  Connexion
+                </Link>
+                <Link
+                  to="/register"
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-amani-primary rounded-lg hover:bg-amani-primary/90 transition-all duration-200"
+                >
+                  <User className="w-4 h-4" />
+                  S'inscrire
+                </Link>
+              </div>
             </div>
           </div>
 
@@ -113,6 +131,26 @@ export function Navigation() {
               {item.name}
             </Link>
           ))}
+
+          {/* Mobile Login Buttons */}
+          <div className="pt-4 space-y-2 border-t border-gray-200 mt-4">
+            <Link
+              to="/login"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="flex items-center gap-2 px-4 py-3 text-base font-medium text-amani-primary border border-amani-primary rounded-xl hover:bg-amani-primary hover:text-white transition-all duration-200"
+            >
+              <LogIn className="w-4 h-4" />
+              Connexion
+            </Link>
+            <Link
+              to="/register"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="flex items-center gap-2 px-4 py-3 text-base font-medium text-white bg-amani-primary rounded-xl hover:bg-amani-primary/90 transition-all duration-200"
+            >
+              <User className="w-4 h-4" />
+              S'inscrire
+            </Link>
+          </div>
         </div>
       </div>
     </nav>
