@@ -546,19 +546,13 @@ export default function Users() {
                                 Réinitialiser le mot de passe
                               </button>
                               <button
-                                onClick={() =>
-                                  alert(`Envoyer un message à ${u.email}`)
-                                }
+                                onClick={() => handleSendMessage(u.id)}
                                 className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                               >
                                 Envoyer un message
                               </button>
                               <button
-                                onClick={() =>
-                                  alert(
-                                    `Suspendre le compte de ${u.firstName} ${u.lastName}`,
-                                  )
-                                }
+                                onClick={() => handleSuspendUser(u.id)}
                                 className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                               >
                                 Suspendre le compte
