@@ -78,7 +78,7 @@ export default function Index() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#E5DDD2]">
       {/* Hero Section */}
       <section className="bg-amani-primary text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -138,7 +138,7 @@ export default function Index() {
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {keyIndices.map((index, i) => (
-              <div key={i} className="bg-gray-50 p-4 rounded-lg">
+              <div key={i} className="bg-[#E5DDD2] p-4 rounded-lg">
                 <div className="text-sm text-gray-600 mb-1">{index.name}</div>
                 <div className="text-2xl font-bold text-amani-primary mb-2">
                   {index.value}
