@@ -31,7 +31,7 @@ export default function Login() {
         <div className="text-center">
           <Link to="/" className="inline-block">
             <img
-              src="https://cdn.builder.io/api/v1/image/assets%2Fa7441c9084eb43e6855cf7e960c5c609%2Fc510645f45b34ee68e7dbc8d72abb1d7?format=webp&width=800"
+              src="https://cdn.builder.io/api/v1/image/assets%2Fa7441c9084eb43e6855cf7e960c5c609%2F6ebebc1a91e8447db48a68aa5b391a28?format=webp&width=800"
               alt="Amani - African Market & News Insights"
               className="h-20 w-auto mx-auto hover:opacity-90 transition-opacity"
             />
