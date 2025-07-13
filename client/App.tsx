@@ -29,27 +29,30 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Navigation />
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/article/:id" element={<Article />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/marche" element={<Marche />} />
-          <Route path="/economie" element={<Economie />} />
-          <Route path="/industrie" element={<Industrie />} />
-          <Route path="/investissement" element={<Investissement />} />
-          <Route path="/insights" element={<Insights />} />
-          <Route path="/tech" element={<Tech />} />
-          <Route path="/podcast" element={<Podcast />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/indices" element={<Indices />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+      <AuthProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Navigation />
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/article/:id" element={<Article />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/marche" element={<Marche />} />
+            <Route path="/economie" element={<Economie />} />
+            <Route path="/industrie" element={<Industrie />} />
+            <Route path="/investissement" element={<Investissement />} />
+            <Route path="/insights" element={<Insights />} />
+            <Route path="/tech" element={<Tech />} />
+            <Route path="/podcast" element={<Podcast />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/indices" element={<Indices />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
