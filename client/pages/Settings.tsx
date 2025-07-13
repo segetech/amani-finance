@@ -137,6 +137,29 @@ export default function Settings() {
     },
   ];
 
+  // Check permissions
+  if (!user || !hasPermission("system_settings")) {
+    return (
+      <div className="min-h-screen bg-[#E5DDD2] flex items-center justify-center">
+        <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md">
+          <h2 className="text-2xl font-bold text-amani-primary mb-4">
+            Accès refusé
+          </h2>
+          <p className="text-gray-600 mb-6">
+            Vous n'avez pas les permissions nécessaires pour accéder aux
+            paramètres système.
+          </p>
+          <Link
+            to="/dashboard"
+            className="bg-amani-primary text-white px-6 py-2 rounded-lg hover:bg-amani-primary/90 transition-colors"
+          >
+            Retour au tableau de bord
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#E5DDD2]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
