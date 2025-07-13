@@ -79,6 +79,11 @@ export function Navigation() {
                   className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-white/10 rounded-lg hover:bg-white/20 transition-all duration-200"
                 >
                   <User className="w-4 h-4" />
+                  {isAuthenticated ? (
+                    <span className="hidden lg:block">{user?.firstName}</span>
+                  ) : (
+                    <span className="hidden lg:block">Compte</span>
+                  )}
                   <ChevronDown
                     className={`w-4 h-4 transition-transform duration-200 ${isUserDropdownOpen ? "rotate-180" : ""}`}
                   />
@@ -86,23 +91,59 @@ export function Navigation() {
 
                 {/* Dropdown Menu */}
                 {isUserDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
-                    <Link
-                      to="/login"
-                      onClick={() => setIsUserDropdownOpen(false)}
-                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                    >
-                      <LogIn className="w-4 h-4" />
-                      Connexion
-                    </Link>
-                    <Link
-                      to="/register"
-                      onClick={() => setIsUserDropdownOpen(false)}
-                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                    >
-                      <User className="w-4 h-4" />
-                      S'inscrire
-                    </Link>
+                  <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                    {isAuthenticated ? (
+                      <>
+                        <div className="px-4 py-3 border-b border-gray-200">
+                          <div className="font-medium text-amani-primary">
+                            {user?.firstName} {user?.lastName}
+                          </div>
+                          <div className="text-sm text-gray-600">
+                            {user?.email}
+                          </div>
+                          <div className="text-xs text-gray-500 mt-1">
+                            {getRoleDisplayName(user?.role || "")}
+                          </div>
+                        </div>
+                        <Link
+                          to="/dashboard"
+                          onClick={() => setIsUserDropdownOpen(false)}
+                          className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                        >
+                          <Settings className="w-4 h-4" />
+                          Tableau de bord
+                        </Link>
+                        <button
+                          onClick={() => {
+                            logout();
+                            setIsUserDropdownOpen(false);
+                          }}
+                          className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                        >
+                          <LogOut className="w-4 h-4" />
+                          Se déconnecter
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <Link
+                          to="/login"
+                          onClick={() => setIsUserDropdownOpen(false)}
+                          className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                        >
+                          <LogIn className="w-4 h-4" />
+                          Connexion
+                        </Link>
+                        <Link
+                          to="/register"
+                          onClick={() => setIsUserDropdownOpen(false)}
+                          className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                        >
+                          <User className="w-4 h-4" />
+                          S'inscrire
+                        </Link>
+                      </>
+                    )}
                   </div>
                 )}
               </div>
