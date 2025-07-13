@@ -1,6 +1,16 @@
 import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
-import { Menu, X, User, LogIn, ChevronDown } from "lucide-react";
+import {
+  Menu,
+  X,
+  User,
+  LogIn,
+  ChevronDown,
+  LogOut,
+  Settings,
+} from "lucide-react";
+import { useAuth } from "../context/AuthContext";
+import { getRoleDisplayName } from "../lib/demoAccounts";
 
 const navigationItems = [
   { name: "Accueil", href: "/" },
