@@ -9,6 +9,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Navigation } from "./components/Navigation";
 import Index from "./pages/Index";
 import Article from "./pages/Article";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 import Marche from "./pages/Marche";
 import Economie from "./pages/Economie";
 import Industrie from "./pages/Industrie";
