@@ -6,16 +6,42 @@ import { demoAccounts, getRoleDisplayName } from "../lib/demoAccounts";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
   const [formData, setFormData] = useState({
     email: "",
     password: "",
     rememberMe: false,
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log("Login attempt:", formData);
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const success = await login(formData.email, formData.password);
+      if (success) {
+        navigate("/dashboard");
+      } else {
+        setError("Email ou mot de passe incorrect");
+      }
+    } catch (err) {
+      setError("Erreur de connexion");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDemoLogin = async (email: string, password: string) => {
+    setFormData({ email, password, rememberMe: false });
+    const success = await login(email, password);
+    if (success) {
+      navigate("/dashboard");
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
