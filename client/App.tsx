@@ -15,6 +15,7 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Marche from "./pages/Marche";
 import Economie from "./pages/Economie";
+import EconomieNews from "./pages/EconomieNews";
 import Industrie from "./pages/Industrie";
 import Investissement from "./pages/Investissement";
 import Insights from "./pages/Insights";
