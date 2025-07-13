@@ -851,6 +851,62 @@ export default function Users() {
             </div>
           </div>
         )}
+
+        {/* Bulk Role Change Modal */}
+        {showBulkRoleModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl shadow-xl max-w-md w-full">
+              <div className="p-6">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                    <Shield className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      Modifier le rôle en lot
+                    </h3>
+                    <p className="text-gray-600">
+                      {selectedUsers.length} utilisateur(s) sélectionné(s)
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Nouveau rôle
+                  </label>
+                  <select
+                    value={newBulkRole}
+                    onChange={(e) => setNewBulkRole(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
+                  >
+                    <option value="visiteur">Visiteur</option>
+                    <option value="abonne">Abonné Premium</option>
+                    <option value="moderateur">Modérateur</option>
+                    <option value="analyste">Analyste</option>
+                    <option value="editeur">Éditeur</option>
+                    <option value="admin">Administrateur</option>
+                  </select>
+                </div>
+
+                <div className="flex gap-3 justify-end">
+                  <button
+                    onClick={() => setShowBulkRoleModal(false)}
+                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    Annuler
+                  </button>
+                  <button
+                    onClick={confirmBulkRoleChange}
+                    className="px-4 py-2 bg-amani-primary text-white rounded-lg hover:bg-amani-primary/90 transition-colors"
+                  >
+                    Modifier les rôles
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
