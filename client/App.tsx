@@ -33,6 +33,7 @@ import Insights from "./pages/Insights";
 import Tech from "./pages/Tech";
 import Podcast from "./pages/Podcast";
 import Contact from "./pages/Contact";
+import About from "./pages/About";
 import Indices from "./pages/Indices";
 import NotFound from "./pages/NotFound";
 
