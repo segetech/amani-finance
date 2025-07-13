@@ -11,6 +11,20 @@ import {
   Twitter,
   Linkedin,
   Youtube,
+  Award,
+  BarChart3,
+  Globe,
+  Briefcase,
+  Users,
+  Target,
+  Clock,
+  Eye,
+  Bell,
+  Download,
+  BookOpen,
+  Mic,
+  Video,
+  PieChart,
 } from "lucide-react";
 
 export default function Index() {
