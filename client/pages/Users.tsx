@@ -29,6 +29,10 @@ export default function Users() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRole, setSelectedRole] = useState("all");
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+  const [showUserModal, setShowUserModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<any>(null);
 
   // Check permissions
   if (!user || !hasPermission("manage_users")) {
