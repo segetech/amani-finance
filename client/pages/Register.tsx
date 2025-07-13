@@ -61,12 +61,11 @@ export default function Register() {
         {/* Header */}
         <div className="text-center mb-8">
           <Link to="/" className="inline-block">
-            <div className="text-4xl font-bold text-amani-primary mb-2">
-              Amani
-            </div>
-            <div className="text-sm text-gray-600">
-              African Market & News Insights
-            </div>
+            <img
+              src="https://cdn.builder.io/api/v1/image/assets%2Fa7441c9084eb43e6855cf7e960c5c609%2Fc510645f45b34ee68e7dbc8d72abb1d7?format=webp&width=800"
+              alt="Amani - African Market & News Insights"
+              className="h-20 w-auto mx-auto hover:opacity-90 transition-opacity"
+            />
           </Link>
           <h2 className="mt-8 text-3xl font-bold text-amani-primary">
             Créer un compte
