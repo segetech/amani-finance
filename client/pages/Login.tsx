@@ -72,8 +72,46 @@ export default function Login() {
           </p>
         </div>
 
+        {/* Demo Accounts */}
+        <div className="bg-white rounded-2xl shadow-xl p-6 mb-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Users className="w-5 h-5 text-amani-primary" />
+            <h2 className="text-lg font-semibold text-amani-primary">
+              Comptes de démonstration
+            </h2>
+          </div>
+          <p className="text-sm text-gray-600 mb-4">
+            Cliquez sur un rôle pour vous connecter automatiquement :
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {demoAccounts.map((account) => (
+              <button
+                key={account.id}
+                onClick={() => handleDemoLogin(account.email, account.password)}
+                className="p-3 text-left border border-gray-200 rounded-lg hover:border-amani-primary hover:bg-amani-secondary/10 transition-colors"
+                disabled={isLoading}
+              >
+                <div className="font-medium text-amani-primary text-sm">
+                  {getRoleDisplayName(account.role)}
+                </div>
+                <div className="text-xs text-gray-600">
+                  {account.firstName} {account.lastName}
+                </div>
+                <div className="text-xs text-gray-500 mt-1">
+                  {account.organization}
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Login Form */}
         <div className="bg-white rounded-2xl shadow-xl p-8">
+          {error && (
+            <div className="mb-4 p-3 bg-red-100 border border-red-300 text-red-700 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
           <form className="space-y-6" onSubmit={handleSubmit}>
             {/* Email */}
             <div>
