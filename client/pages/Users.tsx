@@ -525,6 +525,228 @@ export default function Users() {
             })}
           </div>
         </div>
+
+        {/* User Details Modal */}
+        {showUserModal && selectedUser && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="p-6 border-b border-gray-200">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-bold text-amani-primary">
+                    Détails de l'utilisateur
+                  </h2>
+                  <button
+                    onClick={() => setShowUserModal(false)}
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    <X className="w-6 h-6" />
+                  </button>
+                </div>
+              </div>
+              <div className="p-6">
+                <div className="space-y-6">
+                  {/* User Info */}
+                  <div className="flex items-center gap-4">
+                    <div className="w-16 h-16 bg-gradient-to-br from-amani-primary to-amani-primary/80 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                      {selectedUser.firstName.charAt(0)}
+                      {selectedUser.lastName.charAt(0)}
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-semibold text-amani-primary">
+                        {selectedUser.firstName} {selectedUser.lastName}
+                      </h3>
+                      <p className="text-gray-600">{selectedUser.email}</p>
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-medium ${getRoleColor(selectedUser.role)}`}
+                      >
+                        {getRoleDisplayName(selectedUser.role)}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Details Grid */}
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div>
+                      <h4 className="font-semibold text-gray-700 mb-3">
+                        Informations personnelles
+                      </h4>
+                      <div className="space-y-2 text-sm">
+                        <div>
+                          <span className="font-medium">Organisation:</span>{" "}
+                          {selectedUser.organization}
+                        </div>
+                        <div>
+                          <span className="font-medium">
+                            Dernière connexion:
+                          </span>{" "}
+                          {selectedUser.lastLogin}
+                        </div>
+                        <div>
+                          <span className="font-medium">Compte créé:</span>{" "}
+                          Janvier 2024
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-gray-700 mb-3">
+                        Préférences
+                      </h4>
+                      <div className="space-y-2 text-sm">
+                        <div>
+                          <span className="font-medium">Newsletter:</span>{" "}
+                          {selectedUser.preferences.newsletter
+                            ? "Activée"
+                            : "Désactivée"}
+                        </div>
+                        <div>
+                          <span className="font-medium">Alertes:</span>{" "}
+                          {selectedUser.preferences.alerts
+                            ? "Activées"
+                            : "Désactivées"}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Sectors */}
+                  <div>
+                    <h4 className="font-semibold text-gray-700 mb-3">
+                      Secteurs d'intérêt
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedUser.preferences.sectors.map(
+                        (sector: string, i: number) => (
+                          <span
+                            key={i}
+                            className="px-2 py-1 bg-amani-secondary/50 text-amani-primary rounded text-xs"
+                          >
+                            {sector}
+                          </span>
+                        ),
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Countries */}
+                  <div>
+                    <h4 className="font-semibold text-gray-700 mb-3">
+                      Pays suivis
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedUser.preferences.countries.map(
+                        (country: string, i: number) => (
+                          <span
+                            key={i}
+                            className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs"
+                          >
+                            {country}
+                          </span>
+                        ),
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Permissions */}
+                  <div>
+                    <h4 className="font-semibold text-gray-700 mb-3">
+                      Permissions
+                    </h4>
+                    <div className="grid grid-cols-2 gap-2">
+                      {selectedUser.permissions.map(
+                        (permission: string, i: number) => (
+                          <div
+                            key={i}
+                            className="flex items-center gap-2 text-xs"
+                          >
+                            <CheckCircle className="w-3 h-3 text-green-500" />
+                            <span className="text-gray-600">
+                              {permission.replace(/_/g, " ")}
+                            </span>
+                          </div>
+                        ),
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-3 mt-8 pt-6 border-t border-gray-200">
+                  <button
+                    onClick={() => {
+                      handleEditUser(selectedUser.id);
+                      setShowUserModal(false);
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 bg-amani-primary text-white rounded-lg hover:bg-amani-primary/90 transition-colors"
+                  >
+                    <Edit className="w-4 h-4" />
+                    Modifier
+                  </button>
+                  <button
+                    onClick={() => handleSendPasswordReset(selectedUser.id)}
+                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    <Lock className="w-4 h-4" />
+                    Réinitialiser le mot de passe
+                  </button>
+                  <button
+                    onClick={() => {
+                      handleDeleteUser(selectedUser.id);
+                      setShowUserModal(false);
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    Supprimer
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Delete Confirmation Modal */}
+        {showDeleteConfirm && userToDelete && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl shadow-xl max-w-md w-full">
+              <div className="p-6">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                    <AlertCircle className="w-6 h-6 text-red-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      Confirmer la suppression
+                    </h3>
+                    <p className="text-gray-600">
+                      Cette action est irréversible
+                    </p>
+                  </div>
+                </div>
+                <p className="text-gray-700 mb-6">
+                  Êtes-vous sûr de vouloir supprimer l'utilisateur{" "}
+                  <span className="font-semibold">
+                    {userToDelete.firstName} {userToDelete.lastName}
+                  </span>{" "}
+                  ({userToDelete.email}) ?
+                </p>
+                <div className="flex gap-3 justify-end">
+                  <button
+                    onClick={() => setShowDeleteConfirm(false)}
+                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    Annuler
+                  </button>
+                  <button
+                    onClick={confirmDeleteUser}
+                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                  >
+                    Supprimer
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
