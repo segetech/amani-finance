@@ -85,6 +85,60 @@ export default function Users() {
     }
   };
 
+  const handleViewUser = (userId: string) => {
+    const userToView = demoAccounts.find((u) => u.id === userId);
+    setSelectedUser(userToView);
+    setShowUserModal(true);
+  };
+
+  const handleEditUser = (userId: string) => {
+    // Navigate to edit user page or open edit modal
+    console.log("Editing user:", userId);
+    alert("Fonctionnalité d'édition à implémenter");
+  };
+
+  const handleDeleteUser = (userId: string) => {
+    const userToDelete = demoAccounts.find((u) => u.id === userId);
+    setUserToDelete(userToDelete);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDeleteUser = () => {
+    if (userToDelete) {
+      console.log("Deleting user:", userToDelete.id);
+      alert(
+        `Utilisateur ${userToDelete.firstName} ${userToDelete.lastName} supprimé avec succès!`,
+      );
+      setShowDeleteConfirm(false);
+      setUserToDelete(null);
+    }
+  };
+
+  const handleBulkRoleChange = () => {
+    alert(
+      `Modifier le rôle de ${selectedUsers.length} utilisateur(s) sélectionné(s)`,
+    );
+  };
+
+  const handleBulkDelete = () => {
+    if (
+      confirm(
+        `Êtes-vous sûr de vouloir supprimer ${selectedUsers.length} utilisateur(s) ?`,
+      )
+    ) {
+      console.log("Bulk deleting users:", selectedUsers);
+      alert(`${selectedUsers.length} utilisateur(s) supprimé(s) avec succès!`);
+      setSelectedUsers([]);
+    }
+  };
+
+  const handleSendPasswordReset = (userId: string) => {
+    const userToReset = demoAccounts.find((u) => u.id === userId);
+    if (userToReset) {
+      alert(`Email de réinitialisation envoyé à ${userToReset.email}`);
+    }
+  };
+
   const roles = [
     "admin",
     "editeur",
