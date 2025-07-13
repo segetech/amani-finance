@@ -345,68 +345,188 @@ export default function NewUser() {
             <div className="flex items-center gap-3 mb-6">
               <Lock className="w-6 h-6 text-amani-primary" />
               <h2 className="text-xl font-semibold text-amani-primary">
-                Authentification
+                Configuration du mot de passe
               </h2>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Mot de passe *
+                <label className="block text-sm font-medium text-gray-700 mb-4">
+                  Méthode de configuration du mot de passe
                 </label>
-                <div className="relative">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    name="password"
-                    value={formData.password}
-                    onChange={handleInputChange}
-                    className={`w-full px-4 pr-12 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent ${
-                      errors.password ? "border-red-300" : "border-gray-300"
+                <div className="space-y-4">
+                  <div
+                    className={`border rounded-lg p-4 cursor-pointer transition-all ${
+                      formData.passwordMethod === "email"
+                        ? "border-amani-primary bg-amani-secondary/20"
+                        : "border-gray-200 hover:border-amani-primary/50"
                     }`}
-                    placeholder="••••••••"
-                  />
-                  <button
-                    type="button"
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                    onClick={() => setShowPassword(!showPassword)}
+                    onClick={() =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        passwordMethod: "email",
+                        generatedPassword: "",
+                      }))
+                    }
                   >
-                    {showPassword ? (
-                      <EyeOff className="h-5 w-5 text-gray-400" />
-                    ) : (
-                      <Eye className="h-5 w-5 text-gray-400" />
-                    )}
-                  </button>
+                    <div className="flex items-start gap-3">
+                      <input
+                        type="radio"
+                        name="passwordMethod"
+                        value="email"
+                        checked={formData.passwordMethod === "email"}
+                        onChange={handleInputChange}
+                        className="mt-1 h-4 w-4 text-amani-primary focus:ring-amani-primary"
+                      />
+                      <div>
+                        <div className="font-medium text-amani-primary flex items-center gap-2">
+                          <Mail className="w-4 h-4" />
+                          Envoyer un email de configuration
+                        </div>
+                        <div className="text-sm text-gray-600 mt-1">
+                          L'utilisateur recevra un email avec un lien pour
+                          définir son mot de passe lors de sa première
+                          connexion.
+                        </div>
+                        <div className="mt-2 text-xs text-green-600 flex items-center gap-1">
+                          <CheckCircle className="w-3 h-3" />
+                          Recommandé - Plus sécurisé
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    className={`border rounded-lg p-4 cursor-pointer transition-all ${
+                      formData.passwordMethod === "generate"
+                        ? "border-amani-primary bg-amani-secondary/20"
+                        : "border-gray-200 hover:border-amani-primary/50"
+                    }`}
+                    onClick={() =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        passwordMethod: "generate",
+                      }))
+                    }
+                  >
+                    <div className="flex items-start gap-3">
+                      <input
+                        type="radio"
+                        name="passwordMethod"
+                        value="generate"
+                        checked={formData.passwordMethod === "generate"}
+                        onChange={handleInputChange}
+                        className="mt-1 h-4 w-4 text-amani-primary focus:ring-amani-primary"
+                      />
+                      <div className="flex-1">
+                        <div className="font-medium text-amani-primary flex items-center gap-2">
+                          <Lock className="w-4 h-4" />
+                          Générer un mot de passe temporaire
+                        </div>
+                        <div className="text-sm text-gray-600 mt-1">
+                          Un mot de passe temporaire sera généré
+                          automatiquement. L'utilisateur devra le changer lors
+                          de sa première connexion.
+                        </div>
+
+                        {formData.passwordMethod === "generate" && (
+                          <div className="mt-4 space-y-3">
+                            <button
+                              type="button"
+                              onClick={handleGeneratePassword}
+                              className="flex items-center gap-2 px-4 py-2 bg-amani-primary text-white rounded-lg hover:bg-amani-primary/90 transition-colors text-sm"
+                            >
+                              <Lock className="w-4 h-4" />
+                              {formData.generatedPassword
+                                ? "Régénérer"
+                                : "Générer"}{" "}
+                              un mot de passe
+                            </button>
+
+                            {formData.generatedPassword && (
+                              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  Mot de passe généré :
+                                </label>
+                                <div className="flex items-center gap-3">
+                                  <div className="flex-1 relative">
+                                    <input
+                                      type={showPassword ? "text" : "password"}
+                                      value={formData.generatedPassword}
+                                      readOnly
+                                      className="w-full px-3 py-2 bg-white border border-gray-300 rounded text-sm font-mono"
+                                    />
+                                    <button
+                                      type="button"
+                                      className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                                      onClick={() =>
+                                        setShowPassword(!showPassword)
+                                      }
+                                    >
+                                      {showPassword ? (
+                                        <EyeOff className="h-4 w-4 text-gray-400" />
+                                      ) : (
+                                        <Eye className="h-4 w-4 text-gray-400" />
+                                      )}
+                                    </button>
+                                  </div>
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      navigator.clipboard.writeText(
+                                        formData.generatedPassword,
+                                      )
+                                    }
+                                    className="px-3 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors text-sm"
+                                  >
+                                    Copier
+                                  </button>
+                                </div>
+                                <div className="mt-2 text-xs text-amber-600 flex items-center gap-1">
+                                  <AlertCircle className="w-3 h-3" />
+                                  Assurez-vous de communiquer ce mot de passe de
+                                  manière sécurisée à l'utilisateur
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                {errors.password && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
-                    <AlertCircle className="w-4 h-4" />
-                    {errors.password}
-                  </p>
-                )}
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Confirmer le mot de passe *
-                </label>
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleInputChange}
-                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent ${
-                    errors.confirmPassword
-                      ? "border-red-300"
-                      : "border-gray-300"
-                  }`}
-                  placeholder="••••••••"
-                />
-                {errors.confirmPassword && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
-                    <AlertCircle className="w-4 h-4" />
-                    {errors.confirmPassword}
-                  </p>
-                )}
+              {/* Additional Security Options */}
+              <div className="border-t border-gray-200 pt-6">
+                <h3 className="text-sm font-medium text-gray-700 mb-4">
+                  Options de sécurité
+                </h3>
+                <div className="space-y-3">
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={true}
+                      readOnly
+                      className="h-4 w-4 text-amani-primary focus:ring-amani-primary border-gray-300 rounded"
+                    />
+                    <label className="ml-2 text-sm text-gray-700">
+                      Forcer le changement de mot de passe à la première
+                      connexion
+                    </label>
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={formData.passwordMethod === "email"}
+                      readOnly
+                      className="h-4 w-4 text-amani-primary focus:ring-amani-primary border-gray-300 rounded"
+                    />
+                    <label className="ml-2 text-sm text-gray-700">
+                      Envoyer les instructions de connexion par email
+                    </label>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
