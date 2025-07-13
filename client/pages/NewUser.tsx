@@ -143,6 +143,12 @@ export default function NewUser() {
       return;
     }
 
+    // For generated password method, ensure password is generated
+    if (formData.passwordMethod === "generate" && !formData.generatedPassword) {
+      alert("Veuillez générer un mot de passe avant de créer l'utilisateur.");
+      return;
+    }
+
     setIsSaving(true);
 
     // Simulate API call
@@ -151,12 +157,30 @@ export default function NewUser() {
     const newUser = {
       id: `user-${Date.now()}`,
       ...formData,
+      password:
+        formData.passwordMethod === "generate"
+          ? formData.generatedPassword
+          : "EMAIL_SETUP",
       lastLogin: "Jamais connecté",
+      mustChangePassword: true,
+      accountStatus:
+        formData.passwordMethod === "email" ? "pending_setup" : "active",
       createdAt: new Date().toISOString(),
       createdBy: `${user.firstName} ${user.lastName}`,
     };
 
     console.log("Creating new user:", newUser);
+
+    // Show success message based on password method
+    if (formData.passwordMethod === "email") {
+      alert(
+        `Utilisateur créé avec succès ! Un email de configuration a été envoyé à ${formData.email}`,
+      );
+    } else {
+      alert(
+        `Utilisateur créé avec succès ! Mot de passe temporaire : ${formData.generatedPassword}`,
+      );
+    }
 
     setIsSaving(false);
     navigate("/dashboard/users");
