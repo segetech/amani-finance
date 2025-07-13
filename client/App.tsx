@@ -13,6 +13,7 @@ import Article from "./pages/Article";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
+import NewArticle from "./pages/NewArticle";
 import Marche from "./pages/Marche";
 import Economie from "./pages/Economie";
 import EconomieNews from "./pages/EconomieNews";
