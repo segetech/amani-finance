@@ -30,6 +30,8 @@ import {
 
 export default function Users() {
   const { user, hasPermission } = useAuth();
+  const { success, error, warning, info } = useToast();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRole, setSelectedRole] = useState("all");
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
@@ -37,6 +39,8 @@ export default function Users() {
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [userToDelete, setUserToDelete] = useState<any>(null);
+  const [showBulkRoleModal, setShowBulkRoleModal] = useState(false);
+  const [newBulkRole, setNewBulkRole] = useState("visiteur");
 
   // Check permissions
   if (!user || !hasPermission("manage_users")) {
