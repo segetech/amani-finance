@@ -16,6 +16,7 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import NewArticle from "./pages/NewArticle";
 import NewPodcast from "./pages/NewPodcast";
+import NewIndice from "./pages/NewIndice";
 import Analytics from "./pages/Analytics";
 import Moderation from "./pages/Moderation";
 import Settings from "./pages/Settings";
