@@ -328,7 +328,11 @@ export default function Index() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-4 gap-8">
             <div>
-              <h3 className="text-2xl font-bold mb-4">Amani</h3>
+              <img
+                src="https://cdn.builder.io/api/v1/image/assets%2Fa7441c9084eb43e6855cf7e960c5c609%2F6ebebc1a91e8447db48a68aa5b391a28?format=webp&width=800"
+                alt="Amani"
+                className="h-12 w-auto mb-4 brightness-0 invert"
+              />
               <p className="text-gray-300 mb-4">
                 Votre source d'information économique pour le Sahel et le Tchad.
               </p>
