@@ -402,18 +402,59 @@ export default function Users() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div className="flex items-center gap-2 justify-end">
-                          <button className="text-amani-primary hover:text-amani-primary/80">
+                          <button
+                            onClick={() => handleViewUser(u.id)}
+                            className="text-amani-primary hover:text-amani-primary/80 p-1 rounded hover:bg-amani-secondary/20 transition-colors"
+                            title="Voir les détails"
+                          >
                             <Eye className="w-4 h-4" />
                           </button>
-                          <button className="text-blue-600 hover:text-blue-800">
+                          <button
+                            onClick={() => handleEditUser(u.id)}
+                            className="text-blue-600 hover:text-blue-800 p-1 rounded hover:bg-blue-50 transition-colors"
+                            title="Modifier l'utilisateur"
+                          >
                             <Edit className="w-4 h-4" />
                           </button>
-                          <button className="text-red-600 hover:text-red-800">
+                          <button
+                            onClick={() => handleDeleteUser(u.id)}
+                            className="text-red-600 hover:text-red-800 p-1 rounded hover:bg-red-50 transition-colors"
+                            title="Supprimer l'utilisateur"
+                          >
                             <Trash2 className="w-4 h-4" />
                           </button>
-                          <button className="text-gray-600 hover:text-gray-800">
-                            <MoreHorizontal className="w-4 h-4" />
-                          </button>
+                          <div className="relative group">
+                            <button className="text-gray-600 hover:text-gray-800 p-1 rounded hover:bg-gray-50 transition-colors">
+                              <MoreHorizontal className="w-4 h-4" />
+                            </button>
+                            {/* Dropdown menu */}
+                            <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+                              <button
+                                onClick={() => handleSendPasswordReset(u.id)}
+                                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                              >
+                                Réinitialiser le mot de passe
+                              </button>
+                              <button
+                                onClick={() =>
+                                  alert(`Envoyer un message à ${u.email}`)
+                                }
+                                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                              >
+                                Envoyer un message
+                              </button>
+                              <button
+                                onClick={() =>
+                                  alert(
+                                    `Suspendre le compte de ${u.firstName} ${u.lastName}`,
+                                  )
+                                }
+                                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                              >
+                                Suspendre le compte
+                              </button>
+                            </div>
+                          </div>
                         </div>
                       </td>
                     </tr>
