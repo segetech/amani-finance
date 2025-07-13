@@ -25,8 +25,6 @@ export default function NewUser() {
     firstName: "",
     lastName: "",
     email: "",
-    password: "",
-    confirmPassword: "",
     role: "visiteur",
     organization: "",
     country: "",
@@ -35,6 +33,8 @@ export default function NewUser() {
     newsletter: false,
     alerts: false,
     sendWelcomeEmail: true,
+    passwordMethod: "email", // "email" or "generate"
+    generatedPassword: "",
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
