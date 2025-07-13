@@ -288,8 +288,43 @@ export default function Index() {
         </div>
       </section>
 
+      {/* Awards/Recognition Section */}
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl lg:text-4xl font-bold text-amani-primary mb-4">
+              Reconnaissance et partenaires
+            </h2>
+            <p className="text-gray-600 text-lg max-w-3xl mx-auto">
+              Amani est reconnu par les institutions économiques régionales
+            </p>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {[
+              { name: "BCEAO", desc: "Partenaire officiel" },
+              { name: "BAD", desc: "Source de données" },
+              { name: "CEDEAO", desc: "Collaboration" },
+              { name: "UEMOA", desc: "Analyses partagées" },
+            ].map((partner, index) => (
+              <div
+                key={index}
+                className="bg-white p-6 rounded-xl shadow-lg text-center hover:shadow-xl transition-shadow border border-white/50"
+              >
+                <div className="w-12 h-12 bg-gradient-to-br from-amani-primary to-amani-primary/80 rounded-lg flex items-center justify-center mx-auto mb-4">
+                  <Award className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="font-bold text-amani-primary mb-1">
+                  {partner.name}
+                </h3>
+                <p className="text-sm text-gray-600">{partner.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
-      <footer className="bg-amani-primary text-white py-12">
+      <footer className="bg-amani-primary text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-4 gap-8">
             <div>
