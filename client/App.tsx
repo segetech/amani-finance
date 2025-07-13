@@ -35,21 +35,23 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <AuthProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Navigation />
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/article/:id" element={<Article />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/dashboard/articles/new" element={<NewArticle />} />
-            <Route path="/dashboard/users" element={<Users />} />
-            <Route path="/dashboard/users/new" element={<NewUser />} />
-            <Route path="/marche" element={<Marche />} />
+            <AuthProvider>
+        <ToastProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Navigation />
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/article/:id" element={<Article />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/dashboard/articles/new" element={<NewArticle />} />
+              <Route path="/dashboard/users" element={<Users />} />
+              <Route path="/dashboard/users/new" element={<NewUser />} />
+              <Route path="/dashboard/users/edit/:userId" element={<EditUser />} />
+              <Route path="/marche" element={<Marche />} />
             <Route path="/economie" element={<Economie />} />
             <Route path="/economie/news" element={<EconomieNews />} />
             <Route path="/industrie" element={<Industrie />} />
