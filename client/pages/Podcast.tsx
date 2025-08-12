@@ -339,13 +339,10 @@ export default function Podcast() {
                           {currentlyPlaying === podcast.id ? "Pause" : "Écouter"}
                         </button>
                         
-                        <button className="p-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
-                          <Download className="w-4 h-4" />
-                        </button>
-                        
-                        <button className="p-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
-                          <Share2 className="w-4 h-4" />
-                        </button>
+                        <SocialShare
+                          title={podcast.title}
+                          description={podcast.description}
+                        />
                       </div>
                     </div>
                   </div>
