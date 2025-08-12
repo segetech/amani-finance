@@ -86,6 +86,12 @@ export default function DashboardSidebar() {
       key: "content",
       items: [
         {
+          label: "Gestion de Contenu",
+          path: "/dashboard/content-management",
+          icon: FolderOpen,
+          permission: "create_articles",
+        },
+        {
           label: "Articles",
           path: "/dashboard/articles",
           icon: FileText,
@@ -176,7 +182,7 @@ export default function DashboardSidebar() {
       key: "moderation",
       items: [
         {
-          label: "Centre de modération",
+          label: "Centre de mod��ration",
           path: "/dashboard/moderation",
           icon: Shield,
           permission: "moderate_comments",
