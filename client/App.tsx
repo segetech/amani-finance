@@ -52,6 +52,7 @@ import Indices from "./pages/Indices";
 import NotFound from "./pages/NotFound";
 import ContentManagement from "./pages/ContentManagement";
 import TasksPermissions from "./pages/TasksPermissions";
+import ConditionalFooter from "./components/ConditionalFooter";
 
 const queryClient = new QueryClient();
 
