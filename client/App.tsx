@@ -26,6 +26,7 @@ import Settings from "./pages/Settings";
 import Profile from "./pages/Profile";
 import PermissionsManager from "./pages/PermissionsManager";
 import Users from "./pages/Users";
+import UserActivity from "./pages/UserActivity";
 import NewUser from "./pages/NewUser";
 import NewUserAdvanced from "./pages/NewUserAdvanced";
 import EditUser from "./pages/EditUser";
