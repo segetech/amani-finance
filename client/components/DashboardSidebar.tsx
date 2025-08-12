@@ -324,7 +324,7 @@ export default function DashboardSidebar() {
   };
 
   return (
-    <div className="w-64 bg-white h-full shadow-lg border-r border-gray-200 flex flex-col">
+    <div className="w-64 bg-white h-screen sticky top-0 shadow-lg border-r border-gray-200 flex flex-col">
       {/* Header */}
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center gap-3">
