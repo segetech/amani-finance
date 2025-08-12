@@ -79,6 +79,7 @@ const App = () => (
               <Route path="/dashboard/user-activity" element={<UserActivity />} />
               <Route path="/dashboard/reports" element={<ReportsManager />} />
               <Route path="/dashboard/organizations" element={<Organizations />} />
+              <Route path="/dashboard/integrations" element={<Integrations />} />
               <Route
                 path="/dashboard/users/edit/:userId"
                 element={<EditUser />}
