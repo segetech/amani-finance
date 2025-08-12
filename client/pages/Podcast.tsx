@@ -321,8 +321,8 @@ export default function Podcast() {
                           {podcast.plays.toLocaleString()}
                         </span>
                         <span className="flex items-center gap-1">
-                          <Download className="w-4 h-4" />
-                          {podcast.downloads.toLocaleString()}
+                          <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                          {podcast.rating}
                         </span>
                       </div>
                       
