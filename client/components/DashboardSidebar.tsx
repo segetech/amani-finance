@@ -45,6 +45,11 @@ export default function DashboardSidebar() {
     "analytics",
   ]);
 
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
   const toggleSection = (section: string) => {
     setExpandedSections((prev) =>
       prev.includes(section)
