@@ -50,6 +50,8 @@ import About from "./pages/About";
 import Newsletter from "./pages/Newsletter";
 import Indices from "./pages/Indices";
 import NotFound from "./pages/NotFound";
+import ContentManagement from "./pages/ContentManagement";
+import TasksPermissions from "./pages/TasksPermissions";
 
 const queryClient = new QueryClient();
 
