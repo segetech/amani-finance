@@ -410,36 +410,142 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Newsletter Section */}
-      <section className="py-20 bg-[#E5DDD5]">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="bg-white rounded-3xl p-12 shadow-xl">
-            <Bell className="w-16 h-16 text-[#373B3A] mx-auto mb-6" />
-            <h2 className="text-3xl font-bold text-[#373B3A] mb-6">
-              Restez Informé
-            </h2>
-            <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-              Recevez chaque semaine notre newsletter avec les analyses économiques les plus importantes et les opportunités d'investissement
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto mb-6">
-              <input
-                type="email"
-                placeholder="Votre adresse email"
-                className="flex-1 px-6 py-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#373B3A] focus:border-transparent text-lg"
+      {/* Footer */}
+      <footer className="bg-amani-primary text-white py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-4 gap-8">
+            <div>
+              <img
+                src="https://cdn.builder.io/api/v1/image/assets%2Fa7441c9084eb43e6855cf7e960c5c609%2F6ebebc1a91e8447db48a68aa5b391a28?format=webp&width=800"
+                alt="Amani"
+                className="h-12 w-auto mb-4 brightness-0 invert"
               />
-              <button className="px-8 py-4 bg-[#373B3A] text-white rounded-xl hover:bg-gray-700 transition-colors font-semibold text-lg">
-                S'abonner
-              </button>
+              <p className="text-gray-300 mb-4">
+                Votre source d'information économique pour l'Afrique de l'Ouest et le Mali.
+              </p>
+              <div className="flex gap-4">
+                <a
+                  href="#"
+                  className="text-gray-300 hover:text-white transition-colors"
+                >
+                  <Facebook className="w-5 h-5" />
+                </a>
+                <a
+                  href="#"
+                  className="text-gray-300 hover:text-white transition-colors"
+                >
+                  <Twitter className="w-5 h-5" />
+                </a>
+                <a
+                  href="#"
+                  className="text-gray-300 hover:text-white transition-colors"
+                >
+                  <Linkedin className="w-5 h-5" />
+                </a>
+                <a
+                  href="#"
+                  className="text-gray-300 hover:text-white transition-colors"
+                >
+                  <Youtube className="w-5 h-5" />
+                </a>
+              </div>
             </div>
-
-            <p className="text-sm text-gray-500">
-              Pas de spam, désabonnement possible à tout moment.
-              Plus de 10,000 professionnels nous font déjà confiance.
+            <div>
+              <h4 className="font-semibold mb-4">Navigation</h4>
+              <ul className="space-y-2 text-gray-300">
+                <li>
+                  <Link to="/marche" className="hover:text-white">
+                    Marché
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/economie" className="hover:text-white">
+                    Économie
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/industrie" className="hover:text-white">
+                    Industrie
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/investissement" className="hover:text-white">
+                    Investissement
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Contenu</h4>
+              <ul className="space-y-2 text-gray-300">
+                <li>
+                  <Link to="/insights" className="hover:text-white">
+                    Insights
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/tech" className="hover:text-white">
+                    Tech
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/podcast" className="hover:text-white">
+                    Podcast
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/indices" className="hover:text-white">
+                    Indices
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Contact</h4>
+              <ul className="space-y-2 text-gray-300">
+                <li className="flex items-center gap-2">
+                  <MapPin className="w-4 h-4" />
+                  <span>Faladie, Bamako, Mali</span>
+                </li>
+                <li>
+                  <a href="mailto:info@amani-finance.com" className="hover:text-white flex items-center gap-2">
+                    📧 info@amani-finance.com
+                  </a>
+                </li>
+                <li>
+                  <a href="tel:+22320224567" className="hover:text-white flex items-center gap-2">
+                    📞 +223 20 22 45 67
+                  </a>
+                </li>
+                <li>
+                  <Link to="/newsletter" className="hover:text-white">
+                    Newsletter
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/about" className="hover:text-white">
+                    À propos
+                  </Link>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-white/20 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center text-gray-300">
+            <p>&copy; 2025 Amani Finance. Tous droits réservés.</p>
+            <p className="flex items-center gap-1 mt-2 md:mt-0">
+              Créé avec <Heart className="w-4 h-4 text-red-500 fill-current" /> par
+              <a
+                href="https://www.aikio.co"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white hover:text-gray-200 font-medium ml-1 transition-colors"
+              >
+                Aikio Corp SAS
+              </a>
             </p>
           </div>
         </div>
-      </section>
+      </footer>
 
     </div>
   );
