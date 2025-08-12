@@ -91,6 +91,9 @@ const App = () => (
                 element={<UserActivity />}
               />
               <Route path="/dashboard/reports" element={<ReportsManager />} />
+              <Route path="/dashboard/banned-users" element={<BannedUsers />} />
+              <Route path="/dashboard/notifications" element={<Notifications />} />
+              <Route path="/dashboard/logs" element={<Logs />} />
               <Route
                 path="/dashboard/integrations"
                 element={<Integrations />}
