@@ -217,12 +217,6 @@ export default function DashboardSidebar() {
           icon: Shield,
           permission: "manage_permissions",
         },
-        {
-          label: "Organisations",
-          path: "/dashboard/organizations",
-          icon: Building,
-          permission: "system_settings",
-        },
       ],
     },
     {
