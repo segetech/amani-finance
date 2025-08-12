@@ -198,15 +198,10 @@ export default function Podcast() {
                     {currentlyPlaying === featuredPodcast.id ? "Pause" : "Écouter"}
                   </button>
                   
-                  <button className="flex items-center gap-2 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
-                    <Download className="w-4 h-4" />
-                    Télécharger
-                  </button>
-                  
-                  <button className="flex items-center gap-2 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
-                    <Share2 className="w-4 h-4" />
-                    Partager
-                  </button>
+                  <SocialShare
+                    title={featuredPodcast.title}
+                    description={featuredPodcast.description}
+                  />
                 </div>
               </div>
             </div>
