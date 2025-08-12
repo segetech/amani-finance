@@ -87,10 +87,6 @@ const App = () => (
               />
               <Route path="/dashboard/reports" element={<ReportsManager />} />
               <Route
-                path="/dashboard/organizations"
-                element={<Organizations />}
-              />
-              <Route
                 path="/dashboard/integrations"
                 element={<Integrations />}
               />
