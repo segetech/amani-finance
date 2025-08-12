@@ -287,27 +287,7 @@ export default function Index() {
           <h2 className="text-3xl font-bold text-amani-primary mb-8 text-center">
             Carte interactive du Sahel & Tchad
           </h2>
-          <div className="bg-white rounded-lg shadow-md p-8">
-            <div className="bg-gray-100 h-96 rounded-lg flex items-center justify-center">
-              <div className="text-center">
-                <MapPin className="w-16 h-16 text-amani-primary mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-amani-primary mb-2">
-                  Carte interactive
-                </h3>
-                <p className="text-gray-600 max-w-md">
-                  Explorez les données économiques par pays : Mali, Burkina
-                  Faso, Niger, Mauritanie, Tchad et plus. Cliquez sur un pays
-                  pour voir les dernières actualités et indicateurs économiques.
-                </p>
-                <button
-                  onClick={() => document.getElementById('interactive-map')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="mt-4 bg-amani-primary text-white px-6 py-2 rounded-lg hover:bg-amani-primary/90 transition-colors"
-                >
-                  Explorer la carte
-                </button>
-              </div>
-            </div>
-          </div>
+          <InteractiveMap />
         </div>
       </section>
 
