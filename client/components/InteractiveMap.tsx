@@ -14,19 +14,8 @@ const InteractiveMap = () => {
       capital: 'Bamako',
       color: '#E5DDD5',
       hoverColor: '#D4C7BC',
-      position: { x: 45, y: 35 },
+      position: { x: 35, y: 40 },
       industries: ['Or', 'Coton', 'Agriculture']
-    },
-    senegal: {
-      name: 'Sénégal',
-      gdp: '27.7B $',
-      population: '17.2M',
-      growth: '+6.2%',
-      capital: 'Dakar',
-      color: '#C5B8AB',
-      hoverColor: '#B5A79A',
-      position: { x: 25, y: 45 },
-      industries: ['Phosphates', 'Pêche', 'Tourisme']
     },
     burkina: {
       name: 'Burkina Faso',
@@ -34,32 +23,43 @@ const InteractiveMap = () => {
       population: '22.7M',
       growth: '+4.8%',
       capital: 'Ouagadougou',
-      color: '#A69B8E',
-      hoverColor: '#968B7E',
-      position: { x: 55, y: 42 },
+      color: '#C5B8AB',
+      hoverColor: '#B5A79A',
+      position: { x: 50, y: 45 },
       industries: ['Or', 'Coton', 'Élevage']
     },
-    cote: {
-      name: 'Côte d\'Ivoire',
-      gdp: '71.0B $',
-      population: '28.2M',
-      growth: '+7.4%',
-      capital: 'Abidjan',
+    niger: {
+      name: 'Niger',
+      gdp: '14.9B $',
+      population: '25.3M',
+      growth: '+3.2%',
+      capital: 'Niamey',
+      color: '#A69B8E',
+      hoverColor: '#968B7E',
+      position: { x: 65, y: 35 },
+      industries: ['Uranium', 'Élevage', 'Agriculture']
+    },
+    mauritanie: {
+      name: 'Mauritanie',
+      gdp: '8.1B $',
+      population: '4.8M',
+      growth: '+4.1%',
+      capital: 'Nouakchott',
       color: '#8B7F72',
       hoverColor: '#7B6F62',
-      position: { x: 40, y: 55 },
-      industries: ['Cacao', 'Café', 'Pétrole']
+      position: { x: 20, y: 25 },
+      industries: ['Fer', 'Pêche', 'Élevage']
     },
-    ghana: {
-      name: 'Ghana',
-      gdp: '75.5B $',
-      population: '32.8M',
-      growth: '+5.7%',
-      capital: 'Accra',
+    tchad: {
+      name: 'Tchad',
+      gdp: '12.9B $',
+      population: '17.2M',
+      growth: '+2.8%',
+      capital: 'N\'Djamena',
       color: '#6F6356',
       hoverColor: '#5F5346',
-      position: { x: 55, y: 58 },
-      industries: ['Or', 'Cacao', 'Pétrole']
+      position: { x: 75, y: 50 },
+      industries: ['Pétrole', 'Coton', 'Élevage']
     }
   };
 
