@@ -68,40 +68,40 @@ const App = () => (
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/dashboard" element={<ProtectedRoute><DashboardMain /></ProtectedRoute>} />
-              <Route path="/dashboard/articles" element={<Articles />} />
-              <Route path="/dashboard/articles/new" element={<NewArticle />} />
-              <Route path="/dashboard/podcasts" element={<PodcastsManager />} />
-              <Route path="/dashboard/podcasts/new" element={<NewPodcast />} />
-              <Route path="/dashboard/indices" element={<IndicesManager />} />
-              <Route path="/dashboard/indices/new" element={<NewIndice />} />
-              <Route path="/dashboard/analytics" element={<Analytics />} />
-              <Route path="/dashboard/moderation" element={<Moderation />} />
-              <Route path="/dashboard/settings" element={<Settings />} />
-              <Route path="/dashboard/profile" element={<Profile />} />
+              <Route path="/dashboard/articles" element={<ProtectedRoute><Articles /></ProtectedRoute>} />
+              <Route path="/dashboard/articles/new" element={<ProtectedRoute><NewArticle /></ProtectedRoute>} />
+              <Route path="/dashboard/podcasts" element={<ProtectedRoute><PodcastsManager /></ProtectedRoute>} />
+              <Route path="/dashboard/podcasts/new" element={<ProtectedRoute><NewPodcast /></ProtectedRoute>} />
+              <Route path="/dashboard/indices" element={<ProtectedRoute><IndicesManager /></ProtectedRoute>} />
+              <Route path="/dashboard/indices/new" element={<ProtectedRoute><NewIndice /></ProtectedRoute>} />
+              <Route path="/dashboard/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+              <Route path="/dashboard/moderation" element={<ProtectedRoute><Moderation /></ProtectedRoute>} />
+              <Route path="/dashboard/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+              <Route path="/dashboard/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
               <Route
                 path="/dashboard/permissions"
-                element={<PermissionsManager />}
+                element={<ProtectedRoute><PermissionsManager /></ProtectedRoute>}
               />
-              <Route path="/dashboard/users" element={<Users />} />
+              <Route path="/dashboard/users" element={<ProtectedRoute><Users /></ProtectedRoute>} />
               <Route
                 path="/dashboard/users/new"
-                element={<NewUserAdvanced />}
+                element={<ProtectedRoute><NewUserAdvanced /></ProtectedRoute>}
               />
               <Route
                 path="/dashboard/user-activity"
-                element={<UserActivity />}
+                element={<ProtectedRoute><UserActivity /></ProtectedRoute>}
               />
-              <Route path="/dashboard/reports" element={<ReportsManager />} />
-              <Route path="/dashboard/banned-users" element={<BannedUsers />} />
-              <Route path="/dashboard/notifications" element={<Notifications />} />
-              <Route path="/dashboard/logs" element={<Logs />} />
+              <Route path="/dashboard/reports" element={<ProtectedRoute><ReportsManager /></ProtectedRoute>} />
+              <Route path="/dashboard/banned-users" element={<ProtectedRoute><BannedUsers /></ProtectedRoute>} />
+              <Route path="/dashboard/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
+              <Route path="/dashboard/logs" element={<ProtectedRoute><Logs /></ProtectedRoute>} />
               <Route
                 path="/dashboard/integrations"
-                element={<Integrations />}
+                element={<ProtectedRoute><Integrations /></ProtectedRoute>}
               />
               <Route
                 path="/dashboard/users/edit/:userId"
-                element={<EditUser />}
+                element={<ProtectedRoute><EditUser /></ProtectedRoute>}
               />
               <Route path="/marche" element={<Marche />} />
               <Route path="/economie" element={<Economie />} />
