@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import DashboardLayout from "../components/DashboardLayout";
 import {
   BarChart3,
   Users,
@@ -10,7 +11,6 @@ import {
   Calendar,
   Download,
   Filter,
-  ArrowLeft,
   Activity,
   Globe,
   PieChart,
@@ -24,23 +24,28 @@ export default function Analytics() {
   // Check permissions
   if (!user || !hasPermission("view_analytics")) {
     return (
-      <div className="min-h-screen bg-[#E5DDD2] flex items-center justify-center">
-        <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md">
-          <h2 className="text-2xl font-bold text-amani-primary mb-4">
-            Accès refusé
-          </h2>
-          <p className="text-gray-600 mb-6">
-            Vous n'avez pas les permissions nécessaires pour accéder aux
-            analyses.
-          </p>
-          <Link
-            to="/dashboard"
-            className="bg-amani-primary text-white px-6 py-2 rounded-lg hover:bg-amani-primary/90 transition-colors"
-          >
-            Retour au tableau de bord
-          </Link>
+      <DashboardLayout
+        title="Accès refusé"
+        subtitle="Vous n'avez pas les permissions nécessaires"
+      >
+        <div className="flex items-center justify-center py-12">
+          <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md">
+            <h2 className="text-2xl font-bold text-amani-primary mb-4">
+              Accès refusé
+            </h2>
+            <p className="text-gray-600 mb-6">
+              Vous n'avez pas les permissions nécessaires pour accéder aux
+              analyses.
+            </p>
+            <Link
+              to="/dashboard"
+              className="bg-amani-primary text-white px-6 py-2 rounded-lg hover:bg-amani-primary/90 transition-colors"
+            >
+              Retour au tableau de bord
+            </Link>
+          </div>
         </div>
-      </div>
+      </DashboardLayout>
     );
   }
 
@@ -117,51 +122,34 @@ export default function Analytics() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#E5DDD2]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <Link
-            to="/dashboard"
-            className="inline-flex items-center gap-2 text-amani-primary hover:text-amani-primary/80 mb-4"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Retour au tableau de bord
-          </Link>
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-            <div>
-              <h1 className="text-4xl font-bold text-amani-primary mb-2">
-                Analytics & Statistiques
-              </h1>
-              <p className="text-gray-600">
-                Analysez les performances de votre contenu et l'engagement des
-                utilisateurs
-              </p>
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <Filter className="w-4 h-4 text-gray-500" />
-                <select
-                  value={timeRange}
-                  onChange={(e) => setTimeRange(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
-                >
-                  <option value="7">7 derniers jours</option>
-                  <option value="30">30 derniers jours</option>
-                  <option value="90">90 derniers jours</option>
-                  <option value="365">1 an</option>
-                </select>
-              </div>
-              <button className="flex items-center gap-2 px-4 py-2 bg-amani-primary text-white rounded-lg hover:bg-amani-primary/90 transition-colors">
-                <Download className="w-4 h-4" />
-                Exporter
-              </button>
-            </div>
+    <DashboardLayout
+      title="Analytics & Statistiques"
+      subtitle="Analysez les performances de votre contenu et l'engagement des utilisateurs"
+      actions={
+        <>
+          <div className="flex items-center gap-2">
+            <Filter className="w-4 h-4 text-gray-500" />
+            <select
+              value={timeRange}
+              onChange={(e) => setTimeRange(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
+            >
+              <option value="7">7 derniers jours</option>
+              <option value="30">30 derniers jours</option>
+              <option value="90">90 derniers jours</option>
+              <option value="365">1 an</option>
+            </select>
           </div>
-        </div>
-
+          <button className="flex items-center gap-2 px-4 py-2 bg-amani-primary text-white rounded-lg hover:bg-amani-primary/90 transition-colors">
+            <Download className="w-4 h-4" />
+            Exporter
+          </button>
+        </>
+      }
+    >
+      <div className="space-y-8">
         {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {stats.map((stat, index) => (
             <div
               key={index}
@@ -265,116 +253,112 @@ export default function Analytics() {
         </div>
 
         {/* Top Articles */}
-        <div className="mt-8">
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-white/50">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
-                <FileText className="w-6 h-6 text-amani-primary" />
-                <h2 className="text-xl font-semibold text-amani-primary">
-                  Articles les plus populaires
-                </h2>
-              </div>
-              <Link
-                to="/dashboard/articles"
-                className="text-amani-primary hover:text-amani-primary/80 text-sm font-medium"
-              >
-                Voir tous les articles →
-              </Link>
+        <div className="bg-white rounded-2xl shadow-lg p-6 border border-white/50">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <FileText className="w-6 h-6 text-amani-primary" />
+              <h2 className="text-xl font-semibold text-amani-primary">
+                Articles les plus populaires
+              </h2>
             </div>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="text-left py-3 px-4 font-medium text-gray-700">
-                      Article
-                    </th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-700">
-                      Catégorie
-                    </th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-700">
-                      Vues
-                    </th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-700">
-                      Engagement
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {topArticles.map((article, index) => (
-                    <tr key={index} className="border-b border-gray-100">
-                      <td className="py-3 px-4">
-                        <div className="font-medium text-gray-900">
-                          {article.title}
+            <Link
+              to="/dashboard/articles"
+              className="text-amani-primary hover:text-amani-primary/80 text-sm font-medium"
+            >
+              Voir tous les articles →
+            </Link>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-200">
+                  <th className="text-left py-3 px-4 font-medium text-gray-700">
+                    Article
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-700">
+                    Catégorie
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-700">
+                    Vues
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-700">
+                    Engagement
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {topArticles.map((article, index) => (
+                  <tr key={index} className="border-b border-gray-100">
+                    <td className="py-3 px-4">
+                      <div className="font-medium text-gray-900">
+                        {article.title}
+                      </div>
+                    </td>
+                    <td className="py-3 px-4">
+                      <span className="px-2 py-1 bg-amani-secondary/20 text-amani-primary rounded-full text-xs">
+                        {article.category}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 text-gray-600">
+                      {article.views}
+                    </td>
+                    <td className="py-3 px-4">
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 bg-gray-200 rounded-full h-2">
+                          <div
+                            className="bg-green-500 h-2 rounded-full"
+                            style={{ width: article.engagement }}
+                          ></div>
                         </div>
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className="px-2 py-1 bg-amani-secondary/20 text-amani-primary rounded-full text-xs">
-                          {article.category}
+                        <span className="text-sm text-gray-600">
+                          {article.engagement}
                         </span>
-                      </td>
-                      <td className="py-3 px-4 text-gray-600">
-                        {article.views}
-                      </td>
-                      <td className="py-3 px-4">
-                        <div className="flex items-center gap-2">
-                          <div className="flex-1 bg-gray-200 rounded-full h-2">
-                            <div
-                              className="bg-green-500 h-2 rounded-full"
-                              style={{ width: article.engagement }}
-                            ></div>
-                          </div>
-                          <span className="text-sm text-gray-600">
-                            {article.engagement}
-                          </span>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
 
         {/* Real-time Activity */}
-        <div className="mt-8">
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-white/50">
-            <div className="flex items-center gap-3 mb-6">
-              <Activity className="w-6 h-6 text-amani-primary" />
-              <h2 className="text-xl font-semibold text-amani-primary">
-                Activité en temps réel
-              </h2>
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+        <div className="bg-white rounded-2xl shadow-lg p-6 border border-white/50">
+          <div className="flex items-center gap-3 mb-6">
+            <Activity className="w-6 h-6 text-amani-primary" />
+            <h2 className="text-xl font-semibold text-amani-primary">
+              Activité en temps réel
+            </h2>
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-amani-primary mb-2">
+                47
+              </div>
+              <div className="text-sm text-gray-600">
+                Utilisateurs connectés maintenant
+              </div>
             </div>
-            <div className="grid md:grid-cols-3 gap-6">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-amani-primary mb-2">
-                  47
-                </div>
-                <div className="text-sm text-gray-600">
-                  Utilisateurs connectés maintenant
-                </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-amani-primary mb-2">
+                12
               </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-amani-primary mb-2">
-                  12
-                </div>
-                <div className="text-sm text-gray-600">
-                  Articles lus cette heure
-                </div>
+              <div className="text-sm text-gray-600">
+                Articles lus cette heure
               </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-amani-primary mb-2">
-                  3
-                </div>
-                <div className="text-sm text-gray-600">
-                  Nouveaux abonnements
-                </div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-amani-primary mb-2">
+                3
+              </div>
+              <div className="text-sm text-gray-600">
+                Nouveaux abonnements
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }
