@@ -39,7 +39,10 @@ export default function IndicesManager() {
   const [selectedIndices, setSelectedIndices] = useState<string[]>([]);
 
   // Check permissions
-  if (!user || (!hasPermission("view_indices") && !hasPermission("create_indices"))) {
+  if (
+    !user ||
+    (!hasPermission("view_indices") && !hasPermission("create_indices"))
+  ) {
     return (
       <DashboardLayout title="Accès refusé">
         <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md mx-auto">
@@ -47,7 +50,8 @@ export default function IndicesManager() {
             Accès refusé
           </h2>
           <p className="text-gray-600 mb-6">
-            Vous n'avez pas les permissions nécessaires pour gérer les indices économiques.
+            Vous n'avez pas les permissions nécessaires pour gérer les indices
+            économiques.
           </p>
         </div>
       </DashboardLayout>
@@ -73,12 +77,13 @@ export default function IndicesManager() {
       source: "BCEAO",
       status: "published",
       isPublic: true,
-      description: "Taux directeur de la Banque Centrale des États de l'Afrique de l'Ouest",
+      description:
+        "Taux directeur de la Banque Centrale des États de l'Afrique de l'Ouest",
       views: 12450,
       subscribers: 890,
     },
     {
-      id: "2", 
+      id: "2",
       name: "BRVM Composite",
       code: "BRVM_COMP",
       category: "market",
@@ -94,7 +99,8 @@ export default function IndicesManager() {
       source: "BRVM",
       status: "published",
       isPublic: true,
-      description: "Indice composite de la Bourse Régionale des Valeurs Mobilières",
+      description:
+        "Indice composite de la Bourse Régionale des Valeurs Mobilières",
       views: 8920,
       subscribers: 1250,
     },
@@ -165,11 +171,11 @@ export default function IndicesManager() {
 
   const stats = {
     total: indices.length,
-    published: indices.filter(i => i.status === "published").length,
-    draft: indices.filter(i => i.status === "draft").length,
+    published: indices.filter((i) => i.status === "published").length,
+    draft: indices.filter((i) => i.status === "draft").length,
     totalViews: indices.reduce((sum, i) => sum + i.views, 0),
     totalSubscribers: indices.reduce((sum, i) => sum + i.subscribers, 0),
-    upTrending: indices.filter(i => i.changeDirection === "up").length,
+    upTrending: indices.filter((i) => i.changeDirection === "up").length,
   };
 
   const categories = [
@@ -196,18 +202,18 @@ export default function IndicesManager() {
   ];
 
   const handleIndiceSelect = (indiceId: string) => {
-    setSelectedIndices(prev => 
+    setSelectedIndices((prev) =>
       prev.includes(indiceId)
-        ? prev.filter(id => id !== indiceId)
-        : [...prev, indiceId]
+        ? prev.filter((id) => id !== indiceId)
+        : [...prev, indiceId],
     );
   };
 
   const handleSelectAll = () => {
     setSelectedIndices(
-      selectedIndices.length === filteredIndices.length 
-        ? [] 
-        : filteredIndices.map(i => i.id)
+      selectedIndices.length === filteredIndices.length
+        ? []
+        : filteredIndices.map((i) => i.id),
     );
   };
 
@@ -218,20 +224,32 @@ export default function IndicesManager() {
     }
 
     // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     switch (action) {
       case "publish":
-        success("Indices publiés", `${selectedIndices.length} indice(s) publié(s)`);
+        success(
+          "Indices publiés",
+          `${selectedIndices.length} indice(s) publié(s)`,
+        );
         break;
       case "unpublish":
-        warning("Indices dépubliés", `${selectedIndices.length} indice(s) dépublié(s)`);
+        warning(
+          "Indices dépubliés",
+          `${selectedIndices.length} indice(s) dépublié(s)`,
+        );
         break;
       case "export":
-        success("Export réussi", `${selectedIndices.length} indice(s) exporté(s)`);
+        success(
+          "Export réussi",
+          `${selectedIndices.length} indice(s) exporté(s)`,
+        );
         break;
       case "delete":
-        error("Indices supprimés", `${selectedIndices.length} indice(s) supprimé(s)`);
+        error(
+          "Indices supprimés",
+          `${selectedIndices.length} indice(s) supprimé(s)`,
+        );
         break;
     }
     setSelectedIndices([]);
@@ -239,23 +257,30 @@ export default function IndicesManager() {
 
   const handleDeleteIndice = async (indiceId: string) => {
     if (confirm("Êtes-vous sûr de vouloir supprimer cet indice ?")) {
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
       error("Indice supprimé", "L'indice a été supprimé avec succès");
     }
   };
 
   const handleUpdateIndice = async (indiceId: string) => {
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    success("Indice mis à jour", "L'indice a été actualisé avec les dernières données");
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    success(
+      "Indice mis à jour",
+      "L'indice a été actualisé avec les dernières données",
+    );
   };
 
-  const filteredIndices = indices.filter(indice => {
-    const matchesSearch = indice.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         indice.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         indice.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = filterCategory === "all" || indice.category === filterCategory;
-    const matchesCountry = filterCountry === "all" || indice.country === filterCountry;
-    const matchesStatus = filterStatus === "all" || indice.status === filterStatus;
+  const filteredIndices = indices.filter((indice) => {
+    const matchesSearch =
+      indice.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      indice.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      indice.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory =
+      filterCategory === "all" || indice.category === filterCategory;
+    const matchesCountry =
+      filterCountry === "all" || indice.country === filterCountry;
+    const matchesStatus =
+      filterStatus === "all" || indice.status === filterStatus;
     return matchesSearch && matchesCategory && matchesCountry && matchesStatus;
   });
 
@@ -293,11 +318,11 @@ export default function IndicesManager() {
   };
 
   const getCategoryLabel = (category: string) => {
-    return categories.find(c => c.value === category)?.label || category;
+    return categories.find((c) => c.value === category)?.label || category;
   };
 
   const getCountryLabel = (country: string) => {
-    return countries.find(c => c.value === country)?.label || country;
+    return countries.find((c) => c.value === country)?.label || country;
   };
 
   return (
@@ -390,8 +415,10 @@ export default function IndicesManager() {
                   className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
                 >
                   <option value="all">Toutes les catégories</option>
-                  {categories.map(category => (
-                    <option key={category.value} value={category.value}>{category.label}</option>
+                  {categories.map((category) => (
+                    <option key={category.value} value={category.value}>
+                      {category.label}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -401,8 +428,10 @@ export default function IndicesManager() {
                 className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
               >
                 <option value="all">Tous les pays</option>
-                {countries.map(country => (
-                  <option key={country.value} value={country.value}>{country.label}</option>
+                {countries.map((country) => (
+                  <option key={country.value} value={country.value}>
+                    {country.label}
+                  </option>
                 ))}
               </select>
               <select
@@ -474,7 +503,10 @@ export default function IndicesManager() {
                 <label className="flex items-center gap-2 text-sm">
                   <input
                     type="checkbox"
-                    checked={selectedIndices.length === filteredIndices.length && filteredIndices.length > 0}
+                    checked={
+                      selectedIndices.length === filteredIndices.length &&
+                      filteredIndices.length > 0
+                    }
                     onChange={handleSelectAll}
                     className="h-4 w-4 text-amani-primary focus:ring-amani-primary border-gray-300 rounded"
                   />
@@ -486,7 +518,10 @@ export default function IndicesManager() {
 
           <div className="divide-y divide-gray-200">
             {filteredIndices.map((indice) => (
-              <div key={indice.id} className="p-6 hover:bg-gray-50 transition-colors">
+              <div
+                key={indice.id}
+                className="p-6 hover:bg-gray-50 transition-colors"
+              >
                 <div className="flex items-start gap-4">
                   <input
                     type="checkbox"
@@ -494,7 +529,7 @@ export default function IndicesManager() {
                     onChange={() => handleIndiceSelect(indice.id)}
                     className="mt-2 h-4 w-4 text-amani-primary focus:ring-amani-primary border-gray-300 rounded"
                   />
-                  
+
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between mb-3">
                       <div>
@@ -505,8 +540,12 @@ export default function IndicesManager() {
                           <code className="text-sm bg-gray-100 text-gray-600 px-2 py-1 rounded">
                             {indice.code}
                           </code>
-                          <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(indice.status)}`}>
-                            {indice.status === "published" ? "Publié" : "Brouillon"}
+                          <span
+                            className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(indice.status)}`}
+                          >
+                            {indice.status === "published"
+                              ? "Publié"
+                              : "Brouillon"}
                           </span>
                           {!indice.isPublic && (
                             <span className="px-2 py-1 bg-amber-100 text-amber-800 rounded-full text-xs">
@@ -518,8 +557,10 @@ export default function IndicesManager() {
                           {indice.description}
                         </p>
                       </div>
-                      
-                      <div className={`flex items-center gap-2 px-3 py-2 rounded-lg ${getTrendColor(indice.changeDirection)}`}>
+
+                      <div
+                        className={`flex items-center gap-2 px-3 py-2 rounded-lg ${getTrendColor(indice.changeDirection)}`}
+                      >
                         {getTrendIcon(indice.changeDirection)}
                         <span className="font-bold text-lg">
                           {indice.currentValue}
@@ -527,21 +568,28 @@ export default function IndicesManager() {
                         {indice.unit === "percent" && <span>%</span>}
                       </div>
                     </div>
-                    
+
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                       <div className="text-sm">
                         <span className="text-gray-500">Variation:</span>
-                        <div className={`font-medium ${indice.changeDirection === "up" ? "text-green-600" : indice.changeDirection === "down" ? "text-red-600" : "text-gray-600"}`}>
-                          {indice.changeDirection === "up" ? "+" : ""}{indice.changePercent}%
+                        <div
+                          className={`font-medium ${indice.changeDirection === "up" ? "text-green-600" : indice.changeDirection === "down" ? "text-red-600" : "text-gray-600"}`}
+                        >
+                          {indice.changeDirection === "up" ? "+" : ""}
+                          {indice.changePercent}%
                         </div>
                       </div>
                       <div className="text-sm">
                         <span className="text-gray-500">Catégorie:</span>
-                        <div className="font-medium">{getCategoryLabel(indice.category)}</div>
+                        <div className="font-medium">
+                          {getCategoryLabel(indice.category)}
+                        </div>
                       </div>
                       <div className="text-sm">
                         <span className="text-gray-500">Pays/Région:</span>
-                        <div className="font-medium">{getCountryLabel(indice.country)}</div>
+                        <div className="font-medium">
+                          {getCountryLabel(indice.country)}
+                        </div>
                       </div>
                       <div className="text-sm">
                         <span className="text-gray-500">Source:</span>
@@ -570,9 +618,12 @@ export default function IndicesManager() {
 
                     <div className="flex items-center justify-between">
                       <div className="text-sm text-gray-500">
-                        Valeur précédente: <span className="font-medium">{indice.previousValue}</span>
+                        Valeur précédente:{" "}
+                        <span className="font-medium">
+                          {indice.previousValue}
+                        </span>
                       </div>
-                      
+
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => handleUpdateIndice(indice.id)}
@@ -580,7 +631,7 @@ export default function IndicesManager() {
                         >
                           <RefreshCw className="w-4 h-4" />
                         </button>
-                        
+
                         {hasPermission("view_analytics") && (
                           <Link
                             to={`/dashboard/indices/${indice.id}/analytics`}
@@ -589,13 +640,13 @@ export default function IndicesManager() {
                             <BarChart3 className="w-4 h-4" />
                           </Link>
                         )}
-                        
+
                         {hasPermission("export_indices") && (
                           <button className="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors">
                             <Download className="w-4 h-4" />
                           </button>
                         )}
-                        
+
                         {hasPermission("edit_indices") && (
                           <Link
                             to={`/dashboard/indices/${indice.id}/edit`}
@@ -604,11 +655,11 @@ export default function IndicesManager() {
                             <Edit className="w-4 h-4" />
                           </Link>
                         )}
-                        
+
                         <button className="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors">
                           <Share2 className="w-4 h-4" />
                         </button>
-                        
+
                         {hasPermission("delete_indices") && (
                           <button
                             onClick={() => handleDeleteIndice(indice.id)}
@@ -617,7 +668,7 @@ export default function IndicesManager() {
                             <Trash2 className="w-4 h-4" />
                           </button>
                         )}
-                        
+
                         <button className="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors">
                           <MoreVertical className="w-4 h-4" />
                         </button>
@@ -637,7 +688,10 @@ export default function IndicesManager() {
               Aucun indice trouvé
             </h3>
             <p className="text-gray-600 mb-6">
-              {searchTerm || filterCategory !== "all" || filterCountry !== "all" || filterStatus !== "all"
+              {searchTerm ||
+              filterCategory !== "all" ||
+              filterCountry !== "all" ||
+              filterStatus !== "all"
                 ? "Essayez de modifier vos filtres de recherche."
                 : "Commencez par créer votre premier indice économique."}
             </p>

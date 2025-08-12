@@ -392,20 +392,20 @@ export default function DashboardSidebar() {
           return (
             <div key={section.key}>
               <button
-              onClick={() => toggleSection(section.key)}
-              className="w-full flex items-center justify-between mb-3 p-2 rounded-lg hover:bg-gray-50 transition-colors group"
-            >
-              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider group-hover:text-gray-700">
-                {section.title}
-              </h3>
-              <div className="text-gray-400 group-hover:text-gray-600">
-                {expandedSections.includes(section.key) ? (
-                  <ChevronDown className="w-3 h-3" />
-                ) : (
-                  <ChevronRight className="w-3 h-3" />
-                )}
-              </div>
-            </button>
+                onClick={() => toggleSection(section.key)}
+                className="w-full flex items-center justify-between mb-3 p-2 rounded-lg hover:bg-gray-50 transition-colors group"
+              >
+                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider group-hover:text-gray-700">
+                  {section.title}
+                </h3>
+                <div className="text-gray-400 group-hover:text-gray-600">
+                  {expandedSections.includes(section.key) ? (
+                    <ChevronDown className="w-3 h-3" />
+                  ) : (
+                    <ChevronRight className="w-3 h-3" />
+                  )}
+                </div>
+              </button>
               {expandedSections.includes(section.key) && (
                 <div className="space-y-1">
                   {section.items.map((item) => renderMenuItem(item))}

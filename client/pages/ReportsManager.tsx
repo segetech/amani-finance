@@ -36,7 +36,7 @@ export default function ReportsManager() {
   const { user, hasPermission } = useAuth();
   const { success, error, warning } = useToast();
   const [activeTab, setActiveTab] = useState(
-    hasPermission("create_economic_reports") ? "economic" : "moderation"
+    hasPermission("create_economic_reports") ? "economic" : "moderation",
   );
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
@@ -44,8 +44,10 @@ export default function ReportsManager() {
   const [selectedReports, setSelectedReports] = useState<string[]>([]);
 
   // Check permissions
-  const canViewEconomicReports = hasPermission("create_economic_reports") || hasPermission("view_analytics");
-  const canViewModerationReports = hasPermission("manage_user_reports") || hasPermission("moderate_comments");
+  const canViewEconomicReports =
+    hasPermission("create_economic_reports") || hasPermission("view_analytics");
+  const canViewModerationReports =
+    hasPermission("manage_user_reports") || hasPermission("moderate_comments");
 
   if (!user || (!canViewEconomicReports && !canViewModerationReports)) {
     return (
@@ -55,7 +57,8 @@ export default function ReportsManager() {
             Accès refusé
           </h2>
           <p className="text-gray-600 mb-6">
-            Vous n'avez pas les permissions nécessaires pour accéder aux rapports.
+            Vous n'avez pas les permissions nécessaires pour accéder aux
+            rapports.
           </p>
         </div>
       </DashboardLayout>
@@ -67,7 +70,8 @@ export default function ReportsManager() {
     {
       id: "econ-1",
       title: "Rapport économique mensuel - Janvier 2024",
-      description: "Analyse complète des indicateurs économiques du Sahel pour le mois de janvier",
+      description:
+        "Analyse complète des indicateurs économiques du Sahel pour le mois de janvier",
       type: "monthly",
       status: "published",
       author: "Ibrahim Touré",
@@ -82,7 +86,8 @@ export default function ReportsManager() {
     {
       id: "econ-2",
       title: "Évolution du secteur minier - Q4 2023",
-      description: "Rapport trimestriel sur les performances du secteur minier dans la région",
+      description:
+        "Rapport trimestriel sur les performances du secteur minier dans la région",
       type: "quarterly",
       status: "draft",
       author: "Salif Keita",
@@ -97,7 +102,8 @@ export default function ReportsManager() {
     {
       id: "econ-3",
       title: "Analyse BRVM - Performance 2023",
-      description: "Bilan annuel des performances de la Bourse Régionale des Valeurs Mobilières",
+      description:
+        "Bilan annuel des performances de la Bourse Régionale des Valeurs Mobilières",
       type: "annual",
       status: "published",
       author: "Fatou Diallo",
@@ -117,7 +123,8 @@ export default function ReportsManager() {
       id: "mod-1",
       type: "comment",
       title: "Commentaire inapproprié",
-      description: "Commentaire contenant des propos offensants sur l'article 'Économie malienne'",
+      description:
+        "Commentaire contenant des propos offensants sur l'article 'Économie malienne'",
       reportedContent: "Ce commentaire contient du langage inapproprié...",
       reporter: "user123@example.com",
       reportedUser: "problematic@example.com",
@@ -129,11 +136,12 @@ export default function ReportsManager() {
       category: "Harcèlement",
     },
     {
-      id: "mod-2", 
+      id: "mod-2",
       type: "article",
       title: "Article avec désinformation",
       description: "Article contenant des informations économiques erronées",
-      reportedContent: "L'article affirme que le taux d'inflation est de 15%...",
+      reportedContent:
+        "L'article affirme que le taux d'inflation est de 15%...",
       reporter: "analyst@example.com",
       reportedUser: "author@example.com",
       reason: "Désinformation",
@@ -149,7 +157,7 @@ export default function ReportsManager() {
       title: "Comportement de spam",
       description: "Utilisateur postant de manière répétitive le même contenu",
       reportedContent: "Utilisateur créant plusieurs comptes pour spam...",
-      reporter: "moderator@example.com", 
+      reporter: "moderator@example.com",
       reportedUser: "spammer@example.com",
       reason: "Spam",
       status: "resolved",
@@ -163,23 +171,24 @@ export default function ReportsManager() {
   const stats = {
     economic: {
       total: economicReports.length,
-      published: economicReports.filter(r => r.status === "published").length,
-      draft: economicReports.filter(r => r.status === "draft").length,
+      published: economicReports.filter((r) => r.status === "published").length,
+      draft: economicReports.filter((r) => r.status === "draft").length,
       totalDownloads: economicReports.reduce((sum, r) => sum + r.downloads, 0),
     },
     moderation: {
       total: moderationReports.length,
-      pending: moderationReports.filter(r => r.status === "pending").length,
-      inReview: moderationReports.filter(r => r.status === "in_review").length,
-      resolved: moderationReports.filter(r => r.status === "resolved").length,
+      pending: moderationReports.filter((r) => r.status === "pending").length,
+      inReview: moderationReports.filter((r) => r.status === "in_review")
+        .length,
+      resolved: moderationReports.filter((r) => r.status === "resolved").length,
     },
   };
 
   const handleReportSelect = (reportId: string) => {
-    setSelectedReports(prev => 
+    setSelectedReports((prev) =>
       prev.includes(reportId)
-        ? prev.filter(id => id !== reportId)
-        : [...prev, reportId]
+        ? prev.filter((id) => id !== reportId)
+        : [...prev, reportId],
     );
   };
 
@@ -189,23 +198,38 @@ export default function ReportsManager() {
       return;
     }
 
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     switch (action) {
       case "publish":
-        success("Rapports publiés", `${selectedReports.length} rapport(s) publié(s)`);
+        success(
+          "Rapports publiés",
+          `${selectedReports.length} rapport(s) publié(s)`,
+        );
         break;
       case "download":
-        success("Téléchargement", `${selectedReports.length} rapport(s) télécharg��(s)`);
+        success(
+          "Téléchargement",
+          `${selectedReports.length} rapport(s) télécharg��(s)`,
+        );
         break;
       case "resolve":
-        success("Signalements traités", `${selectedReports.length} signalement(s) résolu(s)`);
+        success(
+          "Signalements traités",
+          `${selectedReports.length} signalement(s) résolu(s)`,
+        );
         break;
       case "assign":
-        success("Attribution", `${selectedReports.length} signalement(s) attribué(s)`);
+        success(
+          "Attribution",
+          `${selectedReports.length} signalement(s) attribué(s)`,
+        );
         break;
       case "delete":
-        error("Rapports supprimés", `${selectedReports.length} rapport(s) supprimé(s)`);
+        error(
+          "Rapports supprimés",
+          `${selectedReports.length} rapport(s) supprimé(s)`,
+        );
         break;
     }
     setSelectedReports([]);
@@ -241,18 +265,22 @@ export default function ReportsManager() {
     }
   };
 
-  const filteredEconomicReports = economicReports.filter(report => {
-    const matchesSearch = report.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         report.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = filterStatus === "all" || report.status === filterStatus;
+  const filteredEconomicReports = economicReports.filter((report) => {
+    const matchesSearch =
+      report.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      report.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus =
+      filterStatus === "all" || report.status === filterStatus;
     const matchesType = filterType === "all" || report.type === filterType;
     return matchesSearch && matchesStatus && matchesType;
   });
 
-  const filteredModerationReports = moderationReports.filter(report => {
-    const matchesSearch = report.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         report.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = filterStatus === "all" || report.status === filterStatus;
+  const filteredModerationReports = moderationReports.filter((report) => {
+    const matchesSearch =
+      report.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      report.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus =
+      filterStatus === "all" || report.status === filterStatus;
     const matchesType = filterType === "all" || report.type === filterType;
     return matchesSearch && matchesStatus && matchesType;
   });
@@ -262,7 +290,8 @@ export default function ReportsManager() {
       title="Rapports et signalements"
       subtitle="Gérez les rapports économiques et les signalements de modération"
       actions={
-        activeTab === "economic" && hasPermission("create_economic_reports") && (
+        activeTab === "economic" &&
+        hasPermission("create_economic_reports") && (
           <Link
             to="/dashboard/reports/new"
             className="flex items-center gap-2 px-4 py-2 bg-amani-primary text-white rounded-lg hover:bg-amani-primary/90 transition-colors"
@@ -528,9 +557,12 @@ export default function ReportsManager() {
 
           {/* Content */}
           <div className="divide-y divide-gray-200">
-            {activeTab === "economic" 
+            {activeTab === "economic"
               ? filteredEconomicReports.map((report) => (
-                  <div key={report.id} className="p-6 hover:bg-gray-50 transition-colors">
+                  <div
+                    key={report.id}
+                    className="p-6 hover:bg-gray-50 transition-colors"
+                  >
                     <div className="flex items-start gap-4">
                       <input
                         type="checkbox"
@@ -538,7 +570,7 @@ export default function ReportsManager() {
                         onChange={() => handleReportSelect(report.id)}
                         className="mt-2 h-4 w-4 text-amani-primary focus:ring-amani-primary border-gray-300 rounded"
                       />
-                      
+
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between mb-3">
                           <div>
@@ -550,36 +582,49 @@ export default function ReportsManager() {
                             </p>
                           </div>
                           <div className="flex items-center gap-2">
-                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(report.status)}`}>
-                              {report.status === "published" ? "Publié" : "Brouillon"}
+                            <span
+                              className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(report.status)}`}
+                            >
+                              {report.status === "published"
+                                ? "Publié"
+                                : "Brouillon"}
                             </span>
                           </div>
                         </div>
-                        
+
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-600 mb-4">
                           <div>
-                            <span className="font-medium">Auteur:</span> {report.author}
+                            <span className="font-medium">Auteur:</span>{" "}
+                            {report.author}
                           </div>
                           <div>
-                            <span className="font-medium">Type:</span> {report.type}
+                            <span className="font-medium">Type:</span>{" "}
+                            {report.type}
                           </div>
                           <div>
-                            <span className="font-medium">Taille:</span> {report.size}
+                            <span className="font-medium">Taille:</span>{" "}
+                            {report.size}
                           </div>
                           <div>
-                            <span className="font-medium">Téléchargements:</span> {report.downloads}
+                            <span className="font-medium">
+                              Téléchargements:
+                            </span>{" "}
+                            {report.downloads}
                           </div>
                         </div>
 
                         <div className="flex items-center justify-between">
                           <div className="flex flex-wrap gap-1">
                             {report.categories.map((category, index) => (
-                              <span key={index} className="text-xs bg-amani-secondary/20 text-amani-primary px-2 py-1 rounded">
+                              <span
+                                key={index}
+                                className="text-xs bg-amani-secondary/20 text-amani-primary px-2 py-1 rounded"
+                              >
                                 {category}
                               </span>
                             ))}
                           </div>
-                          
+
                           <div className="flex items-center gap-2">
                             <button className="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors">
                               <Download className="w-4 h-4" />
@@ -602,7 +647,10 @@ export default function ReportsManager() {
                   </div>
                 ))
               : filteredModerationReports.map((report) => (
-                  <div key={report.id} className="p-6 hover:bg-gray-50 transition-colors">
+                  <div
+                    key={report.id}
+                    className="p-6 hover:bg-gray-50 transition-colors"
+                  >
                     <div className="flex items-start gap-4">
                       <input
                         type="checkbox"
@@ -610,7 +658,7 @@ export default function ReportsManager() {
                         onChange={() => handleReportSelect(report.id)}
                         className="mt-2 h-4 w-4 text-amani-primary focus:ring-amani-primary border-gray-300 rounded"
                       />
-                      
+
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between mb-3">
                           <div>
@@ -622,41 +670,56 @@ export default function ReportsManager() {
                             </p>
                           </div>
                           <div className="flex items-center gap-2">
-                            <span className={`px-2 py-1 rounded text-xs font-medium ${getPriorityColor(report.priority)}`}>
+                            <span
+                              className={`px-2 py-1 rounded text-xs font-medium ${getPriorityColor(report.priority)}`}
+                            >
                               Priorité {report.priority}
                             </span>
-                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(report.status)}`}>
-                              {report.status === "pending" ? "En attente" : 
-                               report.status === "in_review" ? "En révision" : "Résolu"}
+                            <span
+                              className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(report.status)}`}
+                            >
+                              {report.status === "pending"
+                                ? "En attente"
+                                : report.status === "in_review"
+                                  ? "En révision"
+                                  : "Résolu"}
                             </span>
                           </div>
                         </div>
-                        
+
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-600 mb-4">
                           <div>
-                            <span className="font-medium">Signalé par:</span> {report.reporter}
+                            <span className="font-medium">Signalé par:</span>{" "}
+                            {report.reporter}
                           </div>
                           <div>
-                            <span className="font-medium">Utilisateur:</span> {report.reportedUser}
+                            <span className="font-medium">Utilisateur:</span>{" "}
+                            {report.reportedUser}
                           </div>
                           <div>
-                            <span className="font-medium">Raison:</span> {report.reason}
+                            <span className="font-medium">Raison:</span>{" "}
+                            {report.reason}
                           </div>
                           <div>
-                            <span className="font-medium">Assigné à:</span> {report.assignedTo}
+                            <span className="font-medium">Assigné à:</span>{" "}
+                            {report.assignedTo}
                           </div>
                         </div>
 
                         <div className="bg-gray-50 rounded-lg p-3 mb-4">
-                          <h5 className="text-sm font-medium text-gray-900 mb-1">Contenu signalé:</h5>
-                          <p className="text-sm text-gray-600">{report.reportedContent}</p>
+                          <h5 className="text-sm font-medium text-gray-900 mb-1">
+                            Contenu signalé:
+                          </h5>
+                          <p className="text-sm text-gray-600">
+                            {report.reportedContent}
+                          </p>
                         </div>
 
                         <div className="flex items-center justify-between">
                           <div className="text-xs text-gray-500">
                             {report.category} • {report.createdDate}
                           </div>
-                          
+
                           <div className="flex items-center gap-2">
                             <button className="p-2 bg-green-100 text-green-600 rounded-lg hover:bg-green-200 transition-colors">
                               <CheckCircle className="w-4 h-4" />
@@ -675,8 +738,7 @@ export default function ReportsManager() {
                       </div>
                     </div>
                   </div>
-                ))
-            }
+                ))}
           </div>
         </div>
       </div>
