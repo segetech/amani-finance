@@ -121,7 +121,6 @@ const App = () => (
               <Route path="/indices" element={<Indices />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
-            <ConditionalFooter />
           </BrowserRouter>
         </ToastProvider>
       </AuthProvider>
