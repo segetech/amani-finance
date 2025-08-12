@@ -299,7 +299,10 @@ export default function Index() {
                   Faso, Niger, Mauritanie, Tchad et plus. Cliquez sur un pays
                   pour voir les dernières actualités et indicateurs économiques.
                 </p>
-                <button className="mt-4 bg-amani-primary text-white px-6 py-2 rounded-lg hover:bg-amani-primary/90 transition-colors">
+                <button
+                  onClick={() => document.getElementById('interactive-map')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="mt-4 bg-amani-primary text-white px-6 py-2 rounded-lg hover:bg-amani-primary/90 transition-colors"
+                >
                   Explorer la carte
                 </button>
               </div>
