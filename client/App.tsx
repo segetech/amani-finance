@@ -59,17 +59,23 @@ const App = () => (
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/dashboard" element={<DashboardMain />} />
-                            <Route path="/dashboard/articles/new" element={<NewArticle />} />
-                            <Route path="/dashboard/podcasts" element={<PodcastsManager />} />
+              <Route path="/dashboard/articles/new" element={<NewArticle />} />
+              <Route path="/dashboard/podcasts" element={<PodcastsManager />} />
               <Route path="/dashboard/podcasts/new" element={<NewPodcast />} />
               <Route path="/dashboard/indices/new" element={<NewIndice />} />
               <Route path="/dashboard/analytics" element={<Analytics />} />
               <Route path="/dashboard/moderation" element={<Moderation />} />
-                            <Route path="/dashboard/settings" element={<Settings />} />
+              <Route path="/dashboard/settings" element={<Settings />} />
               <Route path="/dashboard/profile" element={<Profile />} />
-              <Route path="/dashboard/permissions" element={<PermissionsManager />} />
+              <Route
+                path="/dashboard/permissions"
+                element={<PermissionsManager />}
+              />
               <Route path="/dashboard/users" element={<Users />} />
-              <Route path="/dashboard/users/new" element={<NewUserAdvanced />} />
+              <Route
+                path="/dashboard/users/new"
+                element={<NewUserAdvanced />}
+              />
               <Route
                 path="/dashboard/users/edit/:userId"
                 element={<EditUser />}
@@ -82,8 +88,8 @@ const App = () => (
               <Route path="/insights" element={<Insights />} />
               <Route path="/tech" element={<Tech />} />
               <Route path="/podcast" element={<Podcast />} />
-                            <Route path="/contact" element={<Contact />} />
-                            <Route path="/about" element={<About />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/about" element={<About />} />
               <Route path="/newsletter" element={<Newsletter />} />
               <Route path="/indices" element={<Indices />} />
               <Route path="*" element={<NotFound />} />

@@ -35,9 +35,7 @@ export default function DashboardLayout({
                   <h1 className="text-2xl font-bold text-amani-primary">
                     {title}
                   </h1>
-                  {subtitle && (
-                    <p className="text-gray-600 mt-1">{subtitle}</p>
-                  )}
+                  {subtitle && <p className="text-gray-600 mt-1">{subtitle}</p>}
                 </div>
               )}
             </div>
@@ -79,15 +77,15 @@ export default function DashboardLayout({
               </div>
 
               {/* Actions */}
-              {actions && <div className="flex items-center gap-2">{actions}</div>}
+              {actions && (
+                <div className="flex items-center gap-2">{actions}</div>
+              )}
             </div>
           </div>
         </header>
 
         {/* Main Content Area */}
-        <main className="flex-1 p-6 overflow-auto">
-          {children}
-        </main>
+        <main className="flex-1 p-6 overflow-auto">{children}</main>
       </div>
     </div>
   );

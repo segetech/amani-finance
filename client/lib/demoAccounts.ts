@@ -21,64 +21,64 @@ export interface DemoUser {
 // Complete permissions list
 export const ALL_PERMISSIONS = {
   // Articles & Content
-  "create_articles": "Créer des articles",
-  "edit_articles": "Modifier des articles",
-  "delete_articles": "Supprimer des articles",
-  "publish_articles": "Publier des articles",
-  "manage_categories": "Gérer les catégories",
+  create_articles: "Créer des articles",
+  edit_articles: "Modifier des articles",
+  delete_articles: "Supprimer des articles",
+  publish_articles: "Publier des articles",
+  manage_categories: "Gérer les catégories",
 
   // Podcasts
-  "create_podcasts": "Créer des podcasts",
-  "edit_podcasts": "Modifier des podcasts",
-  "delete_podcasts": "Supprimer des podcasts",
-  "publish_podcasts": "Publier des podcasts",
+  create_podcasts: "Créer des podcasts",
+  edit_podcasts: "Modifier des podcasts",
+  delete_podcasts: "Supprimer des podcasts",
+  publish_podcasts: "Publier des podcasts",
 
   // Economic Indices
-  "create_indices": "Créer des indices",
-  "edit_indices": "Modifier des indices",
-  "delete_indices": "Supprimer des indices",
-  "view_indices": "Voir les indices",
-  "export_indices": "Exporter les indices",
-  "publish_indices": "Publier des indices",
+  create_indices: "Créer des indices",
+  edit_indices: "Modifier des indices",
+  delete_indices: "Supprimer des indices",
+  view_indices: "Voir les indices",
+  export_indices: "Exporter les indices",
+  publish_indices: "Publier des indices",
 
   // Analytics & Reports
-  "view_analytics": "Voir les analytics",
-  "export_data": "Exporter les données",
-  "create_economic_reports": "Créer des rapports économiques",
-  "view_detailed_analytics": "Analytics détaillées",
-  "access_admin_reports": "Rapports administrateur",
+  view_analytics: "Voir les analytics",
+  export_data: "Exporter les données",
+  create_economic_reports: "Créer des rapports économiques",
+  view_detailed_analytics: "Analytics détaillées",
+  access_admin_reports: "Rapports administrateur",
 
   // Moderation
-  "moderate_comments": "Modérer les commentaires",
-  "review_content": "Réviser le contenu",
-  "manage_user_reports": "Gérer les signalements",
-  "view_content_stats": "Voir les stats de contenu",
-  "ban_users": "Bannir des utilisateurs",
-  "manage_user_roles": "Gérer les rôles utilisateurs",
+  moderate_comments: "Modérer les commentaires",
+  review_content: "Réviser le contenu",
+  manage_user_reports: "Gérer les signalements",
+  view_content_stats: "Voir les stats de contenu",
+  ban_users: "Bannir des utilisateurs",
+  manage_user_roles: "Gérer les rôles utilisateurs",
 
   // User Management
-  "manage_users": "Gérer les utilisateurs",
-  "create_users": "Créer des utilisateurs",
-  "edit_user_profiles": "Modifier les profils",
-  "delete_users": "Supprimer des utilisateurs",
-  "view_user_activity": "Voir l'activité des utilisateurs",
+  manage_users: "Gérer les utilisateurs",
+  create_users: "Créer des utilisateurs",
+  edit_user_profiles: "Modifier les profils",
+  delete_users: "Supprimer des utilisateurs",
+  view_user_activity: "Voir l'activité des utilisateurs",
 
   // System Administration
-  "system_settings": "Paramètres système",
-  "manage_permissions": "Gérer les permissions",
-  "access_logs": "Accéder aux logs",
-  "backup_system": "Sauvegarder le système",
-  "manage_integrations": "Gérer les intégrations",
+  system_settings: "Paramètres système",
+  manage_permissions: "Gérer les permissions",
+  access_logs: "Accéder aux logs",
+  backup_system: "Sauvegarder le système",
+  manage_integrations: "Gérer les intégrations",
 
   // Content Access
-  "view_premium_content": "Contenu premium",
-  "view_public_content": "Contenu public",
-  "save_favorites": "Sauvegarder favoris",
-  "create_alerts": "Créer des alertes",
-  "download_reports": "Télécharger rapports",
-  "access_podcast_archives": "Archives podcasts",
-  "view_basic_indices": "Indices de base",
-  "listen_public_podcasts": "Podcasts publics",
+  view_premium_content: "Contenu premium",
+  view_public_content: "Contenu public",
+  save_favorites: "Sauvegarder favoris",
+  create_alerts: "Créer des alertes",
+  download_reports: "Télécharger rapports",
+  access_podcast_archives: "Archives podcasts",
+  view_basic_indices: "Indices de base",
+  listen_public_podcasts: "Podcasts publics",
 };
 
 export const demoAccounts: DemoUser[] = [

@@ -90,7 +90,7 @@ export default function DashboardMain() {
     },
     {
       label: "Nouveau podcast",
-      path: "/dashboard/podcasts/new", 
+      path: "/dashboard/podcasts/new",
       icon: Mic,
       permission: "create_podcasts",
       color: "bg-purple-500",
@@ -123,7 +123,7 @@ export default function DashboardMain() {
     value: string | number,
     change: number,
     icon: React.ComponentType<{ className?: string }>,
-    permission?: string
+    permission?: string,
   ) => {
     if (permission && !hasPermission(permission)) return null;
 
@@ -136,9 +136,11 @@ export default function DashboardMain() {
           <div className="p-2 bg-amani-secondary/20 rounded-lg">
             <Icon className="w-6 h-6 text-amani-primary" />
           </div>
-          <div className={`flex items-center gap-1 text-sm ${
-            isPositive ? "text-green-600" : "text-red-600"
-          }`}>
+          <div
+            className={`flex items-center gap-1 text-sm ${
+              isPositive ? "text-green-600" : "text-red-600"
+            }`}
+          >
             {isPositive ? (
               <TrendingUp className="w-4 h-4" />
             ) : (
@@ -210,28 +212,28 @@ export default function DashboardMain() {
             stats.articles.total,
             stats.articles.growth,
             FileText,
-            "view_analytics"
+            "view_analytics",
           )}
           {renderStatCard(
             "Podcasts",
             stats.podcasts.total,
             stats.podcasts.growth,
             Mic,
-            "view_analytics"
+            "view_analytics",
           )}
           {renderStatCard(
             "Indices économiques",
             stats.indices.total,
             stats.indices.growth,
             BarChart3,
-            "view_indices"
+            "view_indices",
           )}
           {renderStatCard(
             "Utilisateurs actifs",
             stats.users.total,
             stats.users.growth,
             Users,
-            "view_user_activity"
+            "view_user_activity",
           )}
         </div>
 
@@ -246,14 +248,16 @@ export default function DashboardMain() {
               if (action.permission && !hasPermission(action.permission)) {
                 return null;
               }
-              
+
               return (
                 <Link
                   key={action.path}
                   to={action.path}
                   className="flex flex-col items-center gap-3 p-6 rounded-xl border border-gray-200 hover:border-amani-primary hover:shadow-md transition-all group"
                 >
-                  <div className={`w-12 h-12 ${action.color} rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                  <div
+                    className={`w-12 h-12 ${action.color} rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform`}
+                  >
                     <action.icon className="w-6 h-6 text-white" />
                   </div>
                   <span className="text-sm font-medium text-gray-700 group-hover:text-amani-primary">
@@ -320,7 +324,9 @@ export default function DashboardMain() {
                 </h3>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Vues cette semaine</span>
+                    <span className="text-sm text-gray-600">
+                      Vues cette semaine
+                    </span>
                     <span className="font-bold text-amani-primary">
                       {stats.views.thisWeek.toLocaleString()}
                     </span>
@@ -333,7 +339,9 @@ export default function DashboardMain() {
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <TrendingUp className="w-4 h-4 text-green-600" />
-                    <span className="text-green-600">+{stats.views.growth}%</span>
+                    <span className="text-green-600">
+                      +{stats.views.growth}%
+                    </span>
                     <span className="text-gray-500">vs semaine dernière</span>
                   </div>
                 </div>
@@ -385,25 +393,35 @@ export default function DashboardMain() {
               <div className="space-y-3">
                 {hasPermission("create_articles") && (
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Articles créés</span>
+                    <span className="text-sm text-gray-600">
+                      Articles créés
+                    </span>
                     <span className="font-bold text-amani-primary">23</span>
                   </div>
                 )}
                 {hasPermission("create_podcasts") && (
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Podcasts publiés</span>
+                    <span className="text-sm text-gray-600">
+                      Podcasts publiés
+                    </span>
                     <span className="font-bold text-amani-primary">4</span>
                   </div>
                 )}
                 {hasPermission("create_indices") && (
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Indices mis à jour</span>
+                    <span className="text-sm text-gray-600">
+                      Indices mis à jour
+                    </span>
                     <span className="font-bold text-amani-primary">12</span>
                   </div>
                 )}
                 <div className="flex items-center justify-between border-t pt-3">
-                  <span className="text-sm text-gray-600">Dernière connexion</span>
-                  <span className="text-sm text-gray-500">{user?.lastLogin}</span>
+                  <span className="text-sm text-gray-600">
+                    Dernière connexion
+                  </span>
+                  <span className="text-sm text-gray-500">
+                    {user?.lastLogin}
+                  </span>
                 </div>
               </div>
             </div>

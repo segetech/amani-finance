@@ -38,7 +38,8 @@ export default function PermissionsManager() {
             Accès refusé
           </h2>
           <p className="text-gray-600 mb-6">
-            Vous n'avez pas les permissions nécessaires pour gérer les permissions.
+            Vous n'avez pas les permissions nécessaires pour gérer les
+            permissions.
           </p>
         </div>
       </DashboardLayout>
@@ -56,12 +57,12 @@ export default function PermissionsManager() {
       color: "bg-red-100 text-red-800",
     },
     {
-      id: "editeur", 
+      id: "editeur",
       name: "Éditeur",
       description: "Création et gestion de contenu",
       permissions: [
         "create_articles",
-        "edit_articles", 
+        "edit_articles",
         "publish_articles",
         "create_podcasts",
         "edit_podcasts",
@@ -74,7 +75,7 @@ export default function PermissionsManager() {
     },
     {
       id: "analyste",
-      name: "Analyste", 
+      name: "Analyste",
       description: "Gestion des données économiques",
       permissions: [
         "create_indices",
@@ -111,7 +112,7 @@ export default function PermissionsManager() {
       name: "Contenu",
       permissions: [
         "create_articles",
-        "edit_articles", 
+        "edit_articles",
         "delete_articles",
         "publish_articles",
         "create_podcasts",
@@ -132,7 +133,7 @@ export default function PermissionsManager() {
       ],
     },
     indices: {
-      name: "Indices économiques", 
+      name: "Indices économiques",
       permissions: [
         "create_indices",
         "edit_indices",
@@ -182,8 +183,8 @@ export default function PermissionsManager() {
     }
 
     // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
     success("Rôle créé", `Le rôle "${newRoleName}" a été créé avec succès`);
     setIsCreatingRole(false);
     setNewRoleName("");
@@ -191,16 +192,17 @@ export default function PermissionsManager() {
   };
 
   const handlePermissionToggle = (permission: string) => {
-    setNewRolePermissions(prev => 
+    setNewRolePermissions((prev) =>
       prev.includes(permission)
-        ? prev.filter(p => p !== permission)
-        : [...prev, permission]
+        ? prev.filter((p) => p !== permission)
+        : [...prev, permission],
     );
   };
 
-  const filteredRoles = roles.filter(role => {
-    const matchesSearch = role.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         role.description.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredRoles = roles.filter((role) => {
+    const matchesSearch =
+      role.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      role.description.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesSearch;
   });
 
@@ -241,7 +243,9 @@ export default function PermissionsManager() {
               >
                 <option value="all">Toutes les catégories</option>
                 {Object.entries(permissionCategories).map(([key, category]) => (
-                  <option key={key} value={key}>{category.name}</option>
+                  <option key={key} value={key}>
+                    {category.name}
+                  </option>
                 ))}
               </select>
             </div>
@@ -251,7 +255,10 @@ export default function PermissionsManager() {
         {/* Roles Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredRoles.map((role) => (
-            <div key={role.id} className="bg-white rounded-2xl shadow-lg border border-white/50 overflow-hidden">
+            <div
+              key={role.id}
+              className="bg-white rounded-2xl shadow-lg border border-white/50 overflow-hidden"
+            >
               <div className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
@@ -259,9 +266,14 @@ export default function PermissionsManager() {
                       <Shield className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-amani-primary">{role.name}</h3>
-                      <span className={`text-xs px-2 py-1 rounded-full ${role.color}`}>
-                        {role.userCount} utilisateur{role.userCount > 1 ? 's' : ''}
+                      <h3 className="font-semibold text-amani-primary">
+                        {role.name}
+                      </h3>
+                      <span
+                        className={`text-xs px-2 py-1 rounded-full ${role.color}`}
+                      >
+                        {role.userCount} utilisateur
+                        {role.userCount > 1 ? "s" : ""}
                       </span>
                     </div>
                   </div>
@@ -279,42 +291,57 @@ export default function PermissionsManager() {
                     )}
                   </div>
                 </div>
-                
+
                 <p className="text-gray-600 text-sm mb-4">{role.description}</p>
-                
+
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-700">Permissions</span>
-                    <span className="text-sm text-gray-500">{role.permissions.length}</span>
+                    <span className="text-sm font-medium text-gray-700">
+                      Permissions
+                    </span>
+                    <span className="text-sm text-gray-500">
+                      {role.permissions.length}
+                    </span>
                   </div>
-                  
+
                   <div className="space-y-2">
-                    {Object.entries(permissionCategories).map(([key, category]) => {
-                      const categoryPermissions = category.permissions.filter(p => role.permissions.includes(p));
-                      if (categoryPermissions.length === 0) return null;
-                      
-                      return (
-                        <div key={key} className="flex items-center justify-between py-1">
-                          <span className="text-xs text-gray-600">{category.name}</span>
-                          <div className="flex items-center gap-1">
-                            <span className="text-xs text-gray-500">
-                              {categoryPermissions.length}/{category.permissions.length}
+                    {Object.entries(permissionCategories).map(
+                      ([key, category]) => {
+                        const categoryPermissions = category.permissions.filter(
+                          (p) => role.permissions.includes(p),
+                        );
+                        if (categoryPermissions.length === 0) return null;
+
+                        return (
+                          <div
+                            key={key}
+                            className="flex items-center justify-between py-1"
+                          >
+                            <span className="text-xs text-gray-600">
+                              {category.name}
                             </span>
-                            {categoryPermissions.length === category.permissions.length ? (
-                              <CheckCircle className="w-3 h-3 text-green-600" />
-                            ) : categoryPermissions.length > 0 ? (
-                              <AlertTriangle className="w-3 h-3 text-amber-600" />
-                            ) : (
-                              <XCircle className="w-3 h-3 text-red-600" />
-                            )}
+                            <div className="flex items-center gap-1">
+                              <span className="text-xs text-gray-500">
+                                {categoryPermissions.length}/
+                                {category.permissions.length}
+                              </span>
+                              {categoryPermissions.length ===
+                              category.permissions.length ? (
+                                <CheckCircle className="w-3 h-3 text-green-600" />
+                              ) : categoryPermissions.length > 0 ? (
+                                <AlertTriangle className="w-3 h-3 text-amber-600" />
+                              ) : (
+                                <XCircle className="w-3 h-3 text-red-600" />
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      },
+                    )}
                   </div>
                 </div>
               </div>
-              
+
               <div className="px-6 py-3 bg-gray-50 border-t">
                 <button className="w-full text-sm text-amani-primary hover:text-amani-primary/80 font-medium">
                   Voir les détails
@@ -330,18 +357,29 @@ export default function PermissionsManager() {
             <Settings className="w-5 h-5" />
             Catégories de permissions
           </h3>
-          
+
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {Object.entries(permissionCategories).map(([key, category]) => (
               <div key={key} className="border border-gray-200 rounded-lg p-4">
-                <h4 className="font-medium text-gray-900 mb-3">{category.name}</h4>
+                <h4 className="font-medium text-gray-900 mb-3">
+                  {category.name}
+                </h4>
                 <div className="space-y-2">
                   {category.permissions.map((permission) => (
-                    <div key={permission} className="flex items-center justify-between text-sm">
+                    <div
+                      key={permission}
+                      className="flex items-center justify-between text-sm"
+                    >
                       <span className="text-gray-600">
-                        {ALL_PERMISSIONS[permission as keyof typeof ALL_PERMISSIONS]}
+                        {
+                          ALL_PERMISSIONS[
+                            permission as keyof typeof ALL_PERMISSIONS
+                          ]
+                        }
                       </span>
-                      <span className="text-xs text-gray-500">{permission}</span>
+                      <span className="text-xs text-gray-500">
+                        {permission}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -355,9 +393,11 @@ export default function PermissionsManager() {
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-auto">
               <div className="p-6 border-b border-gray-200">
-                <h3 className="text-xl font-semibold text-amani-primary">Créer un nouveau rôle</h3>
+                <h3 className="text-xl font-semibold text-amani-primary">
+                  Créer un nouveau rôle
+                </h3>
               </div>
-              
+
               <div className="p-6 space-y-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -371,34 +411,54 @@ export default function PermissionsManager() {
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
                   />
                 </div>
-                
+
                 <div>
-                  <h4 className="font-medium text-gray-900 mb-4">Permissions</h4>
+                  <h4 className="font-medium text-gray-900 mb-4">
+                    Permissions
+                  </h4>
                   <div className="space-y-4">
-                    {Object.entries(permissionCategories).map(([key, category]) => (
-                      <div key={key} className="border border-gray-200 rounded-lg p-4">
-                        <h5 className="font-medium text-gray-800 mb-3">{category.name}</h5>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                          {category.permissions.map((permission) => (
-                            <label key={permission} className="flex items-center gap-2 text-sm">
-                              <input
-                                type="checkbox"
-                                checked={newRolePermissions.includes(permission)}
-                                onChange={() => handlePermissionToggle(permission)}
-                                className="h-4 w-4 text-amani-primary focus:ring-amani-primary border-gray-300 rounded"
-                              />
-                              <span className="text-gray-700">
-                                {ALL_PERMISSIONS[permission as keyof typeof ALL_PERMISSIONS]}
-                              </span>
-                            </label>
-                          ))}
+                    {Object.entries(permissionCategories).map(
+                      ([key, category]) => (
+                        <div
+                          key={key}
+                          className="border border-gray-200 rounded-lg p-4"
+                        >
+                          <h5 className="font-medium text-gray-800 mb-3">
+                            {category.name}
+                          </h5>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            {category.permissions.map((permission) => (
+                              <label
+                                key={permission}
+                                className="flex items-center gap-2 text-sm"
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={newRolePermissions.includes(
+                                    permission,
+                                  )}
+                                  onChange={() =>
+                                    handlePermissionToggle(permission)
+                                  }
+                                  className="h-4 w-4 text-amani-primary focus:ring-amani-primary border-gray-300 rounded"
+                                />
+                                <span className="text-gray-700">
+                                  {
+                                    ALL_PERMISSIONS[
+                                      permission as keyof typeof ALL_PERMISSIONS
+                                    ]
+                                  }
+                                </span>
+                              </label>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ),
+                    )}
                   </div>
                 </div>
               </div>
-              
+
               <div className="p-6 border-t border-gray-200 flex items-center justify-end gap-4">
                 <button
                   onClick={() => setIsCreatingRole(false)}

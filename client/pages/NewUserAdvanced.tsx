@@ -55,7 +55,8 @@ export default function NewUserAdvanced() {
             Accès refusé
           </h2>
           <p className="text-gray-600 mb-6">
-            Vous n'avez pas les permissions nécessaires pour créer des utilisateurs.
+            Vous n'avez pas les permissions nécessaires pour créer des
+            utilisateurs.
           </p>
         </div>
       </DashboardLayout>
@@ -75,9 +76,14 @@ export default function NewUserAdvanced() {
       name: "Éditeur",
       description: "Création et gestion de contenu",
       permissions: [
-        "create_articles", "edit_articles", "publish_articles",
-        "create_podcasts", "edit_podcasts", "publish_podcasts",
-        "manage_categories", "view_analytics"
+        "create_articles",
+        "edit_articles",
+        "publish_articles",
+        "create_podcasts",
+        "edit_podcasts",
+        "publish_podcasts",
+        "manage_categories",
+        "view_analytics",
       ],
       color: "bg-blue-100 text-blue-800 border-blue-200",
     },
@@ -86,8 +92,14 @@ export default function NewUserAdvanced() {
       name: "Analyste",
       description: "Gestion des données économiques",
       permissions: [
-        "create_indices", "edit_indices", "publish_indices", "view_indices",
-        "export_indices", "create_economic_reports", "view_analytics", "view_detailed_analytics"
+        "create_indices",
+        "edit_indices",
+        "publish_indices",
+        "view_indices",
+        "export_indices",
+        "create_economic_reports",
+        "view_analytics",
+        "view_detailed_analytics",
       ],
       color: "bg-green-100 text-green-800 border-green-200",
     },
@@ -96,8 +108,12 @@ export default function NewUserAdvanced() {
       name: "Modérateur",
       description: "Modération de contenu et utilisateurs",
       permissions: [
-        "moderate_comments", "review_content", "manage_user_reports",
-        "view_content_stats", "ban_users", "view_user_activity"
+        "moderate_comments",
+        "review_content",
+        "manage_user_reports",
+        "view_content_stats",
+        "ban_users",
+        "view_user_activity",
       ],
       color: "bg-yellow-100 text-yellow-800 border-yellow-200",
     },
@@ -106,8 +122,11 @@ export default function NewUserAdvanced() {
       name: "Abonné Premium",
       description: "Accès au contenu premium",
       permissions: [
-        "view_premium_content", "save_favorites", "create_alerts",
-        "download_reports", "access_podcast_archives"
+        "view_premium_content",
+        "save_favorites",
+        "create_alerts",
+        "download_reports",
+        "access_podcast_archives",
       ],
       color: "bg-purple-100 text-purple-800 border-purple-200",
     },
@@ -117,66 +136,103 @@ export default function NewUserAdvanced() {
     content: {
       name: "Contenu",
       permissions: [
-        "create_articles", "edit_articles", "delete_articles", "publish_articles",
-        "create_podcasts", "edit_podcasts", "delete_podcasts", "publish_podcasts",
-        "manage_categories"
+        "create_articles",
+        "edit_articles",
+        "delete_articles",
+        "publish_articles",
+        "create_podcasts",
+        "edit_podcasts",
+        "delete_podcasts",
+        "publish_podcasts",
+        "manage_categories",
       ],
     },
     analytics: {
       name: "Analytics & Rapports",
       permissions: [
-        "view_analytics", "view_detailed_analytics", "export_data",
-        "create_economic_reports", "access_admin_reports"
+        "view_analytics",
+        "view_detailed_analytics",
+        "export_data",
+        "create_economic_reports",
+        "access_admin_reports",
       ],
     },
     indices: {
       name: "Indices économiques",
       permissions: [
-        "create_indices", "edit_indices", "delete_indices", "view_indices",
-        "export_indices", "publish_indices"
+        "create_indices",
+        "edit_indices",
+        "delete_indices",
+        "view_indices",
+        "export_indices",
+        "publish_indices",
       ],
     },
     moderation: {
       name: "Modération",
       permissions: [
-        "moderate_comments", "review_content", "manage_user_reports",
-        "view_content_stats", "ban_users"
+        "moderate_comments",
+        "review_content",
+        "manage_user_reports",
+        "view_content_stats",
+        "ban_users",
       ],
     },
     users: {
       name: "Gestion utilisateurs",
       permissions: [
-        "manage_users", "create_users", "edit_user_profiles",
-        "delete_users", "view_user_activity", "manage_user_roles"
+        "manage_users",
+        "create_users",
+        "edit_user_profiles",
+        "delete_users",
+        "view_user_activity",
+        "manage_user_roles",
       ],
     },
     system: {
       name: "Système",
       permissions: [
-        "system_settings", "manage_permissions", "access_logs",
-        "backup_system", "manage_integrations"
+        "system_settings",
+        "manage_permissions",
+        "access_logs",
+        "backup_system",
+        "manage_integrations",
       ],
     },
   };
 
   const sectors = [
-    "Marché financier", "Économie régionale", "Industrie minière",
-    "Agriculture", "Investissement", "Technologie", "Politique monétaire",
-    "Commerce international"
+    "Marché financier",
+    "Économie régionale",
+    "Industrie minière",
+    "Agriculture",
+    "Investissement",
+    "Technologie",
+    "Politique monétaire",
+    "Commerce international",
   ];
 
   const countries = [
-    "Mali", "Burkina Faso", "Niger", "Tchad", "Mauritanie",
-    "Sénégal", "UEMOA", "Tous"
+    "Mali",
+    "Burkina Faso",
+    "Niger",
+    "Tchad",
+    "Mauritanie",
+    "Sénégal",
+    "UEMOA",
+    "Tous",
   ];
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
   ) => {
     const { name, value, type } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
+      [name]:
+        type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
     }));
 
     if (errors[name]) {
@@ -203,15 +259,16 @@ export default function NewUserAdvanced() {
   };
 
   const getAllPermissions = () => {
-    const rolePermissions = formData.roles.flatMap(roleId => {
-      const role = availableRoles.find(r => r.id === roleId);
+    const rolePermissions = formData.roles.flatMap((roleId) => {
+      const role = availableRoles.find((r) => r.id === roleId);
       return role ? role.permissions : [];
     });
     return [...new Set([...rolePermissions, ...formData.customPermissions])];
   };
 
   const generatePassword = () => {
-    const chars = "ABCDEFGHJKMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$%&*";
+    const chars =
+      "ABCDEFGHJKMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$%&*";
     let password = "";
     for (let i = 0; i < 12; i++) {
       password += chars.charAt(Math.floor(Math.random() * chars.length));
@@ -242,7 +299,10 @@ export default function NewUserAdvanced() {
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = "Format d'email invalide";
     }
-    if (formData.roles.length === 0 && formData.customPermissions.length === 0) {
+    if (
+      formData.roles.length === 0 &&
+      formData.customPermissions.length === 0
+    ) {
       newErrors.roles = "Au moins un rôle ou une permission est requis";
     }
 
@@ -254,12 +314,18 @@ export default function NewUserAdvanced() {
     e.preventDefault();
 
     if (!validateForm()) {
-      error("Erreur de validation", "Veuillez corriger les erreurs dans le formulaire.");
+      error(
+        "Erreur de validation",
+        "Veuillez corriger les erreurs dans le formulaire.",
+      );
       return;
     }
 
     if (formData.passwordMethod === "generate" && !formData.generatedPassword) {
-      error("Erreur", "Veuillez générer un mot de passe avant de créer l'utilisateur.");
+      error(
+        "Erreur",
+        "Veuillez générer un mot de passe avant de créer l'utilisateur.",
+      );
       return;
     }
 
@@ -275,7 +341,8 @@ export default function NewUserAdvanced() {
       permissions: getAllPermissions(),
       lastLogin: "Jamais connecté",
       mustChangePassword: true,
-      accountStatus: formData.passwordMethod === "email" ? "pending_setup" : "active",
+      accountStatus:
+        formData.passwordMethod === "email" ? "pending_setup" : "active",
       createdAt: new Date().toISOString(),
       createdBy: `${user.firstName} ${user.lastName}`,
     };
@@ -284,7 +351,7 @@ export default function NewUserAdvanced() {
 
     success(
       "Utilisateur créé",
-      `L'utilisateur ${formData.firstName} ${formData.lastName} a été créé avec ${formData.roles.length} rôle(s) et ${getAllPermissions().length} permission(s).`
+      `L'utilisateur ${formData.firstName} ${formData.lastName} a été créé avec ${formData.roles.length} rôle(s) et ${getAllPermissions().length} permission(s).`,
     );
 
     setIsSaving(false);
@@ -461,38 +528,58 @@ export default function NewUserAdvanced() {
               </h3>
               <div className="space-y-4">
                 {Object.entries(permissionCategories).map(([key, category]) => (
-                  <div key={key} className="border border-gray-200 rounded-lg p-4">
+                  <div
+                    key={key}
+                    className="border border-gray-200 rounded-lg p-4"
+                  >
                     <h4 className="font-medium text-gray-800 mb-3 flex items-center gap-2">
                       <Settings className="w-4 h-4" />
                       {category.name}
                     </h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                       {category.permissions.map((permission) => {
-                        const isIncluded = getAllPermissions().includes(permission);
-                        const isFromRole = formData.roles.some(roleId => {
-                          const role = availableRoles.find(r => r.id === roleId);
+                        const isIncluded =
+                          getAllPermissions().includes(permission);
+                        const isFromRole = formData.roles.some((roleId) => {
+                          const role = availableRoles.find(
+                            (r) => r.id === roleId,
+                          );
                           return role?.permissions.includes(permission);
                         });
-                        
+
                         return (
-                          <label 
-                            key={permission} 
+                          <label
+                            key={permission}
                             className={`flex items-center gap-2 text-sm p-2 rounded ${
-                              isFromRole ? 'bg-green-50 text-green-800' : ''
+                              isFromRole ? "bg-green-50 text-green-800" : ""
                             }`}
                           >
                             <input
                               type="checkbox"
-                              checked={formData.customPermissions.includes(permission)}
-                              onChange={() => handlePermissionToggle(permission)}
+                              checked={formData.customPermissions.includes(
+                                permission,
+                              )}
+                              onChange={() =>
+                                handlePermissionToggle(permission)
+                              }
                               disabled={isFromRole}
                               className="h-4 w-4 text-amani-primary focus:ring-amani-primary border-gray-300 rounded"
                             />
-                            <span className={isFromRole ? 'font-medium' : 'text-gray-700'}>
-                              {ALL_PERMISSIONS[permission as keyof typeof ALL_PERMISSIONS]}
+                            <span
+                              className={
+                                isFromRole ? "font-medium" : "text-gray-700"
+                              }
+                            >
+                              {
+                                ALL_PERMISSIONS[
+                                  permission as keyof typeof ALL_PERMISSIONS
+                                ]
+                              }
                             </span>
                             {isFromRole && (
-                              <span className="text-xs text-green-600">(inclus dans rôle)</span>
+                              <span className="text-xs text-green-600">
+                                (inclus dans rôle)
+                              </span>
                             )}
                           </label>
                         );
@@ -510,18 +597,19 @@ export default function NewUserAdvanced() {
               </h4>
               <div className="text-sm text-gray-600">
                 <div className="mb-2">
-                  <strong>{formData.roles.length}</strong> rôle(s) sélectionné(s)
+                  <strong>{formData.roles.length}</strong> rôle(s)
+                  sélectionné(s)
                   {formData.roles.length > 0 && (
-                    <span className="ml-2">
-                      ({formData.roles.join(', ')})
-                    </span>
+                    <span className="ml-2">({formData.roles.join(", ")})</span>
                   )}
                 </div>
                 <div className="mb-2">
-                  <strong>{formData.customPermissions.length}</strong> permission(s) personnalisée(s)
+                  <strong>{formData.customPermissions.length}</strong>{" "}
+                  permission(s) personnalisée(s)
                 </div>
                 <div>
-                  <strong>{getAllPermissions().length}</strong> permission(s) totale(s)
+                  <strong>{getAllPermissions().length}</strong> permission(s)
+                  totale(s)
                 </div>
               </div>
             </div>
@@ -572,8 +660,8 @@ export default function NewUserAdvanced() {
                         Envoyer un email de configuration
                       </div>
                       <div className="text-sm text-gray-600 mt-1">
-                        L'utilisateur recevra un email avec un lien pour
-                        définir son mot de passe lors de sa première connexion.
+                        L'utilisateur recevra un email avec un lien pour définir
+                        son mot de passe lors de sa première connexion.
                       </div>
                       <div className="mt-2 text-xs text-green-600 flex items-center gap-1">
                         <CheckCircle className="w-3 h-3" />
@@ -612,7 +700,8 @@ export default function NewUserAdvanced() {
                       </div>
                       <div className="text-sm text-gray-600 mt-1">
                         Un mot de passe temporaire sera généré automatiquement.
-                        L'utilisateur devra le changer lors de sa première connexion.
+                        L'utilisateur devra le changer lors de sa première
+                        connexion.
                       </div>
 
                       {formData.passwordMethod === "generate" && (
@@ -623,7 +712,10 @@ export default function NewUserAdvanced() {
                             className="flex items-center gap-2 px-4 py-2 bg-amani-primary text-white rounded-lg hover:bg-amani-primary/90 transition-colors text-sm"
                           >
                             <Lock className="w-4 h-4" />
-                            {formData.generatedPassword ? "Régénérer" : "Générer"} un mot de passe
+                            {formData.generatedPassword
+                              ? "Régénérer"
+                              : "Générer"}{" "}
+                            un mot de passe
                           </button>
 
                           {formData.generatedPassword && (
@@ -642,7 +734,9 @@ export default function NewUserAdvanced() {
                                   <button
                                     type="button"
                                     className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                                    onClick={() => setShowPassword(!showPassword)}
+                                    onClick={() =>
+                                      setShowPassword(!showPassword)
+                                    }
                                   >
                                     {showPassword ? (
                                       <EyeOff className="h-4 w-4 text-gray-400" />
@@ -654,7 +748,9 @@ export default function NewUserAdvanced() {
                                 <button
                                   type="button"
                                   onClick={() =>
-                                    navigator.clipboard.writeText(formData.generatedPassword)
+                                    navigator.clipboard.writeText(
+                                      formData.generatedPassword,
+                                    )
                                   }
                                   className="px-3 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors text-sm"
                                 >

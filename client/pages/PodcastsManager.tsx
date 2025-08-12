@@ -37,7 +37,10 @@ export default function PodcastsManager() {
   const [playingPodcast, setPlayingPodcast] = useState<string | null>(null);
 
   // Check permissions
-  if (!user || !hasPermission("create_podcasts") && !hasPermission("view_analytics")) {
+  if (
+    !user ||
+    (!hasPermission("create_podcasts") && !hasPermission("view_analytics"))
+  ) {
     return (
       <DashboardLayout title="Accès refusé">
         <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md mx-auto">
@@ -57,7 +60,8 @@ export default function PodcastsManager() {
     {
       id: "1",
       title: "L'avenir de l'économie sahélienne",
-      description: "Discussion avec des experts sur les perspectives économiques de la région du Sahel",
+      description:
+        "Discussion avec des experts sur les perspectives économiques de la région du Sahel",
       duration: "45:32",
       category: "Économie",
       status: "published",
@@ -72,9 +76,10 @@ export default function PodcastsManager() {
       tags: ["économie", "sahel", "développement"],
     },
     {
-      id: "2", 
+      id: "2",
       title: "Investir dans les startups africaines",
-      description: "Analyse des opportunités d'investissement dans la tech africaine avec des entrepreneurs locaux",
+      description:
+        "Analyse des opportunités d'investissement dans la tech africaine avec des entrepreneurs locaux",
       duration: "38:15",
       category: "Tech",
       status: "published",
@@ -91,7 +96,8 @@ export default function PodcastsManager() {
     {
       id: "3",
       title: "BCEAO : Nouvelles politiques monétaires",
-      description: "Entretien exclusif avec un responsable de la BCEAO sur les dernières décisions",
+      description:
+        "Entretien exclusif avec un responsable de la BCEAO sur les dernières décisions",
       duration: "52:18",
       category: "Finance",
       status: "draft",
@@ -108,7 +114,8 @@ export default function PodcastsManager() {
     {
       id: "4",
       title: "Agriculture durable au Mali",
-      description: "Innovations et défis de l'agriculture moderne dans la région",
+      description:
+        "Innovations et défis de l'agriculture moderne dans la région",
       duration: "41:47",
       category: "Agriculture",
       status: "scheduled",
@@ -126,16 +133,22 @@ export default function PodcastsManager() {
 
   const stats = {
     total: podcasts.length,
-    published: podcasts.filter(p => p.status === "published").length,
-    draft: podcasts.filter(p => p.status === "draft").length,
+    published: podcasts.filter((p) => p.status === "published").length,
+    draft: podcasts.filter((p) => p.status === "draft").length,
     totalPlays: podcasts.reduce((sum, p) => sum + p.plays, 0),
     totalDownloads: podcasts.reduce((sum, p) => sum + p.downloads, 0),
     averageDuration: "44:18",
   };
 
   const categories = [
-    "Économie", "Tech", "Finance", "Agriculture", "Politique", 
-    "Culture", "Interview", "Analyse"
+    "Économie",
+    "Tech",
+    "Finance",
+    "Agriculture",
+    "Politique",
+    "Culture",
+    "Interview",
+    "Analyse",
   ];
 
   const handleTogglePlay = (podcastId: string) => {
@@ -143,18 +156,18 @@ export default function PodcastsManager() {
   };
 
   const handlePodcastSelect = (podcastId: string) => {
-    setSelectedPodcasts(prev => 
+    setSelectedPodcasts((prev) =>
       prev.includes(podcastId)
-        ? prev.filter(id => id !== podcastId)
-        : [...prev, podcastId]
+        ? prev.filter((id) => id !== podcastId)
+        : [...prev, podcastId],
     );
   };
 
   const handleSelectAll = () => {
     setSelectedPodcasts(
-      selectedPodcasts.length === filteredPodcasts.length 
-        ? [] 
-        : filteredPodcasts.map(p => p.id)
+      selectedPodcasts.length === filteredPodcasts.length
+        ? []
+        : filteredPodcasts.map((p) => p.id),
     );
   };
 
@@ -165,17 +178,26 @@ export default function PodcastsManager() {
     }
 
     // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     switch (action) {
       case "publish":
-        success("Podcasts publiés", `${selectedPodcasts.length} podcast(s) publié(s)`);
+        success(
+          "Podcasts publiés",
+          `${selectedPodcasts.length} podcast(s) publié(s)`,
+        );
         break;
       case "unpublish":
-        warning("Podcasts dépubliés", `${selectedPodcasts.length} podcast(s) dépublié(s)`);
+        warning(
+          "Podcasts dépubliés",
+          `${selectedPodcasts.length} podcast(s) dépublié(s)`,
+        );
         break;
       case "delete":
-        error("Podcasts supprimés", `${selectedPodcasts.length} podcast(s) supprimé(s)`);
+        error(
+          "Podcasts supprimés",
+          `${selectedPodcasts.length} podcast(s) supprimé(s)`,
+        );
         break;
     }
     setSelectedPodcasts([]);
@@ -183,17 +205,20 @@ export default function PodcastsManager() {
 
   const handleDeletePodcast = async (podcastId: string) => {
     if (confirm("Êtes-vous sûr de vouloir supprimer ce podcast ?")) {
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
       error("Podcast supprimé", "Le podcast a été supprimé avec succès");
     }
   };
 
-  const filteredPodcasts = podcasts.filter(podcast => {
-    const matchesSearch = podcast.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         podcast.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         podcast.author.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = filterStatus === "all" || podcast.status === filterStatus;
-    const matchesCategory = filterCategory === "all" || podcast.category === filterCategory;
+  const filteredPodcasts = podcasts.filter((podcast) => {
+    const matchesSearch =
+      podcast.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      podcast.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      podcast.author.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus =
+      filterStatus === "all" || podcast.status === filterStatus;
+    const matchesCategory =
+      filterCategory === "all" || podcast.category === filterCategory;
     return matchesSearch && matchesStatus && matchesCategory;
   });
 
@@ -324,8 +349,10 @@ export default function PodcastsManager() {
                 className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
               >
                 <option value="all">Toutes les catégories</option>
-                {categories.map(category => (
-                  <option key={category} value={category}>{category}</option>
+                {categories.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
                 ))}
               </select>
             </div>
@@ -380,7 +407,10 @@ export default function PodcastsManager() {
                 <label className="flex items-center gap-2 text-sm">
                   <input
                     type="checkbox"
-                    checked={selectedPodcasts.length === filteredPodcasts.length && filteredPodcasts.length > 0}
+                    checked={
+                      selectedPodcasts.length === filteredPodcasts.length &&
+                      filteredPodcasts.length > 0
+                    }
                     onChange={handleSelectAll}
                     className="h-4 w-4 text-amani-primary focus:ring-amani-primary border-gray-300 rounded"
                   />
@@ -392,7 +422,10 @@ export default function PodcastsManager() {
 
           <div className="divide-y divide-gray-200">
             {filteredPodcasts.map((podcast) => (
-              <div key={podcast.id} className="p-6 hover:bg-gray-50 transition-colors">
+              <div
+                key={podcast.id}
+                className="p-6 hover:bg-gray-50 transition-colors"
+              >
                 <div className="flex items-start gap-4">
                   <input
                     type="checkbox"
@@ -400,13 +433,13 @@ export default function PodcastsManager() {
                     onChange={() => handlePodcastSelect(podcast.id)}
                     className="mt-2 h-4 w-4 text-amani-primary focus:ring-amani-primary border-gray-300 rounded"
                   />
-                  
+
                   <img
                     src={podcast.coverImage}
                     alt={podcast.title}
                     className="w-20 h-20 rounded-lg object-cover flex-shrink-0"
                   />
-                  
+
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between mb-2">
                       <div>
@@ -418,12 +451,14 @@ export default function PodcastsManager() {
                         </p>
                       </div>
                       <div className="flex items-center gap-2 ml-4">
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(podcast.status)}`}>
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(podcast.status)}`}
+                        >
                           {getStatusLabel(podcast.status)}
                         </span>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
                       <span className="flex items-center gap-1">
                         <Clock className="w-4 h-4" />
@@ -464,13 +499,16 @@ export default function PodcastsManager() {
                         <span className="text-xs text-gray-500">Invités:</span>
                         <div className="flex flex-wrap gap-1">
                           {podcast.guests.map((guest, index) => (
-                            <span key={index} className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">
+                            <span
+                              key={index}
+                              className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded"
+                            >
                               {guest}
                             </span>
                           ))}
                         </div>
                       </div>
-                      
+
                       <div className="flex items-center gap-2">
                         {podcast.audioFile && (
                           <button
@@ -488,7 +526,7 @@ export default function PodcastsManager() {
                             )}
                           </button>
                         )}
-                        
+
                         {hasPermission("view_analytics") && (
                           <Link
                             to={`/dashboard/podcasts/${podcast.id}/analytics`}
@@ -497,7 +535,7 @@ export default function PodcastsManager() {
                             <BarChart3 className="w-4 h-4" />
                           </Link>
                         )}
-                        
+
                         {hasPermission("edit_podcasts") && (
                           <Link
                             to={`/dashboard/podcasts/${podcast.id}/edit`}
@@ -506,11 +544,11 @@ export default function PodcastsManager() {
                             <Edit className="w-4 h-4" />
                           </Link>
                         )}
-                        
+
                         <button className="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors">
                           <Share2 className="w-4 h-4" />
                         </button>
-                        
+
                         {hasPermission("delete_podcasts") && (
                           <button
                             onClick={() => handleDeletePodcast(podcast.id)}
@@ -519,7 +557,7 @@ export default function PodcastsManager() {
                             <Trash2 className="w-4 h-4" />
                           </button>
                         )}
-                        
+
                         <button className="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors">
                           <MoreVertical className="w-4 h-4" />
                         </button>
