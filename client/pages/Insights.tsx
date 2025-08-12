@@ -27,7 +27,7 @@ const Insights = () => {
       readTime: "12 min",
       views: "5.2K",
       date: "2024-03-15",
-      image: "/api/placeholder/600/300",
+      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=300&fit=crop",
       summary: "Une analyse approfondie des tendances qui façonneront l'économie numérique africaine au cours des six prochaines années, avec des prévisions basées sur les données actuelles.",
       tags: ["Économie Numérique", "Prévisions", "Technologie", "Croissance"],
       featured: true,
@@ -41,7 +41,7 @@ const Insights = () => {
       readTime: "8 min",
       views: "3.8K",
       date: "2024-03-14",
-      image: "/api/placeholder/600/300",
+      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=300&fit=crop",
       summary: "Étude sur les transformations du marché de l'emploi avec l'arrivée de l'IA et les stratégies d'adaptation nécessaires pour les travailleurs africains.",
       tags: ["Intelligence Artificielle", "Emploi", "Formation", "Adaptation"],
       featured: false,
@@ -55,7 +55,7 @@ const Insights = () => {
       readTime: "10 min",
       views: "4.1K",
       date: "2024-03-13",
-      image: "/api/placeholder/600/300",
+      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=300&fit=crop",
       summary: "Analyse du phénomène croissant d'adoption des cryptomonnaies sur le continent africain, ses avantages pour l'inclusion financière et les risques associés.",
       tags: ["Cryptomonnaies", "Finance", "Innovation", "Inclusion"],
       featured: true,
@@ -125,25 +125,12 @@ const Insights = () => {
 
   const expertAuthors = [
     {
-      name: "Dr. Amina Kone",
-      title: "Économiste Senior",
-      speciality: "Économie Numérique",
-      articles: 24,
-      followers: "12.5K"
-    },
-    {
-      name: "Prof. Jean-Baptiste Ouédraogo",
-      title: "Professeur en Innovation",
-      speciality: "Intelligence Artificielle",
-      articles: 18,
-      followers: "8.9K"
-    },
-    {
-      name: "Sarah Diallo",
-      title: "Analyste Financière",
-      speciality: "Marchés Financiers",
-      articles: 31,
-      followers: "15.2K"
+      name: "Dr Mohamed Keita",
+      title: "Expert Économiste",
+      speciality: "Économie Africaine",
+      articles: 45,
+      followers: "25.8K",
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face"
     }
   ];
 
@@ -219,8 +206,12 @@ const Insights = () => {
             {expertAuthors.map((author, index) => (
               <Card key={index} className="text-center hover:shadow-lg transition-shadow">
                 <CardContent className="pt-6">
-                  <div className="w-20 h-20 bg-[#373B3A] rounded-full mx-auto mb-4 flex items-center justify-center">
-                    <User className="h-10 w-10 text-white" />
+                  <div className="w-20 h-20 rounded-full mx-auto mb-4 overflow-hidden">
+                    <img
+                      src={author.image}
+                      alt={author.name}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 mb-1">{author.name}</h3>
                   <p className="text-gray-600 mb-2">{author.title}</p>
