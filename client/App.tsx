@@ -25,6 +25,7 @@ import Profile from "./pages/Profile";
 import PermissionsManager from "./pages/PermissionsManager";
 import Users from "./pages/Users";
 import NewUser from "./pages/NewUser";
+import NewUserAdvanced from "./pages/NewUserAdvanced";
 import EditUser from "./pages/EditUser";
 import Marche from "./pages/Marche";
 import Economie from "./pages/Economie";
