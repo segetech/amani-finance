@@ -22,6 +22,7 @@ import Analytics from "./pages/Analytics";
 import Moderation from "./pages/Moderation";
 import Settings from "./pages/Settings";
 import Profile from "./pages/Profile";
+import PermissionsManager from "./pages/PermissionsManager";
 import Users from "./pages/Users";
 import NewUser from "./pages/NewUser";
 import EditUser from "./pages/EditUser";
