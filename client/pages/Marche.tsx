@@ -489,6 +489,8 @@ export default function Marche() {
           </div>
         </div>
       </section>
+
+      <Footer />
     </div>
   );
 }
