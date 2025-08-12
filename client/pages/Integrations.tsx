@@ -70,7 +70,8 @@ export default function Integrations() {
     {
       id: "1",
       name: "BCEAO API",
-      description: "Intégration avec l'API de la Banque Centrale pour les données monétaires",
+      description:
+        "Intégration avec l'API de la Banque Centrale pour les données monétaires",
       category: "financial",
       status: "active",
       provider: "BCEAO",
@@ -85,7 +86,8 @@ export default function Integrations() {
     {
       id: "2",
       name: "UEMOA Data Hub",
-      description: "Accès aux données économiques de l'Union Économique et Monétaire Ouest Africaine",
+      description:
+        "Accès aux données économiques de l'Union Économique et Monétaire Ouest Africaine",
       category: "economic",
       status: "active",
       provider: "UEMOA",
@@ -175,7 +177,8 @@ export default function Integrations() {
     {
       id: "8",
       name: "Webhook Processor",
-      description: "Traitement des webhooks entrants pour synchronisation données",
+      description:
+        "Traitement des webhooks entrants pour synchronisation données",
       category: "automation",
       status: "pending",
       provider: "Custom",
@@ -202,28 +205,34 @@ export default function Integrations() {
   const stats = [
     {
       label: "Intégrations actives",
-      value: integrations.filter(int => int.status === "active").length.toString(),
+      value: integrations
+        .filter((int) => int.status === "active")
+        .length.toString(),
       icon: CheckCircle,
       color: "text-green-600",
       bg: "bg-green-100",
     },
     {
       label: "En configuration",
-      value: integrations.filter(int => int.status === "pending").length.toString(),
+      value: integrations
+        .filter((int) => int.status === "pending")
+        .length.toString(),
       icon: Clock,
       color: "text-amber-600",
       bg: "bg-amber-100",
     },
     {
       label: "Inactives",
-      value: integrations.filter(int => int.status === "inactive").length.toString(),
+      value: integrations
+        .filter((int) => int.status === "inactive")
+        .length.toString(),
       icon: AlertCircle,
       color: "text-red-600",
       bg: "bg-red-100",
     },
     {
       label: "Providers",
-      value: new Set(integrations.map(int => int.provider)).size.toString(),
+      value: new Set(integrations.map((int) => int.provider)).size.toString(),
       icon: Globe,
       color: "text-blue-600",
       bg: "bg-blue-100",
@@ -259,7 +268,9 @@ export default function Integrations() {
   const filteredIntegrations = integrations.filter((integration) => {
     const matchesSearch =
       integration.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      integration.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      integration.description
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
       integration.provider.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory =
       filterCategory === "all" || integration.category === filterCategory;
@@ -271,8 +282,8 @@ export default function Integrations() {
   const handleToggleIntegration = (id: string, currentStatus: string) => {
     const newStatus = currentStatus === "active" ? "inactive" : "active";
     success(
-      "Intégration mise à jour", 
-      `Intégration ${newStatus === "active" ? "activée" : "désactivée"}`
+      "Intégration mise à jour",
+      `Intégration ${newStatus === "active" ? "activée" : "désactivée"}`,
     );
   };
 
@@ -281,7 +292,10 @@ export default function Integrations() {
   };
 
   const handleSyncIntegration = (id: string) => {
-    warning("Synchronisation", `Synchronisation de l'intégration ${id} en cours`);
+    warning(
+      "Synchronisation",
+      `Synchronisation de l'intégration ${id} en cours`,
+    );
   };
 
   const handleDeleteIntegration = (id: string) => {
@@ -289,7 +303,10 @@ export default function Integrations() {
   };
 
   const handleAddIntegration = () => {
-    success("Nouvelle intégration", "Assistant de création d'intégration lancé");
+    success(
+      "Nouvelle intégration",
+      "Assistant de création d'intégration lancé",
+    );
   };
 
   return (
@@ -385,7 +402,9 @@ export default function Integrations() {
                   Aucune intégration trouvée
                 </h3>
                 <p className="text-gray-600 mb-4">
-                  {searchTerm || filterCategory !== "all" || filterStatus !== "all"
+                  {searchTerm ||
+                  filterCategory !== "all" ||
+                  filterStatus !== "all"
                     ? "Aucune intégration ne correspond à vos critères."
                     : "Commencez par ajouter votre première intégration."}
                 </p>
@@ -407,7 +426,9 @@ export default function Integrations() {
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-4 mb-3">
-                          <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${integration.color}`}>
+                          <div
+                            className={`w-12 h-12 rounded-lg flex items-center justify-center ${integration.color}`}
+                          >
                             <integration.icon className="w-6 h-6" />
                           </div>
                           <div>
@@ -418,12 +439,15 @@ export default function Integrations() {
                               </span>
                             </h3>
                             <p className="text-sm text-gray-600">
-                              {integration.provider} • {integration.authentication}
+                              {integration.provider} •{" "}
+                              {integration.authentication}
                             </p>
                           </div>
                         </div>
 
-                        <p className="text-gray-600 mb-4">{integration.description}</p>
+                        <p className="text-gray-600 mb-4">
+                          {integration.description}
+                        </p>
 
                         <div className="space-y-3">
                           <div className="flex items-center gap-4 text-sm">
@@ -458,7 +482,12 @@ export default function Integrations() {
                           <div className="text-sm text-gray-600">
                             <span className="flex items-center gap-1">
                               <Clock className="w-4 h-4" />
-                              Dernière sync: {integration.lastSync === "N/A" ? "Jamais" : new Date(integration.lastSync).toLocaleString("fr-FR")}
+                              Dernière sync:{" "}
+                              {integration.lastSync === "N/A"
+                                ? "Jamais"
+                                : new Date(integration.lastSync).toLocaleString(
+                                    "fr-FR",
+                                  )}
                             </span>
                           </div>
                         </div>
@@ -473,20 +502,30 @@ export default function Integrations() {
                             )}`}
                           >
                             {integration.status === "active" && "Active"}
-                            {integration.status === "pending" && "Configuration"}
+                            {integration.status === "pending" &&
+                              "Configuration"}
                             {integration.status === "inactive" && "Inactive"}
                           </span>
                         </div>
 
                         <div className="flex items-center gap-1">
                           <button
-                            onClick={() => handleToggleIntegration(integration.id, integration.status)}
+                            onClick={() =>
+                              handleToggleIntegration(
+                                integration.id,
+                                integration.status,
+                              )
+                            }
                             className={`p-2 rounded-lg transition-colors ${
                               integration.status === "active"
                                 ? "text-red-600 hover:bg-red-100"
                                 : "text-green-600 hover:bg-green-100"
                             }`}
-                            title={integration.status === "active" ? "Désactiver" : "Activer"}
+                            title={
+                              integration.status === "active"
+                                ? "Désactiver"
+                                : "Activer"
+                            }
                           >
                             {integration.status === "active" ? (
                               <PowerOff className="w-4 h-4" />
@@ -495,21 +534,27 @@ export default function Integrations() {
                             )}
                           </button>
                           <button
-                            onClick={() => handleSyncIntegration(integration.id)}
+                            onClick={() =>
+                              handleSyncIntegration(integration.id)
+                            }
                             className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
                             title="Synchroniser"
                           >
                             <RefreshCw className="w-4 h-4" />
                           </button>
                           <button
-                            onClick={() => handleConfigureIntegration(integration.id)}
+                            onClick={() =>
+                              handleConfigureIntegration(integration.id)
+                            }
                             className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
                             title="Configurer"
                           >
                             <Settings className="w-4 h-4" />
                           </button>
                           <button
-                            onClick={() => handleDeleteIntegration(integration.id)}
+                            onClick={() =>
+                              handleDeleteIntegration(integration.id)
+                            }
                             className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
                             title="Supprimer"
                           >

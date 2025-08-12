@@ -71,7 +71,8 @@ export default function Organizations() {
       website: "https://www.bceao.int",
       email: "contact@bceao.int",
       phone: "+223 20 22 73 00",
-      description: "Institution monétaire régionale de l'Union économique et monétaire ouest-africaine",
+      description:
+        "Institution monétaire régionale de l'Union économique et monétaire ouest-africaine",
       createdAt: "2023-01-15",
       lastActive: "2024-01-15 14:30",
     },
@@ -103,7 +104,8 @@ export default function Organizations() {
       website: "https://www.uemoa.int",
       email: "contact@uemoa.int",
       phone: "+226 25 31 88 73",
-      description: "Union économique et monétaire de huit pays d'Afrique de l'Ouest",
+      description:
+        "Union économique et monétaire de huit pays d'Afrique de l'Ouest",
       createdAt: "2023-02-10",
       lastActive: "2024-01-15 09:15",
     },
@@ -144,28 +146,34 @@ export default function Organizations() {
   const stats = [
     {
       label: "Organisations actives",
-      value: organizations.filter(org => org.status === "active").length.toString(),
+      value: organizations
+        .filter((org) => org.status === "active")
+        .length.toString(),
       icon: Building,
       color: "text-green-600",
       bg: "bg-green-100",
     },
     {
       label: "En attente",
-      value: organizations.filter(org => org.status === "pending").length.toString(),
+      value: organizations
+        .filter((org) => org.status === "pending")
+        .length.toString(),
       icon: Clock,
       color: "text-amber-600",
       bg: "bg-amber-100",
     },
     {
       label: "Membres totaux",
-      value: organizations.reduce((sum, org) => sum + org.members, 0).toString(),
+      value: organizations
+        .reduce((sum, org) => sum + org.members, 0)
+        .toString(),
       icon: Users,
       color: "text-blue-600",
       bg: "bg-blue-100",
     },
     {
       label: "Pays couverts",
-      value: new Set(organizations.map(org => org.country)).size.toString(),
+      value: new Set(organizations.map((org) => org.country)).size.toString(),
       icon: Globe,
       color: "text-purple-600",
       bg: "bg-purple-100",
@@ -204,8 +212,7 @@ export default function Organizations() {
       org.shortName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       org.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
       org.country.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter =
-      filterStatus === "all" || org.status === filterStatus;
+    const matchesFilter = filterStatus === "all" || org.status === filterStatus;
     return matchesSearch && matchesFilter;
   });
 
@@ -380,7 +387,10 @@ export default function Organizations() {
                           </span>
                           <span className="flex items-center gap-1">
                             <Calendar className="w-4 h-4" />
-                            Membre depuis {new Date(org.createdAt).toLocaleDateString("fr-FR")}
+                            Membre depuis{" "}
+                            {new Date(org.createdAt).toLocaleDateString(
+                              "fr-FR",
+                            )}
                           </span>
                         </div>
                       </div>

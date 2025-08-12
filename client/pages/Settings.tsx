@@ -97,10 +97,7 @@ export default function Settings() {
   };
 
   const handleExportSettings = () => {
-    success(
-      "Export terminé",
-      "Les paramètres ont été exportés avec succès.",
-    );
+    success("Export terminé", "Les paramètres ont été exportés avec succès.");
   };
 
   const tabs = [
@@ -268,7 +265,9 @@ export default function Settings() {
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
                     >
                       <option value="Africa/Bamako">Africa/Bamako</option>
-                      <option value="Africa/Ouagadougou">Africa/Ouagadougou</option>
+                      <option value="Africa/Ouagadougou">
+                        Africa/Ouagadougou
+                      </option>
                       <option value="Africa/Niamey">Africa/Niamey</option>
                       <option value="Africa/Ndjamena">Africa/Ndjamena</option>
                     </select>
@@ -295,7 +294,9 @@ export default function Settings() {
 
                 <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                   <div>
-                    <h3 className="font-medium text-gray-900">Mode maintenance</h3>
+                    <h3 className="font-medium text-gray-900">
+                      Mode maintenance
+                    </h3>
                     <p className="text-sm text-gray-600">
                       Activer le mode maintenance pour la plateforme
                     </p>
@@ -336,21 +337,39 @@ export default function Settings() {
 
                 <div className="space-y-4">
                   {[
-                    { key: "emailNotifications", label: "Notifications par email" },
+                    {
+                      key: "emailNotifications",
+                      label: "Notifications par email",
+                    },
                     { key: "pushNotifications", label: "Notifications push" },
                     { key: "newsletterEnabled", label: "Newsletter activée" },
                     { key: "alertsEnabled", label: "Alertes activées" },
-                    { key: "moderationNotifications", label: "Notifications de modération" },
-                    { key: "systemNotifications", label: "Notifications système" },
+                    {
+                      key: "moderationNotifications",
+                      label: "Notifications de modération",
+                    },
+                    {
+                      key: "systemNotifications",
+                      label: "Notifications système",
+                    },
                   ].map((setting) => (
-                    <div key={setting.key} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                    <div
+                      key={setting.key}
+                      className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+                    >
                       <div>
-                        <h3 className="font-medium text-gray-900">{setting.label}</h3>
+                        <h3 className="font-medium text-gray-900">
+                          {setting.label}
+                        </h3>
                       </div>
                       <label className="relative inline-flex items-center cursor-pointer">
                         <input
                           type="checkbox"
-                          checked={notificationSettings[setting.key as keyof typeof notificationSettings] as boolean}
+                          checked={
+                            notificationSettings[
+                              setting.key as keyof typeof notificationSettings
+                            ] as boolean
+                          }
                           onChange={(e) =>
                             setNotificationSettings({
                               ...notificationSettings,
@@ -420,21 +439,48 @@ export default function Settings() {
 
                 <div className="space-y-4">
                   {[
-                    { key: "twoFactorRequired", label: "Authentification à deux facteurs obligatoire" },
-                    { key: "passwordRequireSpecial", label: "Caractères spéciaux obligatoires" },
-                    { key: "passwordRequireNumbers", label: "Chiffres obligatoires" },
-                    { key: "passwordRequireUppercase", label: "Majuscules obligatoires" },
-                    { key: "allowRegistration", label: "Autoriser les inscriptions" },
-                    { key: "requireEmailVerification", label: "Vérification email obligatoire" },
+                    {
+                      key: "twoFactorRequired",
+                      label: "Authentification à deux facteurs obligatoire",
+                    },
+                    {
+                      key: "passwordRequireSpecial",
+                      label: "Caractères spéciaux obligatoires",
+                    },
+                    {
+                      key: "passwordRequireNumbers",
+                      label: "Chiffres obligatoires",
+                    },
+                    {
+                      key: "passwordRequireUppercase",
+                      label: "Majuscules obligatoires",
+                    },
+                    {
+                      key: "allowRegistration",
+                      label: "Autoriser les inscriptions",
+                    },
+                    {
+                      key: "requireEmailVerification",
+                      label: "Vérification email obligatoire",
+                    },
                   ].map((setting) => (
-                    <div key={setting.key} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                    <div
+                      key={setting.key}
+                      className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+                    >
                       <div>
-                        <h3 className="font-medium text-gray-900">{setting.label}</h3>
+                        <h3 className="font-medium text-gray-900">
+                          {setting.label}
+                        </h3>
                       </div>
                       <label className="relative inline-flex items-center cursor-pointer">
                         <input
                           type="checkbox"
-                          checked={securitySettings[setting.key as keyof typeof securitySettings] as boolean}
+                          checked={
+                            securitySettings[
+                              setting.key as keyof typeof securitySettings
+                            ] as boolean
+                          }
                           onChange={(e) =>
                             setSecuritySettings({
                               ...securitySettings,
@@ -504,18 +550,33 @@ export default function Settings() {
 
                 <div className="space-y-4">
                   {[
-                    { key: "allowComments", label: "Autoriser les commentaires" },
-                    { key: "moderateComments", label: "Modérer les commentaires" },
+                    {
+                      key: "allowComments",
+                      label: "Autoriser les commentaires",
+                    },
+                    {
+                      key: "moderateComments",
+                      label: "Modérer les commentaires",
+                    },
                     { key: "autoPublish", label: "Publication automatique" },
                   ].map((setting) => (
-                    <div key={setting.key} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                    <div
+                      key={setting.key}
+                      className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+                    >
                       <div>
-                        <h3 className="font-medium text-gray-900">{setting.label}</h3>
+                        <h3 className="font-medium text-gray-900">
+                          {setting.label}
+                        </h3>
                       </div>
                       <label className="relative inline-flex items-center cursor-pointer">
                         <input
                           type="checkbox"
-                          checked={contentSettings[setting.key as keyof typeof contentSettings] as boolean}
+                          checked={
+                            contentSettings[
+                              setting.key as keyof typeof contentSettings
+                            ] as boolean
+                          }
                           onChange={(e) =>
                             setContentSettings({
                               ...contentSettings,
@@ -546,15 +607,21 @@ export default function Settings() {
                     <p className="text-gray-600">Amani Platform v2.1.0</p>
                   </div>
                   <div className="bg-gray-50 rounded-lg p-4">
-                    <h3 className="font-medium text-gray-900 mb-2">Base de données</h3>
+                    <h3 className="font-medium text-gray-900 mb-2">
+                      Base de données
+                    </h3>
                     <p className="text-gray-600">PostgreSQL 14.9</p>
                   </div>
                   <div className="bg-gray-50 rounded-lg p-4">
-                    <h3 className="font-medium text-gray-900 mb-2">Stockage utilisé</h3>
+                    <h3 className="font-medium text-gray-900 mb-2">
+                      Stockage utilisé
+                    </h3>
                     <p className="text-gray-600">2.4 GB / 10 GB</p>
                   </div>
                   <div className="bg-gray-50 rounded-lg p-4">
-                    <h3 className="font-medium text-gray-900 mb-2">Dernière sauvegarde</h3>
+                    <h3 className="font-medium text-gray-900 mb-2">
+                      Dernière sauvegarde
+                    </h3>
                     <p className="text-gray-600">15 Jan 2024, 03:00</p>
                   </div>
                 </div>
@@ -567,7 +634,8 @@ export default function Settings() {
                         Maintenance programmée
                       </h3>
                       <p className="text-amber-700 text-sm">
-                        Une maintenance est programmée le 20 janvier 2024 de 02:00 à 04:00 UTC.
+                        Une maintenance est programmée le 20 janvier 2024 de
+                        02:00 à 04:00 UTC.
                       </p>
                     </div>
                   </div>

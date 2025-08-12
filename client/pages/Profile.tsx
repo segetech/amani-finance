@@ -67,14 +67,20 @@ export default function Profile() {
   const handleSaveProfile = async () => {
     setIsSaving(true);
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    success("Profil mis à jour", "Vos informations ont été sauvegardées avec succès.");
+    success(
+      "Profil mis à jour",
+      "Vos informations ont été sauvegardées avec succès.",
+    );
     setIsSaving(false);
   };
 
   const handleSavePreferences = async () => {
     setIsSaving(true);
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    success("Préférences mises à jour", "Vos préférences ont été sauvegardées avec succès.");
+    success(
+      "Préférences mises à jour",
+      "Vos préférences ont été sauvegardées avec succès.",
+    );
     setIsSaving(false);
   };
 
@@ -89,8 +95,15 @@ export default function Profile() {
     }
     setIsSaving(true);
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    success("Mot de passe mis à jour", "Votre mot de passe a été changé avec succès.");
-    setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" });
+    success(
+      "Mot de passe mis à jour",
+      "Votre mot de passe a été changé avec succès.",
+    );
+    setPasswordData({
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+    });
     setIsSaving(false);
   };
 
@@ -242,7 +255,10 @@ export default function Profile() {
                         type="text"
                         value={profileData.firstName}
                         onChange={(e) =>
-                          setProfileData({ ...profileData, firstName: e.target.value })
+                          setProfileData({
+                            ...profileData,
+                            firstName: e.target.value,
+                          })
                         }
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
                       />
@@ -255,7 +271,10 @@ export default function Profile() {
                         type="text"
                         value={profileData.lastName}
                         onChange={(e) =>
-                          setProfileData({ ...profileData, lastName: e.target.value })
+                          setProfileData({
+                            ...profileData,
+                            lastName: e.target.value,
+                          })
                         }
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
                       />
@@ -268,7 +287,10 @@ export default function Profile() {
                         type="email"
                         value={profileData.email}
                         onChange={(e) =>
-                          setProfileData({ ...profileData, email: e.target.value })
+                          setProfileData({
+                            ...profileData,
+                            email: e.target.value,
+                          })
                         }
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
                       />
@@ -281,7 +303,10 @@ export default function Profile() {
                         type="tel"
                         value={profileData.phone}
                         onChange={(e) =>
-                          setProfileData({ ...profileData, phone: e.target.value })
+                          setProfileData({
+                            ...profileData,
+                            phone: e.target.value,
+                          })
                         }
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
                       />
@@ -294,7 +319,10 @@ export default function Profile() {
                         type="text"
                         value={profileData.organization}
                         onChange={(e) =>
-                          setProfileData({ ...profileData, organization: e.target.value })
+                          setProfileData({
+                            ...profileData,
+                            organization: e.target.value,
+                          })
                         }
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
                       />
@@ -307,7 +335,10 @@ export default function Profile() {
                         type="text"
                         value={profileData.location}
                         onChange={(e) =>
-                          setProfileData({ ...profileData, location: e.target.value })
+                          setProfileData({
+                            ...profileData,
+                            location: e.target.value,
+                          })
                         }
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
                       />
@@ -355,7 +386,10 @@ export default function Profile() {
                       <select
                         value={preferences.language}
                         onChange={(e) =>
-                          setPreferences({ ...preferences, language: e.target.value })
+                          setPreferences({
+                            ...preferences,
+                            language: e.target.value,
+                          })
                         }
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
                       >
@@ -370,12 +404,17 @@ export default function Profile() {
                       <select
                         value={preferences.timezone}
                         onChange={(e) =>
-                          setPreferences({ ...preferences, timezone: e.target.value })
+                          setPreferences({
+                            ...preferences,
+                            timezone: e.target.value,
+                          })
                         }
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
                       >
                         <option value="Africa/Bamako">Africa/Bamako</option>
-                        <option value="Africa/Ouagadougou">Africa/Ouagadougou</option>
+                        <option value="Africa/Ouagadougou">
+                          Africa/Ouagadougou
+                        </option>
                         <option value="Africa/Niamey">Africa/Niamey</option>
                         <option value="Africa/Ndjamena">Africa/Ndjamena</option>
                       </select>
@@ -383,23 +422,37 @@ export default function Profile() {
                   </div>
 
                   <div className="space-y-4">
-                    <h3 className="text-lg font-medium text-gray-900">Notifications</h3>
+                    <h3 className="text-lg font-medium text-gray-900">
+                      Notifications
+                    </h3>
                     {[
-                      { key: "emailNotifications", label: "Notifications par email" },
+                      {
+                        key: "emailNotifications",
+                        label: "Notifications par email",
+                      },
                       { key: "pushNotifications", label: "Notifications push" },
                       { key: "marketingEmails", label: "Emails marketing" },
                       { key: "securityAlerts", label: "Alertes de sécurité" },
                       { key: "weeklyDigest", label: "Résumé hebdomadaire" },
                       { key: "instantAlerts", label: "Alertes instantanées" },
                     ].map((setting) => (
-                      <div key={setting.key} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                      <div
+                        key={setting.key}
+                        className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+                      >
                         <div>
-                          <h4 className="font-medium text-gray-900">{setting.label}</h4>
+                          <h4 className="font-medium text-gray-900">
+                            {setting.label}
+                          </h4>
                         </div>
                         <label className="relative inline-flex items-center cursor-pointer">
                           <input
                             type="checkbox"
-                            checked={preferences[setting.key as keyof typeof preferences] as boolean}
+                            checked={
+                              preferences[
+                                setting.key as keyof typeof preferences
+                              ] as boolean
+                            }
                             onChange={(e) =>
                               setPreferences({
                                 ...preferences,
@@ -447,7 +500,9 @@ export default function Profile() {
                               className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
                             />
                             <button
-                              onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                              onClick={() =>
+                                setShowCurrentPassword(!showCurrentPassword)
+                              }
                               className="absolute inset-y-0 right-0 pr-3 flex items-center"
                             >
                               {showCurrentPassword ? (
@@ -475,7 +530,9 @@ export default function Profile() {
                               className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
                             />
                             <button
-                              onClick={() => setShowNewPassword(!showNewPassword)}
+                              onClick={() =>
+                                setShowNewPassword(!showNewPassword)
+                              }
                               className="absolute inset-y-0 right-0 pr-3 flex items-center"
                             >
                               {showNewPassword ? (
@@ -508,7 +565,9 @@ export default function Profile() {
                           className="flex items-center gap-2 px-4 py-2 bg-amani-primary text-white rounded-lg hover:bg-amani-primary/90 transition-colors disabled:opacity-50"
                         >
                           <Key className="w-4 h-4" />
-                          {isSaving ? "Mise à jour..." : "Changer le mot de passe"}
+                          {isSaving
+                            ? "Mise à jour..."
+                            : "Changer le mot de passe"}
                         </button>
                       </div>
                     </div>
@@ -569,14 +628,23 @@ export default function Profile() {
                         icon: BarChart3,
                       },
                     ].map((activity, index) => (
-                      <div key={index} className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
+                      <div
+                        key={index}
+                        className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg"
+                      >
                         <div className="p-2 bg-white rounded-lg">
                           <activity.icon className="w-4 h-4 text-amani-primary" />
                         </div>
                         <div className="flex-1">
-                          <h4 className="font-medium text-gray-900">{activity.action}</h4>
-                          <p className="text-sm text-gray-600">{activity.description}</p>
-                          <p className="text-xs text-gray-500 mt-1">{activity.time}</p>
+                          <h4 className="font-medium text-gray-900">
+                            {activity.action}
+                          </h4>
+                          <p className="text-sm text-gray-600">
+                            {activity.description}
+                          </p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            {activity.time}
+                          </p>
                         </div>
                       </div>
                     ))}

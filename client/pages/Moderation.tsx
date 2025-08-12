@@ -340,7 +340,9 @@ export default function Moderation() {
                       </div>
                       <div className="flex items-center gap-2 ml-4">
                         <button
-                          onClick={() => handleApprove(report.id, "Signalement")}
+                          onClick={() =>
+                            handleApprove(report.id, "Signalement")
+                          }
                           className="p-2 text-green-600 hover:bg-green-100 rounded-lg transition-colors"
                           title="Approuver"
                         >
@@ -406,14 +408,18 @@ export default function Moderation() {
                       </div>
                       <div className="flex items-center gap-2 ml-4">
                         <button
-                          onClick={() => handleApprove(comment.id, "Commentaire")}
+                          onClick={() =>
+                            handleApprove(comment.id, "Commentaire")
+                          }
                           className="p-2 text-green-600 hover:bg-green-100 rounded-lg transition-colors"
                           title="Approuver"
                         >
                           <Check className="w-4 h-4" />
                         </button>
                         <button
-                          onClick={() => handleReject(comment.id, "Commentaire")}
+                          onClick={() =>
+                            handleReject(comment.id, "Commentaire")
+                          }
                           className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
                           title="Rejeter"
                         >

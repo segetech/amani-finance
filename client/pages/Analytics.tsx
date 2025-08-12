@@ -299,9 +299,7 @@ export default function Analytics() {
                         {article.category}
                       </span>
                     </td>
-                    <td className="py-3 px-4 text-gray-600">
-                      {article.views}
-                    </td>
+                    <td className="py-3 px-4 text-gray-600">{article.views}</td>
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-2">
                         <div className="flex-1 bg-gray-200 rounded-full h-2">
@@ -352,9 +350,7 @@ export default function Analytics() {
               <div className="text-3xl font-bold text-amani-primary mb-2">
                 3
               </div>
-              <div className="text-sm text-gray-600">
-                Nouveaux abonnements
-              </div>
+              <div className="text-sm text-gray-600">Nouveaux abonnements</div>
             </div>
           </div>
         </div>
