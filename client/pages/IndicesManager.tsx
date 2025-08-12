@@ -23,7 +23,7 @@ import {
   CheckCircle,
   Clock,
   MoreVertical,
-  Refresh,
+  RefreshCw,
   Database,
   FileSpreadsheet,
   Share2,
@@ -411,7 +411,7 @@ export default function IndicesManager() {
                 className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
               >
                 <option value="all">Tous les statuts</option>
-                <option value="published">Publi��</option>
+                <option value="published">Publié</option>
                 <option value="draft">Brouillon</option>
               </select>
             </div>
