@@ -168,7 +168,7 @@ export default function DashboardSidebar() {
       key: "moderation",
       items: [
         {
-          label: "Centre de mod��ration",
+          label: "Centre de modération",
           path: "/dashboard/moderation",
           icon: Shield,
           permission: "moderate_comments",
