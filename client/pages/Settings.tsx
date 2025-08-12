@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
+import DashboardLayout from "../components/DashboardLayout";
 import {
   Settings as SettingsIcon,
   Bell,
@@ -13,7 +14,6 @@ import {
   Upload,
   Download,
   Save,
-  ArrowLeft,
   Eye,
   EyeOff,
   AlertCircle,
@@ -29,6 +29,34 @@ export default function Settings() {
   const { success, error, warning } = useToast();
   const [activeTab, setActiveTab] = useState("general");
   const [isSaving, setIsSaving] = useState(false);
+
+  // Check permissions
+  if (!user || !hasPermission("system_settings")) {
+    return (
+      <DashboardLayout
+        title="Accès refusé"
+        subtitle="Vous n'avez pas les permissions nécessaires"
+      >
+        <div className="flex items-center justify-center py-12">
+          <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md">
+            <h2 className="text-2xl font-bold text-amani-primary mb-4">
+              Accès refusé
+            </h2>
+            <p className="text-gray-600 mb-6">
+              Vous n'avez pas les permissions nécessaires pour accéder aux
+              paramètres système.
+            </p>
+            <Link
+              to="/dashboard"
+              className="bg-amani-primary text-white px-6 py-2 rounded-lg hover:bg-amani-primary/90 transition-colors"
+            >
+              Retour au tableau de bord
+            </Link>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   const [generalSettings, setGeneralSettings] = useState({
     siteName: "Amani - African Market & News Insights",
@@ -81,7 +109,6 @@ export default function Settings() {
 
   const handleSave = async (settingsType: string) => {
     setIsSaving(true);
-    // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1000));
     success(
       "Paramètres sauvegardés",
@@ -91,7 +118,6 @@ export default function Settings() {
   };
 
   const handleImportSettings = () => {
-    // Simulate import
     warning(
       "Import terminé",
       "Les paramètres ont été importés. Vérifiez les modifications.",
@@ -99,764 +125,458 @@ export default function Settings() {
   };
 
   const handleExportSettings = () => {
-    // Simulate export
-    success("Export réussi", "Les paramètres ont été exportés avec succès.");
-  };
-
-  const handleTestEmail = async () => {
-    setIsSaving(true);
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    success("Test envoyé", "Email de test envoyé avec succès.");
-    setIsSaving(false);
+    success(
+      "Export terminé",
+      "Les paramètres ont été exportés avec succès.",
+    );
   };
 
   const tabs = [
-    {
-      id: "general",
-      name: "Général",
-      icon: SettingsIcon,
-      description: "Configuration générale du site",
-    },
-    {
-      id: "notifications",
-      name: "Notifications",
-      icon: Bell,
-      description: "Paramètres d'email et notifications",
-    },
-    {
-      id: "security",
-      name: "Sécurité",
-      icon: Shield,
-      description: "Authentification et sécurité",
-    },
-    {
-      id: "content",
-      name: "Contenu",
-      icon: FileText,
-      description: "Gestion du contenu et médias",
-    },
+    { id: "general", label: "Général", icon: SettingsIcon },
+    { id: "notifications", label: "Notifications", icon: Bell },
+    { id: "security", label: "Sécurité", icon: Shield },
+    { id: "content", label: "Contenu", icon: FileText },
+    { id: "system", label: "Système", icon: Database },
   ];
 
-  // Check permissions
-  if (!user || !hasPermission("system_settings")) {
-    return (
-      <div className="min-h-screen bg-[#E5DDD2] flex items-center justify-center">
-        <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md">
-          <h2 className="text-2xl font-bold text-amani-primary mb-4">
-            Accès refusé
-          </h2>
-          <p className="text-gray-600 mb-6">
-            Vous n'avez pas les permissions nécessaires pour accéder aux
-            paramètres système.
-          </p>
-          <Link
-            to="/dashboard"
-            className="bg-amani-primary text-white px-6 py-2 rounded-lg hover:bg-amani-primary/90 transition-colors"
-          >
-            Retour au tableau de bord
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-[#E5DDD2]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <Link
-            to="/dashboard"
-            className="inline-flex items-center gap-2 text-amani-primary hover:text-amani-primary/80 mb-4"
+    <DashboardLayout
+      title="Paramètres système"
+      subtitle="Configurez les paramètres de la plateforme"
+      actions={
+        <>
+          <button
+            onClick={handleImportSettings}
+            className="flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
           >
-            <ArrowLeft className="w-4 h-4" />
-            Retour au tableau de bord
-          </Link>
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-            <div>
-              <h1 className="text-4xl font-bold text-amani-primary mb-2">
-                Paramètres système
-              </h1>
-              <p className="text-gray-600">
-                Configurez les paramètres de la plateforme Amani
-              </p>
-            </div>
-            <div className="flex items-center gap-4">
-              <button
-                onClick={handleImportSettings}
-                className="flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                <Upload className="w-4 h-4" />
-                Importer
-              </button>
-              <button
-                onClick={handleExportSettings}
-                className="flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                <Download className="w-4 h-4" />
-                Exporter
-              </button>
-            </div>
+            <Upload className="w-4 h-4" />
+            Importer
+          </button>
+          <button
+            onClick={handleExportSettings}
+            className="flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <Download className="w-4 h-4" />
+            Exporter
+          </button>
+        </>
+      }
+    >
+      <div className="grid lg:grid-cols-4 gap-8">
+        {/* Sidebar Navigation */}
+        <div className="lg:col-span-1">
+          <div className="bg-white rounded-2xl shadow-lg border border-white/50 p-4">
+            <nav className="space-y-2">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`w-full flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-colors ${
+                    activeTab === tab.id
+                      ? "bg-amani-primary text-white"
+                      : "text-gray-700 hover:bg-gray-100"
+                  }`}
+                >
+                  <tab.icon className="w-4 h-4" />
+                  {tab.label}
+                </button>
+              ))}
+            </nav>
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-4 gap-8">
-          {/* Sidebar */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl shadow-lg border border-white/50 p-6">
-              <h3 className="font-semibold text-amani-primary mb-4">
-                Catégories
-              </h3>
-              <nav className="space-y-2">
-                {tabs.map((tab) => (
+        {/* Main Content */}
+        <div className="lg:col-span-3">
+          <div className="bg-white rounded-2xl shadow-lg border border-white/50 p-6">
+            {activeTab === "general" && (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-semibold text-amani-primary">
+                    Paramètres généraux
+                  </h2>
                   <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`w-full text-left p-3 rounded-lg transition-colors ${
-                      activeTab === tab.id
-                        ? "bg-amani-secondary/20 text-amani-primary border-l-4 border-amani-primary"
-                        : "text-gray-600 hover:bg-gray-50"
-                    }`}
+                    onClick={() => handleSave("généraux")}
+                    disabled={isSaving}
+                    className="flex items-center gap-2 px-4 py-2 bg-amani-primary text-white rounded-lg hover:bg-amani-primary/90 transition-colors disabled:opacity-50"
                   >
-                    <div className="flex items-center gap-3">
-                      <tab.icon className="w-5 h-5" />
-                      <div>
-                        <div className="font-medium">{tab.name}</div>
-                        <div className="text-xs text-gray-500">
-                          {tab.description}
-                        </div>
-                      </div>
-                    </div>
+                    <Save className="w-4 h-4" />
+                    {isSaving ? "Sauvegarde..." : "Sauvegarder"}
                   </button>
-                ))}
-              </nav>
-            </div>
-          </div>
+                </div>
 
-          {/* Content */}
-          <div className="lg:col-span-3">
-            <div className="bg-white rounded-2xl shadow-lg border border-white/50">
-              {/* General Settings */}
-              {activeTab === "general" && (
-                <div className="p-6">
-                  <div className="flex items-center gap-3 mb-6">
-                    <SettingsIcon className="w-6 h-6 text-amani-primary" />
-                    <h2 className="text-xl font-semibold text-amani-primary">
-                      Paramètres généraux
-                    </h2>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Nom du site
+                    </label>
+                    <input
+                      type="text"
+                      value={generalSettings.siteName}
+                      onChange={(e) =>
+                        setGeneralSettings({
+                          ...generalSettings,
+                          siteName: e.target.value,
+                        })
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
+                    />
                   </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Email de contact
+                    </label>
+                    <input
+                      type="email"
+                      value={generalSettings.contactEmail}
+                      onChange={(e) =>
+                        setGeneralSettings({
+                          ...generalSettings,
+                          contactEmail: e.target.value,
+                        })
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Description du site
+                    </label>
+                    <textarea
+                      value={generalSettings.siteDescription}
+                      onChange={(e) =>
+                        setGeneralSettings({
+                          ...generalSettings,
+                          siteDescription: e.target.value,
+                        })
+                      }
+                      rows={3}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Fuseau horaire
+                    </label>
+                    <select
+                      value={generalSettings.timezone}
+                      onChange={(e) =>
+                        setGeneralSettings({
+                          ...generalSettings,
+                          timezone: e.target.value,
+                        })
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
+                    >
+                      <option value="Africa/Bamako">Africa/Bamako</option>
+                      <option value="Africa/Ouagadougou">Africa/Ouagadougou</option>
+                      <option value="Africa/Niamey">Africa/Niamey</option>
+                      <option value="Africa/Ndjamena">Africa/Ndjamena</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Langue
+                    </label>
+                    <select
+                      value={generalSettings.language}
+                      onChange={(e) =>
+                        setGeneralSettings({
+                          ...generalSettings,
+                          language: e.target.value,
+                        })
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
+                    >
+                      <option value="fr">Français</option>
+                      <option value="en">English</option>
+                    </select>
+                  </div>
+                </div>
 
-                  <div className="space-y-6">
-                    <div className="grid md:grid-cols-2 gap-6">
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div>
+                    <h3 className="font-medium text-gray-900">Mode maintenance</h3>
+                    <p className="text-sm text-gray-600">
+                      Activer le mode maintenance pour la plateforme
+                    </p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={generalSettings.maintenanceMode}
+                      onChange={(e) =>
+                        setGeneralSettings({
+                          ...generalSettings,
+                          maintenanceMode: e.target.checked,
+                        })
+                      }
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amani-primary/25 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amani-primary"></div>
+                  </label>
+                </div>
+              </div>
+            )}
+
+            {activeTab === "notifications" && (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-semibold text-amani-primary">
+                    Paramètres de notifications
+                  </h2>
+                  <button
+                    onClick={() => handleSave("de notifications")}
+                    disabled={isSaving}
+                    className="flex items-center gap-2 px-4 py-2 bg-amani-primary text-white rounded-lg hover:bg-amani-primary/90 transition-colors disabled:opacity-50"
+                  >
+                    <Save className="w-4 h-4" />
+                    {isSaving ? "Sauvegarde..." : "Sauvegarder"}
+                  </button>
+                </div>
+
+                <div className="space-y-4">
+                  {[
+                    { key: "emailNotifications", label: "Notifications par email" },
+                    { key: "pushNotifications", label: "Notifications push" },
+                    { key: "newsletterEnabled", label: "Newsletter activée" },
+                    { key: "alertsEnabled", label: "Alertes activées" },
+                    { key: "moderationNotifications", label: "Notifications de modération" },
+                    { key: "systemNotifications", label: "Notifications système" },
+                  ].map((setting) => (
+                    <div key={setting.key} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Nom du site
-                        </label>
+                        <h3 className="font-medium text-gray-900">{setting.label}</h3>
+                      </div>
+                      <label className="relative inline-flex items-center cursor-pointer">
                         <input
-                          type="text"
-                          value={generalSettings.siteName}
+                          type="checkbox"
+                          checked={notificationSettings[setting.key as keyof typeof notificationSettings] as boolean}
                           onChange={(e) =>
-                            setGeneralSettings((prev) => ({
-                              ...prev,
-                              siteName: e.target.value,
-                            }))
+                            setNotificationSettings({
+                              ...notificationSettings,
+                              [setting.key]: e.target.checked,
+                            })
                           }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
+                          className="sr-only peer"
                         />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Email de contact
-                        </label>
-                        <input
-                          type="email"
-                          value={generalSettings.contactEmail}
-                          onChange={(e) =>
-                            setGeneralSettings((prev) => ({
-                              ...prev,
-                              contactEmail: e.target.value,
-                            }))
-                          }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Fuseau horaire
-                        </label>
-                        <select
-                          value={generalSettings.timezone}
-                          onChange={(e) =>
-                            setGeneralSettings((prev) => ({
-                              ...prev,
-                              timezone: e.target.value,
-                            }))
-                          }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
-                        >
-                          <option value="Africa/Bamako">
-                            Africa/Bamako (GMT+0)
-                          </option>
-                          <option value="Africa/Ouagadougou">
-                            Africa/Ouagadougou (GMT+0)
-                          </option>
-                          <option value="Africa/Niamey">
-                            Africa/Niamey (GMT+1)
-                          </option>
-                          <option value="Africa/Ndjamena">
-                            Africa/Ndjamena (GMT+1)
-                          </option>
-                        </select>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Langue par défaut
-                        </label>
-                        <select
-                          value={generalSettings.language}
-                          onChange={(e) =>
-                            setGeneralSettings((prev) => ({
-                              ...prev,
-                              language: e.target.value,
-                            }))
-                          }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
-                        >
-                          <option value="fr">Français</option>
-                          <option value="en">English</option>
-                          <option value="ar">العربية</option>
-                        </select>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Description du site
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amani-primary/25 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amani-primary"></div>
                       </label>
-                      <textarea
-                        rows={3}
-                        value={generalSettings.siteDescription}
-                        onChange={(e) =>
-                          setGeneralSettings((prev) => ({
-                            ...prev,
-                            siteDescription: e.target.value,
-                          }))
-                        }
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
-                      />
                     </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
-                    <div className="border-t border-gray-200 pt-6">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h3 className="text-lg font-medium text-gray-900">
-                            Mode maintenance
-                          </h3>
-                          <p className="text-sm text-gray-500">
-                            Activer le mode maintenance pour les mises à jour
-                          </p>
-                        </div>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={generalSettings.maintenanceMode}
-                            onChange={(e) =>
-                              setGeneralSettings((prev) => ({
-                                ...prev,
-                                maintenanceMode: e.target.checked,
-                              }))
-                            }
-                            className="sr-only peer"
-                          />
-                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amani-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amani-primary"></div>
-                        </label>
-                      </div>
-                    </div>
+            {activeTab === "security" && (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-semibold text-amani-primary">
+                    Paramètres de sécurité
+                  </h2>
+                  <button
+                    onClick={() => handleSave("de sécurité")}
+                    disabled={isSaving}
+                    className="flex items-center gap-2 px-4 py-2 bg-amani-primary text-white rounded-lg hover:bg-amani-primary/90 transition-colors disabled:opacity-50"
+                  >
+                    <Save className="w-4 h-4" />
+                    {isSaving ? "Sauvegarde..." : "Sauvegarder"}
+                  </button>
+                </div>
 
-                    <div className="flex justify-end">
-                      <button
-                        onClick={() => handleSave("généraux")}
-                        disabled={isSaving}
-                        className="flex items-center gap-2 px-6 py-3 bg-amani-primary text-white rounded-lg hover:bg-amani-primary/90 transition-colors disabled:opacity-50"
-                      >
-                        {isSaving ? (
-                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                        ) : (
-                          <Save className="w-4 h-4" />
-                        )}
-                        Sauvegarder
-                      </button>
-                    </div>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Durée de session (heures)
+                    </label>
+                    <input
+                      type="number"
+                      value={securitySettings.sessionTimeout}
+                      onChange={(e) =>
+                        setSecuritySettings({
+                          ...securitySettings,
+                          sessionTimeout: e.target.value,
+                        })
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Longueur minimale du mot de passe
+                    </label>
+                    <input
+                      type="number"
+                      value={securitySettings.passwordMinLength}
+                      onChange={(e) =>
+                        setSecuritySettings({
+                          ...securitySettings,
+                          passwordMinLength: e.target.value,
+                        })
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
+                    />
                   </div>
                 </div>
-              )}
 
-              {/* Notification Settings */}
-              {activeTab === "notifications" && (
-                <div className="p-6">
-                  <div className="flex items-center gap-3 mb-6">
-                    <Bell className="w-6 h-6 text-amani-primary" />
-                    <h2 className="text-xl font-semibold text-amani-primary">
-                      Paramètres de notification
-                    </h2>
-                  </div>
-
-                  <div className="space-y-6">
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <div className="space-y-4">
-                        <h3 className="font-medium text-gray-900">
-                          Types de notifications
-                        </h3>
-                        {[
-                          {
-                            key: "emailNotifications",
-                            label: "Notifications par email",
-                          },
-                          {
-                            key: "pushNotifications",
-                            label: "Notifications push",
-                          },
-                          { key: "newsletterEnabled", label: "Newsletter" },
-                          { key: "alertsEnabled", label: "Alertes" },
-                          {
-                            key: "moderationNotifications",
-                            label: "Notifications de modération",
-                          },
-                          {
-                            key: "systemNotifications",
-                            label: "Notifications système",
-                          },
-                        ].map((item) => (
-                          <div
-                            key={item.key}
-                            className="flex items-center justify-between"
-                          >
-                            <span className="text-sm text-gray-700">
-                              {item.label}
-                            </span>
-                            <label className="relative inline-flex items-center cursor-pointer">
-                              <input
-                                type="checkbox"
-                                checked={
-                                  notificationSettings[
-                                    item.key as keyof typeof notificationSettings
-                                  ] as boolean
-                                }
-                                onChange={(e) =>
-                                  setNotificationSettings((prev) => ({
-                                    ...prev,
-                                    [item.key]: e.target.checked,
-                                  }))
-                                }
-                                className="sr-only peer"
-                              />
-                              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amani-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amani-primary"></div>
-                            </label>
-                          </div>
-                        ))}
-                      </div>
-
-                      <div className="space-y-4">
-                        <h3 className="font-medium text-gray-900">
-                          Configuration SMTP
-                        </h3>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Serveur SMTP
-                          </label>
-                          <input
-                            type="text"
-                            value={notificationSettings.smtpHost}
-                            onChange={(e) =>
-                              setNotificationSettings((prev) => ({
-                                ...prev,
-                                smtpHost: e.target.value,
-                              }))
-                            }
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Port
-                          </label>
-                          <input
-                            type="text"
-                            value={notificationSettings.smtpPort}
-                            onChange={(e) =>
-                              setNotificationSettings((prev) => ({
-                                ...prev,
-                                smtpPort: e.target.value,
-                              }))
-                            }
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Utilisateur SMTP
-                          </label>
-                          <input
-                            type="email"
-                            value={notificationSettings.smtpUser}
-                            onChange={(e) =>
-                              setNotificationSettings((prev) => ({
-                                ...prev,
-                                smtpUser: e.target.value,
-                              }))
-                            }
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="border-t border-gray-200 pt-6">
-                      <div className="flex items-center gap-4">
-                        <button
-                          onClick={handleTestEmail}
-                          disabled={isSaving}
-                          className="flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
-                        >
-                          {isSaving ? (
-                            <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
-                          ) : (
-                            <Mail className="w-4 h-4" />
-                          )}
-                          Tester l'email
-                        </button>
-                        <button
-                          onClick={() => handleSave("de notification")}
-                          disabled={isSaving}
-                          className="flex items-center gap-2 px-6 py-3 bg-amani-primary text-white rounded-lg hover:bg-amani-primary/90 transition-colors disabled:opacity-50"
-                        >
-                          <Save className="w-4 h-4" />
-                          Sauvegarder
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Security Settings */}
-              {activeTab === "security" && (
-                <div className="p-6">
-                  <div className="flex items-center gap-3 mb-6">
-                    <Shield className="w-6 h-6 text-amani-primary" />
-                    <h2 className="text-xl font-semibold text-amani-primary">
-                      Paramètres de sécurité
-                    </h2>
-                  </div>
-
-                  <div className="space-y-6">
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <div className="space-y-4">
-                        <h3 className="font-medium text-gray-900">
-                          Authentification
-                        </h3>
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm text-gray-700">
-                            Double authentification obligatoire
-                          </span>
-                          <label className="relative inline-flex items-center cursor-pointer">
-                            <input
-                              type="checkbox"
-                              checked={securitySettings.twoFactorRequired}
-                              onChange={(e) =>
-                                setSecuritySettings((prev) => ({
-                                  ...prev,
-                                  twoFactorRequired: e.target.checked,
-                                }))
-                              }
-                              className="sr-only peer"
-                            />
-                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amani-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amani-primary"></div>
-                          </label>
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Durée de session (heures)
-                          </label>
-                          <input
-                            type="number"
-                            value={securitySettings.sessionTimeout}
-                            onChange={(e) =>
-                              setSecuritySettings((prev) => ({
-                                ...prev,
-                                sessionTimeout: e.target.value,
-                              }))
-                            }
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Tentatives de connexion max
-                          </label>
-                          <input
-                            type="number"
-                            value={securitySettings.maxLoginAttempts}
-                            onChange={(e) =>
-                              setSecuritySettings((prev) => ({
-                                ...prev,
-                                maxLoginAttempts: e.target.value,
-                              }))
-                            }
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
-                          />
-                        </div>
-                      </div>
-
-                      <div className="space-y-4">
-                        <h3 className="font-medium text-gray-900">
-                          Politique des mots de passe
-                        </h3>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Longueur minimale
-                          </label>
-                          <input
-                            type="number"
-                            value={securitySettings.passwordMinLength}
-                            onChange={(e) =>
-                              setSecuritySettings((prev) => ({
-                                ...prev,
-                                passwordMinLength: e.target.value,
-                              }))
-                            }
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
-                          />
-                        </div>
-                        {[
-                          {
-                            key: "passwordRequireSpecial",
-                            label: "Caractères spéciaux requis",
-                          },
-                          {
-                            key: "passwordRequireNumbers",
-                            label: "Chiffres requis",
-                          },
-                          {
-                            key: "passwordRequireUppercase",
-                            label: "Majuscules requises",
-                          },
-                        ].map((item) => (
-                          <div
-                            key={item.key}
-                            className="flex items-center justify-between"
-                          >
-                            <span className="text-sm text-gray-700">
-                              {item.label}
-                            </span>
-                            <label className="relative inline-flex items-center cursor-pointer">
-                              <input
-                                type="checkbox"
-                                checked={
-                                  securitySettings[
-                                    item.key as keyof typeof securitySettings
-                                  ] as boolean
-                                }
-                                onChange={(e) =>
-                                  setSecuritySettings((prev) => ({
-                                    ...prev,
-                                    [item.key]: e.target.checked,
-                                  }))
-                                }
-                                className="sr-only peer"
-                              />
-                              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amani-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amani-primary"></div>
-                            </label>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="border-t border-gray-200 pt-6">
-                      <div className="flex justify-end">
-                        <button
-                          onClick={() => handleSave("de sécurité")}
-                          disabled={isSaving}
-                          className="flex items-center gap-2 px-6 py-3 bg-amani-primary text-white rounded-lg hover:bg-amani-primary/90 transition-colors disabled:opacity-50"
-                        >
-                          <Save className="w-4 h-4" />
-                          Sauvegarder
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Content Settings */}
-              {activeTab === "content" && (
-                <div className="p-6">
-                  <div className="flex items-center gap-3 mb-6">
-                    <FileText className="w-6 h-6 text-amani-primary" />
-                    <h2 className="text-xl font-semibold text-amani-primary">
-                      Paramètres de contenu
-                    </h2>
-                  </div>
-
-                  <div className="space-y-6">
-                    <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  {[
+                    { key: "twoFactorRequired", label: "Authentification à deux facteurs obligatoire" },
+                    { key: "passwordRequireSpecial", label: "Caractères spéciaux obligatoires" },
+                    { key: "passwordRequireNumbers", label: "Chiffres obligatoires" },
+                    { key: "passwordRequireUppercase", label: "Majuscules obligatoires" },
+                    { key: "allowRegistration", label: "Autoriser les inscriptions" },
+                    { key: "requireEmailVerification", label: "Vérification email obligatoire" },
+                  ].map((setting) => (
+                    <div key={setting.key} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Articles par page
-                        </label>
+                        <h3 className="font-medium text-gray-900">{setting.label}</h3>
+                      </div>
+                      <label className="relative inline-flex items-center cursor-pointer">
                         <input
-                          type="number"
-                          value={contentSettings.articlesPerPage}
+                          type="checkbox"
+                          checked={securitySettings[setting.key as keyof typeof securitySettings] as boolean}
                           onChange={(e) =>
-                            setContentSettings((prev) => ({
-                              ...prev,
-                              articlesPerPage: e.target.value,
-                            }))
+                            setSecuritySettings({
+                              ...securitySettings,
+                              [setting.key]: e.target.checked,
+                            })
                           }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
+                          className="sr-only peer"
                         />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Catégorie par défaut
-                        </label>
-                        <select
-                          value={contentSettings.defaultCategory}
-                          onChange={(e) =>
-                            setContentSettings((prev) => ({
-                              ...prev,
-                              defaultCategory: e.target.value,
-                            }))
-                          }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
-                        >
-                          <option value="economie">Économie</option>
-                          <option value="marche">Marché</option>
-                          <option value="industrie">Industrie</option>
-                          <option value="tech">Tech</option>
-                        </select>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Taille max upload (MB)
-                        </label>
-                        <input
-                          type="number"
-                          value={contentSettings.maxUploadSize}
-                          onChange={(e) =>
-                            setContentSettings((prev) => ({
-                              ...prev,
-                              maxUploadSize: e.target.value,
-                            }))
-                          }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Articles en vedette
-                        </label>
-                        <input
-                          type="number"
-                          value={contentSettings.featuredArticlesCount}
-                          onChange={(e) =>
-                            setContentSettings((prev) => ({
-                              ...prev,
-                              featuredArticlesCount: e.target.value,
-                            }))
-                          }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Types de fichiers autorisés
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amani-primary/25 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amani-primary"></div>
                       </label>
-                      <input
-                        type="text"
-                        value={contentSettings.allowedFileTypes}
-                        onChange={(e) =>
-                          setContentSettings((prev) => ({
-                            ...prev,
-                            allowedFileTypes: e.target.value,
-                          }))
-                        }
-                        placeholder="jpg,jpeg,png,gif,pdf,doc,docx"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
-                      />
                     </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
-                    <div className="space-y-4">
-                      {[
-                        {
-                          key: "allowComments",
-                          label: "Autoriser les commentaires",
-                        },
-                        {
-                          key: "moderateComments",
-                          label: "Modérer les commentaires",
-                        },
-                        {
-                          key: "autoPublish",
-                          label: "Publication automatique",
-                        },
-                      ].map((item) => (
-                        <div
-                          key={item.key}
-                          className="flex items-center justify-between"
-                        >
-                          <span className="text-sm text-gray-700">
-                            {item.label}
-                          </span>
-                          <label className="relative inline-flex items-center cursor-pointer">
-                            <input
-                              type="checkbox"
-                              checked={
-                                contentSettings[
-                                  item.key as keyof typeof contentSettings
-                                ] as boolean
-                              }
-                              onChange={(e) =>
-                                setContentSettings((prev) => ({
-                                  ...prev,
-                                  [item.key]: e.target.checked,
-                                }))
-                              }
-                              className="sr-only peer"
-                            />
-                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amani-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amani-primary"></div>
-                          </label>
-                        </div>
-                      ))}
-                    </div>
+            {activeTab === "content" && (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-semibold text-amani-primary">
+                    Paramètres de contenu
+                  </h2>
+                  <button
+                    onClick={() => handleSave("de contenu")}
+                    disabled={isSaving}
+                    className="flex items-center gap-2 px-4 py-2 bg-amani-primary text-white rounded-lg hover:bg-amani-primary/90 transition-colors disabled:opacity-50"
+                  >
+                    <Save className="w-4 h-4" />
+                    {isSaving ? "Sauvegarde..." : "Sauvegarder"}
+                  </button>
+                </div>
 
-                    <div className="border-t border-gray-200 pt-6">
-                      <div className="flex justify-end">
-                        <button
-                          onClick={() => handleSave("de contenu")}
-                          disabled={isSaving}
-                          className="flex items-center gap-2 px-6 py-3 bg-amani-primary text-white rounded-lg hover:bg-amani-primary/90 transition-colors disabled:opacity-50"
-                        >
-                          <Save className="w-4 h-4" />
-                          Sauvegarder
-                        </button>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Articles par page
+                    </label>
+                    <input
+                      type="number"
+                      value={contentSettings.articlesPerPage}
+                      onChange={(e) =>
+                        setContentSettings({
+                          ...contentSettings,
+                          articlesPerPage: e.target.value,
+                        })
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Taille max upload (MB)
+                    </label>
+                    <input
+                      type="number"
+                      value={contentSettings.maxUploadSize}
+                      onChange={(e) =>
+                        setContentSettings({
+                          ...contentSettings,
+                          maxUploadSize: e.target.value,
+                        })
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  {[
+                    { key: "allowComments", label: "Autoriser les commentaires" },
+                    { key: "moderateComments", label: "Modérer les commentaires" },
+                    { key: "autoPublish", label: "Publication automatique" },
+                  ].map((setting) => (
+                    <div key={setting.key} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                      <div>
+                        <h3 className="font-medium text-gray-900">{setting.label}</h3>
                       </div>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={contentSettings[setting.key as keyof typeof contentSettings] as boolean}
+                          onChange={(e) =>
+                            setContentSettings({
+                              ...contentSettings,
+                              [setting.key]: e.target.checked,
+                            })
+                          }
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amani-primary/25 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amani-primary"></div>
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {activeTab === "system" && (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-semibold text-amani-primary">
+                    Informations système
+                  </h2>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <h3 className="font-medium text-gray-900 mb-2">Version</h3>
+                    <p className="text-gray-600">Amani Platform v2.1.0</p>
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <h3 className="font-medium text-gray-900 mb-2">Base de données</h3>
+                    <p className="text-gray-600">PostgreSQL 14.9</p>
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <h3 className="font-medium text-gray-900 mb-2">Stockage utilisé</h3>
+                    <p className="text-gray-600">2.4 GB / 10 GB</p>
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <h3 className="font-medium text-gray-900 mb-2">Dernière sauvegarde</h3>
+                    <p className="text-gray-600">15 Jan 2024, 03:00</p>
+                  </div>
+                </div>
+
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                  <div className="flex items-start gap-3">
+                    <AlertCircle className="w-5 h-5 text-amber-600 mt-0.5" />
+                    <div>
+                      <h3 className="font-medium text-amber-800 mb-1">
+                        Maintenance programmée
+                      </h3>
+                      <p className="text-amber-700 text-sm">
+                        Une maintenance est programmée le 20 janvier 2024 de 02:00 à 04:00 UTC.
+                      </p>
                     </div>
                   </div>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }
