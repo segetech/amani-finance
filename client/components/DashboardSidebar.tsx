@@ -25,6 +25,8 @@ import {
   ChevronDown,
   ChevronRight,
   LogOut,
+  FolderOpen,
+  CheckSquare,
 } from "lucide-react";
 import { useState } from "react";
 
