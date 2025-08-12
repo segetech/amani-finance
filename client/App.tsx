@@ -67,7 +67,7 @@ const App = () => (
               <Route path="/dashboard/profile" element={<Profile />} />
               <Route path="/dashboard/permissions" element={<PermissionsManager />} />
               <Route path="/dashboard/users" element={<Users />} />
-              <Route path="/dashboard/users/new" element={<NewUser />} />
+              <Route path="/dashboard/users/new" element={<NewUserAdvanced />} />
               <Route
                 path="/dashboard/users/edit/:userId"
                 element={<EditUser />}
