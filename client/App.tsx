@@ -63,6 +63,7 @@ const App = () => (
                             <Route path="/dashboard/articles/new" element={<NewArticle />} />
                             <Route path="/dashboard/podcasts" element={<PodcastsManager />} />
               <Route path="/dashboard/podcasts/new" element={<NewPodcast />} />
+              <Route path="/dashboard/indices" element={<IndicesManager />} />
               <Route path="/dashboard/indices/new" element={<NewIndice />} />
               <Route path="/dashboard/analytics" element={<Analytics />} />
               <Route path="/dashboard/moderation" element={<Moderation />} />
