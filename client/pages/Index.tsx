@@ -56,22 +56,22 @@ export default function Index() {
     },
     {
       id: 2,
-      title: "La BCEAO maintient son taux directeur à 3.5%",
+      title: "BRVM : hausse de 2.3% portée par les valeurs bancaires",
       excerpt:
-        "La Banque centrale des États de l'Afrique de l'Ouest a décidé de maintenir...",
-      category: "Finance",
-      date: "2024-01-14",
+        "La Bourse Régionale des Valeurs Mobilières a clôturé en hausse grâce aux performances...",
+      category: "Marché",
+      date: "2024-01-15",
       author: "Fatou Kone",
       image: "/placeholder.svg",
     },
     {
       id: 3,
-      title: "Croissance du secteur agricole au Burkina Faso",
+      title: "Burkina Faso : nouveau gisement d'or découvert",
       excerpt:
-        "Le secteur agricole burkinabé enregistre une croissance de 8% cette année...",
-      category: "Agriculture",
-      date: "2024-01-13",
-      author: "Ibrahim Ouédraogo",
+        "Une société minière canadienne annonce la découverte d'un important gisement...",
+      category: "Industrie",
+      date: "2024-01-14",
+      author: "Ibrahim Traore",
       image: "/placeholder.svg",
     },
   ];
@@ -79,91 +79,99 @@ export default function Index() {
   const podcasts = [
     {
       id: 1,
-      title: "L'avenir de l'économie numérique en Afrique",
-      description:
-        "Discussion avec des experts sur les défis et opportunités du numérique",
+      title: "L'avenir de l'économie sahélienne",
       duration: "45 min",
-      category: "Tech",
-      date: "2024-01-10",
+      date: "2024-01-12",
+      description:
+        "Discussion avec des experts sur les perspectives économiques de la région",
+      image: "/placeholder.svg",
     },
     {
       id: 2,
-      title: "Investir dans l'agriculture sahélienne",
-      description:
-        "Analyse des opportunités d'investissement dans le secteur agricole",
+      title: "Investir dans les startups africaines",
       duration: "38 min",
-      category: "Agriculture",
       date: "2024-01-08",
+      description:
+        "Analyse des opportunités d'investissement dans la tech africaine",
+      image: "/placeholder.svg",
     },
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#E5DDD2]">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-amani-primary via-gray-800 to-gray-900 text-white py-32 overflow-hidden">
-        <div className={"absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\"40\" height=\"40\" viewBox=\"0 0 40 40\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.02\"%3E%3Cpath d=\"m0 40l40-40h-40v40zm40 0v-40h-40l40 40z\"/%3E%3C/g%3E%3C/svg%3E')] opacity-10"}></div>
-        
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-          <div className="text-center">
-            <h1 className="text-6xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-              Amani Finance
-            </h1>
-            <p className="text-2xl md:text-3xl font-light mb-8 text-gray-300">
-              Économie & Finance Africaine
-            </p>
-            <p className="text-xl max-w-4xl mx-auto mb-12 leading-relaxed text-gray-200">
-              Votre plateforme de référence pour l'information économique et
-              financière en Afrique. Nous rendons l'information digestible et
-              accessible à tous les acteurs économiques.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-6 justify-center">
+      <section className="bg-amani-primary text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <h1 className="text-4xl lg:text-6xl font-bold mb-6">À la une</h1>
+              <h2 className="text-2xl lg:text-3xl font-semibold mb-4">
+                Le Mali lance son plus grand projet d'infrastructure
+              </h2>
+              <p className="text-lg mb-8 text-gray-200">
+                Un investissement de 2 milliards d'euros pour moderniser les
+                réseaux de transport et d'énergie, promettant de transformer
+                l'économie du pays d'ici 2027.
+              </p>
+              <div className="flex flex-wrap gap-4 items-center mb-8">
+                <span className="bg-white/20 px-3 py-1 rounded-full text-sm">
+                  Économie
+                </span>
+                <span className="flex items-center gap-2 text-sm">
+                  <Calendar className="w-4 h-4" />
+                  15 janvier 2024
+                </span>
+                <span className="flex items-center gap-2 text-sm">
+                  <User className="w-4 h-4" />
+                  Amadou Diallo
+                </span>
+              </div>
               <Link
-                to="/marche"
-                className="inline-flex items-center gap-3 px-8 py-4 bg-white text-amani-primary rounded-xl hover:bg-gray-100 transition-all duration-300 font-semibold text-lg shadow-xl hover:shadow-2xl transform hover:-translate-y-1"
+                to="/article/1"
+                className="inline-flex items-center gap-2 bg-white text-amani-primary px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
               >
-                <BarChart3 className="w-6 h-6" />
-                Explorer les marchés
+                Lire l'article
+                <ArrowRight className="w-4 h-4" />
               </Link>
-              <Link
-                to="/insights"
-                className="inline-flex items-center gap-3 px-8 py-4 border-2 border-white text-white rounded-xl hover:bg-white hover:text-amani-primary transition-all duration-300 font-semibold text-lg"
-              >
-                <Target className="w-6 h-6" />
-                Voir les analyses
-              </Link>
+            </div>
+            <div className="relative">
+              <img
+                src="/placeholder.svg"
+                alt="Infrastructure project"
+                className="w-full h-80 object-cover rounded-lg shadow-xl"
+              />
             </div>
           </div>
         </div>
       </section>
 
-      {/* Key Indices */}
-      <section className="py-16 bg-white">
+      {/* Key Indices Widget */}
+      <section className="py-8 bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center text-amani-primary mb-12">
-            Indices clés en temps réel
-          </h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-amani-primary">
+              Indices clés
+            </h2>
+            <Link to="/indices" className="text-amani-primary hover:underline">
+              Voir tous les indices →
+            </Link>
+          </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {keyIndices.map((index, i) => (
               <div key={i} className="bg-[#E5DDD2] p-4 rounded-lg">
-                <h3 className="font-bold text-lg text-amani-primary">
-                  {index.name}
-                </h3>
-                <div className="flex items-center justify-between mt-2">
-                  <span className="text-2xl font-bold text-gray-900">
-                    {index.value}
-                  </span>
-                  <span
-                    className={`flex items-center gap-1 font-medium ${
-                      index.isPositive ? "text-green-600" : "text-red-600"
-                    }`}
-                  >
-                    {index.isPositive ? (
-                      <TrendingUp className="w-4 h-4" />
-                    ) : (
-                      <TrendingDown className="w-4 h-4" />
-                    )}
-                    {index.change}
-                  </span>
+                <div className="text-sm text-gray-600 mb-1">{index.name}</div>
+                <div className="text-2xl font-bold text-amani-primary mb-2">
+                  {index.value}
+                </div>
+                <div
+                  className={`flex items-center gap-1 text-sm ${index.isPositive ? "text-green-600" : "text-red-600"}`}
+                >
+                  {index.isPositive ? (
+                    <TrendingUp className="w-4 h-4" />
+                  ) : (
+                    <TrendingDown className="w-4 h-4" />
+                  )}
+                  {index.change}
                 </div>
               </div>
             ))}
@@ -171,7 +179,7 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Latest News - Featured + List Design */}
+      {/* Latest News - Improved section with fixed encoding */}
       <section className="py-16 bg-gradient-to-br from-gray-50 to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -290,188 +298,12 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Sections by Category - Creative Design */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-amani-primary mb-6">
-              Nos Rubriques
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Explorez l'actualité économique organisée par secteur d'activité
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Marché Section */}
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-3xl p-8 hover:shadow-2xl transition-all duration-300 group cursor-pointer">
-              <div className="flex items-center justify-between mb-6">
-                <div className="bg-blue-600 w-16 h-16 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <BarChart3 className="w-8 h-8 text-white" />
-                </div>
-                <Link to="/marche" className="text-blue-600 hover:text-blue-800 font-medium">
-                  Voir plus →
-                </Link>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Actualités Marché</h3>
-              <p className="text-gray-700 mb-6">Suivez en temps réel les cours, indices et mouvements des marchés financiers.</p>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="font-medium">BRVM</span>
-                  <span className="text-green-600 font-bold">+2.3%</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="font-medium">FCFA/EUR</span>
-                  <span className="text-red-600 font-bold">-0.1%</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="font-medium">Taux BCEAO</span>
-                  <span className="text-gray-600 font-bold">3.5%</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Économie Section */}
-            <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-3xl p-8 hover:shadow-2xl transition-all duration-300 group cursor-pointer">
-              <div className="flex items-center justify-between mb-6">
-                <div className="bg-green-600 w-16 h-16 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Globe className="w-8 h-8 text-white" />
-                </div>
-                <Link to="/economie" className="text-green-600 hover:text-green-800 font-medium">
-                  Voir plus →
-                </Link>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Économie</h3>
-              <p className="text-gray-700 mb-6">Analyses macroéconomiques, politiques monétaires et indicateurs par pays.</p>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-green-600">+5.8%</div>
-                  <div className="text-sm text-gray-600">Croissance PIB</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-green-600">4.2%</div>
-                  <div className="text-sm text-gray-600">Inflation</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Industrie Section */}
-            <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-3xl p-8 hover:shadow-2xl transition-all duration-300 group cursor-pointer">
-              <div className="flex items-center justify-between mb-6">
-                <div className="bg-purple-600 w-16 h-16 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Briefcase className="w-8 h-8 text-white" />
-                </div>
-                <Link to="/industrie" className="text-purple-600 hover:text-purple-800 font-medium">
-                  Voir plus →
-                </Link>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Industrie</h3>
-              <p className="text-gray-700 mb-6">Tendances industrielles, innovations et opportunités sectorielles.</p>
-              <div className="flex items-center gap-4">
-                <div className="bg-purple-200 px-3 py-1 rounded-full text-purple-800 text-sm font-medium">Automobile</div>
-                <div className="bg-purple-200 px-3 py-1 rounded-full text-purple-800 text-sm font-medium">Énergie</div>
-                <div className="bg-purple-200 px-3 py-1 rounded-full text-purple-800 text-sm font-medium">Mining</div>
-              </div>
-            </div>
-
-            {/* Investissement Section */}
-            <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-3xl p-8 hover:shadow-2xl transition-all duration-300 group cursor-pointer">
-              <div className="flex items-center justify-between mb-6">
-                <div className="bg-orange-600 w-16 h-16 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Target className="w-8 h-8 text-white" />
-                </div>
-                <Link to="/investissement" className="text-orange-600 hover:text-orange-800 font-medium">
-                  Voir plus →
-                </Link>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Investissements</h3>
-              <p className="text-gray-700 mb-6">Opportunités d'investissement et analyses de projets.</p>
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-orange-600 rounded-full"></div>
-                  <span className="text-sm">€125M investis ce trimestre</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-orange-600 rounded-full"></div>
-                  <span className="text-sm">384 projets financés</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-orange-600 rounded-full"></div>
-                  <span className="text-sm">Rendement moyen: 12.8%</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Second Row */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
-            {/* Insights Section */}
-            <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-3xl p-8 hover:shadow-2xl transition-all duration-300 group cursor-pointer">
-              <div className="flex items-center justify-between mb-6">
-                <div className="bg-yellow-600 w-16 h-16 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Lightbulb className="w-8 h-8 text-white" />
-                </div>
-                <Link to="/insights" className="text-yellow-600 hover:text-yellow-800 font-medium">
-                  Voir plus →
-                </Link>
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Insights</h3>
-              <p className="text-gray-700 mb-4">Analyses approfondies par nos experts.</p>
-              <div className="text-center">
-                <div className="text-lg font-bold text-yellow-600">Dr. Mohamed Keita</div>
-                <div className="text-sm text-gray-600">Expert Économiste</div>
-              </div>
-            </div>
-
-            {/* Tech Section */}
-            <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-3xl p-8 hover:shadow-2xl transition-all duration-300 group cursor-pointer">
-              <div className="flex items-center justify-between mb-6">
-                <div className="bg-indigo-600 w-16 h-16 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Zap className="w-8 h-8 text-white" />
-                </div>
-                <Link to="/tech" className="text-indigo-600 hover:text-indigo-800 font-medium">
-                  Voir plus →
-                </Link>
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Tech</h3>
-              <p className="text-gray-700 mb-4">Innovation et écosystème technologique.</p>
-              <div className="space-y-2">
-                <div className="text-sm text-gray-600">🚀 2,450 startups</div>
-                <div className="text-sm text-gray-600">💰 $3.2B investis</div>
-                <div className="text-sm text-gray-600">👨‍💻 180K développeurs</div>
-              </div>
-            </div>
-
-            {/* Podcast Section */}
-            <div className="bg-gradient-to-br from-pink-50 to-pink-100 rounded-3xl p-8 hover:shadow-2xl transition-all duration-300 group cursor-pointer">
-              <div className="flex items-center justify-between mb-6">
-                <div className="bg-pink-600 w-16 h-16 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Mic className="w-8 h-8 text-white" />
-                </div>
-                <Link to="/podcast" className="text-pink-600 hover:text-pink-800 font-medium">
-                  Voir plus →
-                </Link>
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Podcasts</h3>
-              <p className="text-gray-700 mb-4">Interviews et analyses audio.</p>
-              <div className="flex items-center gap-2">
-                <Play className="w-6 h-6 text-pink-600" />
-                <span className="text-sm font-medium">Épisode récent disponible</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Podcast Section */}
       <section className="py-16 bg-amani-secondary/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-3xl font-bold text-amani-primary">Podcasts</h2>
-            <Link
-              to="/podcast"
-              className="text-amani-primary hover:underline"
-            >
+            <Link to="/podcast" className="text-amani-primary hover:underline">
               Tous les podcasts →
             </Link>
           </div>
@@ -481,30 +313,30 @@ export default function Index() {
                 key={podcast.id}
                 className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
               >
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 bg-amani-primary rounded-lg flex items-center justify-center">
-                    <Mic className="w-6 h-6 text-white" />
+                <div className="flex gap-4">
+                  <img
+                    src={podcast.image}
+                    alt={podcast.title}
+                    className="w-20 h-20 rounded-lg object-cover flex-shrink-0"
+                  />
+                  <div className="flex-1">
+                    <h3 className="text-xl font-semibold text-amani-primary mb-2">
+                      {podcast.title}
+                    </h3>
+                    <p className="text-gray-600 mb-3 text-sm">
+                      {podcast.description}
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4 text-sm text-gray-500">
+                        <span>{podcast.duration}</span>
+                        <span>{podcast.date}</span>
+                      </div>
+                      <button className="flex items-center gap-2 bg-amani-primary text-white px-4 py-2 rounded-lg hover:bg-amani-primary/90 transition-colors">
+                        <Play className="w-4 h-4" />
+                        Écouter
+                      </button>
+                    </div>
                   </div>
-                  <div>
-                    <span className="bg-[#E5DDD5] text-amani-primary px-3 py-1 rounded-full text-xs font-medium">
-                      {podcast.category}
-                    </span>
-                    <p className="text-sm text-gray-500 mt-1">{podcast.date}</p>
-                  </div>
-                </div>
-                <h3 className="text-xl font-semibold text-amani-primary mb-3">
-                  {podcast.title}
-                </h3>
-                <p className="text-gray-600 mb-4">{podcast.description}</p>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-500 flex items-center gap-1">
-                    <Clock className="w-4 h-4" />
-                    {podcast.duration}
-                  </span>
-                  <button className="bg-amani-primary text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors flex items-center gap-2">
-                    <Play className="w-4 h-4" />
-                    Écouter
-                  </button>
                 </div>
               </div>
             ))}
@@ -526,14 +358,14 @@ export default function Index() {
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-amani-primary mb-6">
+            <h2 className="text-4xl font-bold text-[#373B3A] mb-6">
               Nos Services
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Une gamme complète de services pour comprendre l'économie africaine
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               {
@@ -577,7 +409,7 @@ export default function Index() {
                 <div className={`${service.color} w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
                   <service.icon className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-amani-primary mb-4">
+                <h3 className="text-xl font-bold text-[#373B3A] mb-4">
                   {service.title}
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
@@ -590,17 +422,17 @@ export default function Index() {
       </section>
 
       {/* Why Choose Amani Section */}
-      <section className="py-20 bg-gradient-to-br from-amani-primary to-gray-700 text-white">
+      <section className="py-20 bg-gradient-to-br from-[#373B3A] to-gray-700 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-6">
               Pourquoi Choisir Amani Finance ?
             </h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              Notre expertise au service de votre compréhension de l'économie africaine
+              Notre expertise au service de votre compréhension de l'��conomie africaine
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
               {
@@ -763,10 +595,10 @@ export default function Index() {
           <div className="border-t border-white/20 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center text-gray-300">
             <p>&copy; 2025 Amani Finance. Tous droits réservés.</p>
             <p className="flex items-center gap-1 mt-2 md:mt-0">
-              Créé avec <Heart className="w-4 h-4 text-red-500 fill-current" /> par 
-              <a 
-                href="https://www.aikio.co" 
-                target="_blank" 
+              Créé avec <Heart className="w-4 h-4 text-red-500 fill-current" /> par
+              <a
+                href="https://www.aikio.co"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="text-white hover:text-gray-200 font-medium ml-1 transition-colors"
               >
