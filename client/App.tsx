@@ -75,6 +75,7 @@ const App = () => (
               <Route path="/dashboard/users" element={<Users />} />
               <Route path="/dashboard/users/new" element={<NewUserAdvanced />} />
               <Route path="/dashboard/user-activity" element={<UserActivity />} />
+              <Route path="/dashboard/reports" element={<ReportsManager />} />
               <Route
                 path="/dashboard/users/edit/:userId"
                 element={<EditUser />}
