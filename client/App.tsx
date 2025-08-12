@@ -64,6 +64,7 @@ const App = () => (
               <Route path="/dashboard/moderation" element={<Moderation />} />
                             <Route path="/dashboard/settings" element={<Settings />} />
               <Route path="/dashboard/profile" element={<Profile />} />
+              <Route path="/dashboard/permissions" element={<PermissionsManager />} />
               <Route path="/dashboard/users" element={<Users />} />
               <Route path="/dashboard/users/new" element={<NewUser />} />
               <Route
