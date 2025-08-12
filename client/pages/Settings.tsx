@@ -111,6 +111,34 @@ export default function Settings() {
     { id: "system", label: "Système", icon: Database },
   ];
 
+  // Check permissions after all hooks
+  if (!user || !hasPermission("system_settings")) {
+    return (
+      <DashboardLayout
+        title="Accès refusé"
+        subtitle="Vous n'avez pas les permissions nécessaires"
+      >
+        <div className="flex items-center justify-center py-12">
+          <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md">
+            <h2 className="text-2xl font-bold text-amani-primary mb-4">
+              Accès refusé
+            </h2>
+            <p className="text-gray-600 mb-6">
+              Vous n'avez pas les permissions nécessaires pour accéder aux
+              paramètres système.
+            </p>
+            <Link
+              to="/dashboard"
+              className="bg-amani-primary text-white px-6 py-2 rounded-lg hover:bg-amani-primary/90 transition-colors"
+            >
+              Retour au tableau de bord
+            </Link>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
   return (
     <DashboardLayout
       title="Paramètres système"
