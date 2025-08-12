@@ -146,7 +146,7 @@ export default function DashboardSidebar() {
         {
           label: "Analytics",
           path: "/dashboard/analytics",
-          icon: Analytics,
+          icon: BarChart3,
           permission: "view_analytics",
         },
         {
@@ -168,7 +168,7 @@ export default function DashboardSidebar() {
       key: "moderation",
       items: [
         {
-          label: "Centre de modération",
+          label: "Centre de mod��ration",
           path: "/dashboard/moderation",
           icon: Shield,
           permission: "moderate_comments",
