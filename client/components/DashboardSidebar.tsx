@@ -39,6 +39,7 @@ interface SidebarItem {
 export default function DashboardSidebar() {
   const { user, logout, hasPermission } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [expandedSections, setExpandedSections] = useState<string[]>([
     "content",
     "analytics",
