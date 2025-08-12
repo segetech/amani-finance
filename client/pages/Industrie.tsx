@@ -57,7 +57,7 @@ const Industrie = () => {
       title: "L'industrie automobile africaine en pleine transformation digitale",
       summary: "Les constructeurs automobiles investissent massivement dans l'innovation technologique et l'automatisation pour rester compétitifs sur le marché mondial.",
       sector: "Automobile",
-      image: "/api/placeholder/400/250",
+      image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=250&fit=crop",
       date: "2024-03-15",
       readTime: "5 min",
       trending: true
@@ -67,7 +67,7 @@ const Industrie = () => {
       title: "Révolution verte : L'industrie énergétique mise sur les renouvelables",
       summary: "Les entreprises énergétiques accélèrent leur transition vers les sources d'énergie renouvelable, créant de nouveaux emplois et opportunités d'investissement.",
       sector: "Énergie",
-      image: "/api/placeholder/400/250",
+      image: "https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?w=400&h=250&fit=crop",
       date: "2024-03-14",
       readTime: "7 min",
       trending: false
@@ -77,7 +77,7 @@ const Industrie = () => {
       title: "L'industrie pharmaceutique : Innovation et accessibilité au cœur des défis",
       summary: "Face aux enjeux de santé publique, l'industrie pharmaceutique développe de nouvelles approches pour améliorer l'accès aux médicaments.",
       sector: "Pharmaceutique",
-      image: "/api/placeholder/400/250",
+      image: "https://images.unsplash.com/photo-1565793298595-6a879b1d9492?w=400&h=250&fit=crop",
       date: "2024-03-13",
       readTime: "6 min",
       trending: true
@@ -87,7 +87,7 @@ const Industrie = () => {
       title: "Agroalimentaire : La sécurité alimentaire à l'ère du développement durable",
       summary: "L'industrie agroalimentaire innove pour répondre aux défis de la sécurité alimentaire tout en respectant les principes du développement durable.",
       sector: "Agroalimentaire",
-      image: "/api/placeholder/400/250",
+      image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=400&h=250&fit=crop",
       date: "2024-03-12",
       readTime: "4 min",
       trending: false
