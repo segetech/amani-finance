@@ -71,7 +71,7 @@ const InteractiveMap = () => {
         {/* Interactive Map */}
         <div className="relative">
           <h3 className="text-2xl font-bold text-[#373B3A] mb-6 text-center">
-            Économie de l'Afrique de l'Ouest
+            Économie du Sahel et du Tchad
           </h3>
           
           {/* SVG Map Container */}
