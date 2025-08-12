@@ -265,14 +265,21 @@ const Investissement = () => {
           {/* Opportunities Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {filteredOpportunities.map((opportunity) => (
-              <Card key={opportunity.id} className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <div className="flex justify-between items-start mb-3">
+              <Card key={opportunity.id} className="hover:shadow-lg transition-shadow overflow-hidden">
+                <div className="relative">
+                  <img
+                    src={opportunity.image}
+                    alt={opportunity.title}
+                    className="w-full h-48 object-cover"
+                  />
+                  <div className="absolute top-3 left-3 flex gap-2">
                     <Badge variant="secondary">{opportunity.category}</Badge>
                     <Badge className={getStatusColor(opportunity.status)}>
                       {opportunity.status}
                     </Badge>
                   </div>
+                </div>
+                <CardHeader>
                   <CardTitle className="text-xl mb-2">{opportunity.title}</CardTitle>
                   <CardDescription className="text-gray-600">
                     {opportunity.description}
