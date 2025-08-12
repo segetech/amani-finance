@@ -25,7 +25,13 @@ import {
   Mic,
   Video,
   PieChart,
+  Lightbulb,
+  Shield,
+  Zap,
+  Heart,
+  CheckCircle,
 } from "lucide-react";
+import InteractiveMap from '../components/InteractiveMap';
 
 export default function Index() {
   // Mock data for demonstration
