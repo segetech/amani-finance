@@ -19,7 +19,6 @@ import {
   Globe,
   Headphones,
   Edit,
-  Analytics,
   UserCheck,
   FileSpreadsheet,
   Building,
