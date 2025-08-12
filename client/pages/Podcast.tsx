@@ -13,6 +13,7 @@ import {
   Headphones,
   Star,
   Eye,
+  Download,
 } from "lucide-react";
 import SocialShare from '../components/SocialShare';
 
