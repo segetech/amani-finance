@@ -578,7 +578,7 @@ export default function IndicesManager() {
                           onClick={() => handleUpdateIndice(indice.id)}
                           className="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
                         >
-                          <Refresh className="w-4 h-4" />
+                          <RefreshCw className="w-4 h-4" />
                         </button>
                         
                         {hasPermission("view_analytics") && (
