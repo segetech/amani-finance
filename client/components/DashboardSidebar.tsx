@@ -182,7 +182,7 @@ export default function DashboardSidebar() {
       key: "moderation",
       items: [
         {
-          label: "Centre de mod��ration",
+          label: "Centre de modération",
           path: "/dashboard/moderation",
           icon: Shield,
           permission: "moderate_comments",
@@ -205,6 +205,12 @@ export default function DashboardSidebar() {
       title: "Gestion",
       key: "management",
       items: [
+        {
+          label: "Tâches & Permissions",
+          path: "/dashboard/tasks-permissions",
+          icon: CheckSquare,
+          permission: "manage_users",
+        },
         {
           label: "Utilisateurs",
           path: "/dashboard/users",
