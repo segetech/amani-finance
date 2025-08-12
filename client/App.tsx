@@ -31,7 +31,6 @@ import ReportsManager from "./pages/ReportsManager";
 import NewUser from "./pages/NewUser";
 import NewUserAdvanced from "./pages/NewUserAdvanced";
 import EditUser from "./pages/EditUser";
-import Organizations from "./pages/Organizations";
 import Integrations from "./pages/Integrations";
 import Marche from "./pages/Marche";
 import Economie from "./pages/Economie";
