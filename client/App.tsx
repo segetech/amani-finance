@@ -17,6 +17,7 @@ import Dashboard from "./pages/Dashboard";
 import DashboardMain from "./pages/DashboardMain";
 import NewArticle from "./pages/NewArticle";
 import NewPodcast from "./pages/NewPodcast";
+import PodcastsManager from "./pages/PodcastsManager";
 import NewIndice from "./pages/NewIndice";
 import Analytics from "./pages/Analytics";
 import Moderation from "./pages/Moderation";
