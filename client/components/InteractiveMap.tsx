@@ -264,12 +264,12 @@ const InteractiveMap = () => {
                 <div className="text-center">
                   <BarChart3 className="w-8 h-8 text-blue-600 mx-auto mb-2" />
                   <p className="text-sm font-semibold">PIB Total</p>
-                  <p className="text-lg font-bold text-[#373B3A]">211B $</p>
+                  <p className="text-lg font-bold text-[#373B3A]">72B $</p>
                 </div>
                 <div className="text-center">
                   <Users className="w-8 h-8 text-green-600 mx-auto mb-2" />
                   <p className="text-sm font-semibold">Population</p>
-                  <p className="text-lg font-bold text-[#373B3A]">122M</p>
+                  <p className="text-lg font-bold text-[#373B3A]">92M</p>
                 </div>
               </div>
             </div>
