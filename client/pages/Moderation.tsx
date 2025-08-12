@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
+import DashboardLayout from "../components/DashboardLayout";
 import {
   Shield,
   Flag,
@@ -13,7 +14,6 @@ import {
   AlertTriangle,
   Clock,
   User,
-  ArrowLeft,
   Filter,
   Search,
   MoreVertical,
@@ -31,23 +31,28 @@ export default function Moderation() {
   // Check permissions
   if (!user || !hasPermission("moderate_comments")) {
     return (
-      <div className="min-h-screen bg-[#E5DDD2] flex items-center justify-center">
-        <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md">
-          <h2 className="text-2xl font-bold text-amani-primary mb-4">
-            Accès refusé
-          </h2>
-          <p className="text-gray-600 mb-6">
-            Vous n'avez pas les permissions nécessaires pour accéder à la
-            modération.
-          </p>
-          <Link
-            to="/dashboard"
-            className="bg-amani-primary text-white px-6 py-2 rounded-lg hover:bg-amani-primary/90 transition-colors"
-          >
-            Retour au tableau de bord
-          </Link>
+      <DashboardLayout
+        title="Accès refusé"
+        subtitle="Vous n'avez pas les permissions nécessaires"
+      >
+        <div className="flex items-center justify-center py-12">
+          <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md">
+            <h2 className="text-2xl font-bold text-amani-primary mb-4">
+              Accès refusé
+            </h2>
+            <p className="text-gray-600 mb-6">
+              Vous n'avez pas les permissions nécessaires pour accéder à la
+              modération.
+            </p>
+            <Link
+              to="/dashboard"
+              className="bg-amani-primary text-white px-6 py-2 rounded-lg hover:bg-amani-primary/90 transition-colors"
+            >
+              Retour au tableau de bord
+            </Link>
+          </div>
         </div>
-      </div>
+      </DashboardLayout>
     );
   }
 
@@ -99,59 +104,47 @@ export default function Moderation() {
       type: "article",
       content: "Article contenant des informations erronées",
       reporter: "analyst@example.com",
-      reported: "author@example.com",
-      reason: "Désinformation",
+      reported: "editor@example.com",
+      reason: "Fausses informations",
       status: "reviewing",
-      createdAt: "2024-01-15 10:15",
+      createdAt: "2024-01-15 12:15",
       priority: "medium",
     },
     {
       id: "3",
-      type: "user",
-      content: "Comportement de spam répétitif",
-      reporter: "moderator@example.com",
+      type: "comment",
+      content: "Spam répétitif dans plusieurs articles",
+      reporter: "mod@example.com",
       reported: "spammer@example.com",
       reason: "Spam",
       status: "pending",
-      createdAt: "2024-01-14 16:45",
-      priority: "low",
+      createdAt: "2024-01-15 10:45",
+      priority: "high",
     },
   ];
 
   const comments = [
     {
       id: "1",
-      content:
-        "Ce texte contient du contenu potentiellement problématique qui nécessite une révision...",
+      content: "Ce commentaire nécessite une révision manuelle...",
       author: "user123@example.com",
       article: "Évolution du FCFA face à l'Euro",
-      status: "flagged",
-      createdAt: "2024-01-15 12:30",
-      reports: 3,
+      status: "pending",
+      createdAt: "2024-01-15 16:20",
+      flags: ["inappropriate"],
     },
     {
       id: "2",
-      content:
-        "Excellent article, très informatif sur la situation économique régionale.",
-      author: "reader@example.com",
+      content: "Commentaire signalé par plusieurs utilisateurs...",
+      author: "suspicious@example.com",
       article: "Perspectives économiques du Mali",
-      status: "approved",
-      createdAt: "2024-01-15 11:20",
-      reports: 0,
-    },
-    {
-      id: "3",
-      content: "Je ne suis pas d'accord avec cette analyse, voici pourquoi...",
-      author: "critic@example.com",
-      article: "Investissements miniers au Burkina Faso",
-      status: "pending",
-      createdAt: "2024-01-15 09:45",
-      reports: 1,
+      status: "flagged",
+      createdAt: "2024-01-15 15:10",
+      flags: ["spam", "offensive"],
     },
   ];
 
   const handleApprove = async (id: string, type: string) => {
-    // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 500));
     success("Approuvé", `${type} approuvé avec succès`);
   };
@@ -217,32 +210,42 @@ export default function Moderation() {
   });
 
   return (
-    <div className="min-h-screen bg-[#E5DDD2]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <Link
-            to="/dashboard"
-            className="inline-flex items-center gap-2 text-amani-primary hover:text-amani-primary/80 mb-4"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Retour au tableau de bord
-          </Link>
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-            <div>
-              <h1 className="text-4xl font-bold text-amani-primary mb-2">
-                Centre de modération
-              </h1>
-              <p className="text-gray-600">
-                Gérez le contenu signalé et modérez les interactions sur la
-                plateforme
-              </p>
-            </div>
+    <DashboardLayout
+      title="Centre de modération"
+      subtitle="Gérez le contenu signalé et modérez les interactions sur la plateforme"
+      actions={
+        <>
+          <div className="flex items-center gap-2">
+            <Search className="w-4 h-4 text-gray-500" />
+            <input
+              type="text"
+              placeholder="Rechercher..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent w-64"
+            />
           </div>
-        </div>
-
-        {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="flex items-center gap-2">
+            <Filter className="w-4 h-4 text-gray-500" />
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
+            >
+              <option value="all">Tous les statuts</option>
+              <option value="pending">En attente</option>
+              <option value="reviewing">En révision</option>
+              <option value="flagged">Signalé</option>
+              <option value="approved">Approuvé</option>
+              <option value="rejected">Rejeté</option>
+            </select>
+          </div>
+        </>
+      }
+    >
+      <div className="space-y-8">
+        {/* Stats Overview */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {moderationStats.map((stat, index) => (
             <div
               key={index}
@@ -255,7 +258,7 @@ export default function Moderation() {
                   </div>
                   <div className="text-sm text-gray-600">{stat.label}</div>
                 </div>
-                <div className={`p-3 rounded-xl ${stat.bg}`}>
+                <div className={`p-3 rounded-lg ${stat.bg}`}>
                   <stat.icon className={`w-6 h-6 ${stat.color}`} />
                 </div>
               </div>
@@ -264,12 +267,12 @@ export default function Moderation() {
         </div>
 
         {/* Tabs */}
-        <div className="bg-white rounded-2xl shadow-lg border border-white/50 mb-8">
+        <div className="bg-white rounded-2xl shadow-lg border border-white/50">
           <div className="border-b border-gray-200">
             <nav className="flex">
               <button
                 onClick={() => setActiveTab("reports")}
-                className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
+                className={`px-6 py-4 text-sm font-medium border-b-2 ${
                   activeTab === "reports"
                     ? "border-amani-primary text-amani-primary"
                     : "border-transparent text-gray-500 hover:text-gray-700"
@@ -282,7 +285,7 @@ export default function Moderation() {
               </button>
               <button
                 onClick={() => setActiveTab("comments")}
-                className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
+                className={`px-6 py-4 text-sm font-medium border-b-2 ${
                   activeTab === "comments"
                     ? "border-amani-primary text-amani-primary"
                     : "border-transparent text-gray-500 hover:text-gray-700"
@@ -296,117 +299,66 @@ export default function Moderation() {
             </nav>
           </div>
 
-          {/* Filters */}
-          <div className="p-6 border-b border-gray-200">
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <input
-                  type="text"
-                  placeholder="Rechercher..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <Filter className="w-4 h-4 text-gray-500" />
-                <select
-                  value={filterStatus}
-                  onChange={(e) => setFilterStatus(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
-                >
-                  <option value="all">Tous les statuts</option>
-                  <option value="pending">En attente</option>
-                  <option value="approved">Approuvé</option>
-                  <option value="rejected">Rejeté</option>
-                  <option value="reviewing">En révision</option>
-                  <option value="flagged">Signalé</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          {/* Content */}
           <div className="p-6">
             {activeTab === "reports" && (
               <div className="space-y-4">
                 {filteredReports.map((report) => (
                   <div
                     key={report.id}
-                    className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50"
+                    className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors"
                   >
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-red-100 rounded-lg">
-                          <Flag className="w-4 h-4 text-red-600" />
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                          <span
+                            className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                              report.status,
+                            )}`}
+                          >
+                            {report.status}
+                          </span>
+                          <span
+                            className={`text-sm font-medium ${getPriorityColor(
+                              report.priority,
+                            )}`}
+                          >
+                            Priorité {report.priority}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            {report.createdAt}
+                          </span>
                         </div>
-                        <div>
-                          <div className="font-medium text-gray-900">
-                            {report.content}
-                          </div>
-                          <div className="text-sm text-gray-500 mt-1">
-                            Signalé par {report.reporter} • {report.createdAt}
-                          </div>
+                        <p className="text-gray-900 mb-2">{report.content}</p>
+                        <div className="text-sm text-gray-600">
+                          <span className="font-medium">Signalé par:</span>{" "}
+                          {report.reporter} |{" "}
+                          <span className="font-medium">Utilisateur:</span>{" "}
+                          {report.reported} |{" "}
+                          <span className="font-medium">Raison:</span>{" "}
+                          {report.reason}
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(
-                            report.priority,
-                          )}`}
-                        >
-                          {report.priority === "high"
-                            ? "Priorité haute"
-                            : report.priority === "medium"
-                              ? "Priorité moyenne"
-                              : "Priorité basse"}
-                        </span>
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                            report.status,
-                          )}`}
-                        >
-                          {report.status === "pending"
-                            ? "En attente"
-                            : report.status === "reviewing"
-                              ? "En révision"
-                              : report.status}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="text-sm text-gray-600">
-                        <span className="font-medium">
-                          Utilisateur signalé:
-                        </span>{" "}
-                        {report.reported} •{" "}
-                        <span className="font-medium">Raison:</span>{" "}
-                        {report.reason}
-                      </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 ml-4">
                         <button
-                          onClick={() =>
-                            handleApprove(report.id, "Signalement")
-                          }
-                          className="flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200 transition-colors text-sm"
+                          onClick={() => handleApprove(report.id, "Signalement")}
+                          className="p-2 text-green-600 hover:bg-green-100 rounded-lg transition-colors"
+                          title="Approuver"
                         >
                           <Check className="w-4 h-4" />
-                          Approuver
                         </button>
                         <button
                           onClick={() => handleReject(report.id, "Signalement")}
-                          className="flex items-center gap-1 px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors text-sm"
+                          className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
+                          title="Rejeter"
                         >
                           <X className="w-4 h-4" />
-                          Rejeter
                         </button>
                         <button
                           onClick={() => handleSuspendUser(report.reported)}
-                          className="flex items-center gap-1 px-3 py-1 bg-orange-100 text-orange-700 rounded hover:bg-orange-200 transition-colors text-sm"
+                          className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                          title="Suspendre utilisateur"
                         >
                           <Ban className="w-4 h-4" />
-                          Suspendre
                         </button>
                       </div>
                     </div>
@@ -420,64 +372,57 @@ export default function Moderation() {
                 {filteredComments.map((comment) => (
                   <div
                     key={comment.id}
-                    className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50"
+                    className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors"
                   >
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-blue-100 rounded-lg">
-                          <MessageSquare className="w-4 h-4 text-blue-600" />
-                        </div>
-                        <div className="flex-1">
-                          <div className="text-gray-900 mb-2">
-                            {comment.content}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            Par {comment.author} sur "{comment.article}" •{" "}
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                          <span
+                            className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                              comment.status,
+                            )}`}
+                          >
+                            {comment.status}
+                          </span>
+                          <span className="text-xs text-gray-500">
                             {comment.createdAt}
-                            {comment.reports > 0 && (
-                              <span className="ml-2 text-red-600">
-                                • {comment.reports} signalement(s)
-                              </span>
-                            )}
-                          </div>
+                          </span>
+                          {comment.flags.map((flag) => (
+                            <span
+                              key={flag}
+                              className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs"
+                            >
+                              {flag}
+                            </span>
+                          ))}
+                        </div>
+                        <p className="text-gray-900 mb-2">{comment.content}</p>
+                        <div className="text-sm text-gray-600">
+                          <span className="font-medium">Auteur:</span>{" "}
+                          {comment.author} |{" "}
+                          <span className="font-medium">Article:</span>{" "}
+                          {comment.article}
                         </div>
                       </div>
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                          comment.status,
-                        )}`}
-                      >
-                        {comment.status === "pending"
-                          ? "En attente"
-                          : comment.status === "approved"
-                            ? "Approuvé"
-                            : comment.status === "flagged"
-                              ? "Signalé"
-                              : comment.status}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-end gap-2">
-                      <button
-                        onClick={() => handleApprove(comment.id, "Commentaire")}
-                        className="flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200 transition-colors text-sm"
-                      >
-                        <Check className="w-4 h-4" />
-                        Approuver
-                      </button>
-                      <button
-                        onClick={() => handleReject(comment.id, "Commentaire")}
-                        className="flex items-center gap-1 px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors text-sm"
-                      >
-                        <EyeOff className="w-4 h-4" />
-                        Masquer
-                      </button>
-                      <button
-                        onClick={() => handleSuspendUser(comment.author)}
-                        className="flex items-center gap-1 px-3 py-1 bg-orange-100 text-orange-700 rounded hover:bg-orange-200 transition-colors text-sm"
-                      >
-                        <Ban className="w-4 h-4" />
-                        Suspendre auteur
-                      </button>
+                      <div className="flex items-center gap-2 ml-4">
+                        <button
+                          onClick={() => handleApprove(comment.id, "Commentaire")}
+                          className="p-2 text-green-600 hover:bg-green-100 rounded-lg transition-colors"
+                          title="Approuver"
+                        >
+                          <Check className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleReject(comment.id, "Commentaire")}
+                          className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
+                          title="Rejeter"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                        <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+                          <MoreVertical className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -486,6 +431,6 @@ export default function Moderation() {
           </div>
         </div>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }
