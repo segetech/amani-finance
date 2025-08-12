@@ -28,19 +28,19 @@ const Contact = () => {
     {
       icon: Mail,
       title: 'Email',
-      details: 'contact@amani-economic.com',
+      details: 'info@amani-finance.com',
       description: 'Nous répondons sous 24h'
     },
     {
       icon: Phone,
       title: 'Téléphone',
-      details: '+225 01 23 45 67 89',
+      details: '+223 20 22 45 67',
       description: 'Lun-Ven, 9h-18h GMT'
     },
     {
       icon: MapPin,
       title: 'Adresse',
-      details: 'Plateau, Abidjan, Côte d\'Ivoire',
+      details: 'Faladie, Bamako, Mali',
       description: 'Siège social'
     },
     {
@@ -53,22 +53,16 @@ const Contact = () => {
 
   const teamMembers = [
     {
-      name: 'Dr. Kouame N\'Guessan',
-      role: 'Directeur Général',
-      email: 'k.nguessan@amani-economic.com',
-      speciality: 'Stratégie économique et développement'
+      name: 'Dr Keita Mohamed',
+      role: 'Expert Économiste',
+      email: 'k.mohamed@amani-finance.com',
+      speciality: 'Analyse économique et stratégie financière'
     },
     {
-      name: 'Fatou Diallo',
-      role: 'Directrice de la Communication',
-      email: 'f.diallo@amani-economic.com',
-      speciality: 'Relations presse et partenariats'
-    },
-    {
-      name: 'Jean-Baptiste Kone',
-      role: 'Responsable Technique',
-      email: 'jb.kone@amani-economic.com',
-      speciality: 'Support technique et innovation'
+      name: 'Kani Sissoko',
+      role: 'Directrice des Opérations',
+      email: 'k.sissoko@amani-finance.com',
+      speciality: 'Gestion opérationnelle et développement'
     }
   ];
 
@@ -324,13 +318,13 @@ const Contact = () => {
                 <h4 className="text-lg font-semibold text-[#373B3A] mb-4">Contact Rapide</h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <Button variant="outline" className="justify-start" asChild>
-                    <a href="mailto:contact@amani-economic.com">
+                    <a href="mailto:info@amani-finance.com">
                       <Mail className="h-4 w-4 mr-2" />
                       Envoyer un email
                     </a>
                   </Button>
                   <Button variant="outline" className="justify-start" asChild>
-                    <a href="tel:+22501234567891">
+                    <a href="tel:+22320224567">
                       <Phone className="h-4 w-4 mr-2" />
                       Appeler maintenant
                     </a>
@@ -353,7 +347,7 @@ const Contact = () => {
               <div className="text-center">
                 <MapPin className="h-16 w-16 text-gray-400 mx-auto mb-4" />
                 <p className="text-gray-600 text-lg">Carte interactive</p>
-                <p className="text-gray-500">Plateau, Abidjan, Côte d'Ivoire</p>
+                <p className="text-gray-500">Faladie, Bamako, Mali</p>
               </div>
             </div>
           </Card>
