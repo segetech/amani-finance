@@ -66,7 +66,8 @@ const Investissement = () => {
       description: "Investissement dans les solutions de paiement mobile qui révolutionnent le secteur financier africain avec une croissance de 40% par an.",
       highlights: ["Marché en croissance de 40%", "Technologie éprouvée", "Équipe expérimentée"],
       status: "Ouvert",
-      funded: 65
+      funded: 65,
+      image: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=250&fit=crop"
     },
     {
       id: 2,
@@ -79,7 +80,8 @@ const Investissement = () => {
       description: "Modernisation de l'agriculture africaine avec des technologies IoT pour améliorer les rendements et la durabilité.",
       highlights: ["Impact social positif", "Technologie innovante", "Marché stable"],
       status: "Ouvert",
-      funded: 45
+      funded: 45,
+      image: "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=400&h=250&fit=crop"
     },
     {
       id: 3,
@@ -92,7 +94,8 @@ const Investissement = () => {
       description: "Développement de parcs solaires communautaires pour fournir une énergie propre et abordable aux zones rurales.",
       highlights: ["Énergie renouvelable", "Impact environnemental", "Revenus stables"],
       status: "Bientôt",
-      funded: 0
+      funded: 0,
+      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=250&fit=crop"
     },
     {
       id: 4,
@@ -105,7 +108,8 @@ const Investissement = () => {
       description: "Plateforme digitale connectant les entreprises africaines pour faciliter le commerce interentreprises à l'échelle continentale.",
       highlights: ["Marché B2B en expansion", "Technologie scalable", "Potentiel élevé"],
       status: "Fermé",
-      funded: 100
+      funded: 100,
+      image: "https://images.unsplash.com/photo-1565793298595-6a879b1d9492?w=400&h=250&fit=crop"
     }
   ];
 
