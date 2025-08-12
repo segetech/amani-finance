@@ -11,11 +11,10 @@ import {
   Filter,
   TrendingUp,
   Headphones,
-  Download,
-  Share2,
   Star,
   Eye,
 } from "lucide-react";
+import SocialShare from '../components/SocialShare';
 
 export default function Podcast() {
   const [searchTerm, setSearchTerm] = useState("");
