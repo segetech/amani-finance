@@ -308,6 +308,170 @@ export default function Index() {
         </div>
       </section>
 
+      {/* Interactive Map Section */}
+      <section className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-[#373B3A] mb-6">
+              Explorez l'Économie Africaine
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Découvrez les indicateurs économiques clés des pays d'Afrique de l'Ouest
+              avec notre carte interactive
+            </p>
+          </div>
+          <InteractiveMap />
+        </div>
+      </section>
+
+      {/* Services Section */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-[#373B3A] mb-6">
+              Nos Services
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Une gamme complète de services pour comprendre l'économie africaine
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              {
+                icon: BarChart3,
+                title: "Analyses de Marché",
+                description: "Données en temps réel sur les indices boursiers, taux de change et indicateurs économiques",
+                color: "bg-blue-500"
+              },
+              {
+                icon: Lightbulb,
+                title: "Insights Stratégiques",
+                description: "Analyses approfondies et prospectives par nos experts économistes",
+                color: "bg-yellow-500"
+              },
+              {
+                icon: Globe,
+                title: "Veille Économique",
+                description: "Actualités et tendances des économies africaines mises à jour quotidiennement",
+                color: "bg-green-500"
+              },
+              {
+                icon: Video,
+                title: "Podcasts Experts",
+                description: "Interviews exclusives avec les leaders économiques et analyses sectorielles",
+                color: "bg-purple-500"
+              },
+              {
+                icon: Target,
+                title: "Opportunités d'Investissement",
+                description: "Identification et analyse des meilleures opportunités d'investissement",
+                color: "bg-red-500"
+              },
+              {
+                icon: Shield,
+                title: "Conseil Stratégique",
+                description: "Accompagnement personnalisé pour vos décisions d'investissement",
+                color: "bg-indigo-500"
+              }
+            ].map((service, index) => (
+              <div key={index} className="bg-gray-50 rounded-2xl p-8 hover:shadow-xl transition-all duration-300 group">
+                <div className={`${service.color} w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                  <service.icon className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-[#373B3A] mb-4">
+                  {service.title}
+                </h3>
+                <p className="text-gray-600 leading-relaxed">
+                  {service.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Why Choose Amani Section */}
+      <section className="py-20 bg-gradient-to-br from-[#373B3A] to-gray-700 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold mb-6">
+              Pourquoi Choisir Amani Finance ?
+            </h2>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              Notre expertise au service de votre compréhension de l'économie africaine
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[
+              {
+                icon: CheckCircle,
+                title: "Expertise Locale",
+                description: "Une équipe d'experts basés en Afrique avec une connaissance approfondie des marchés locaux"
+              },
+              {
+                icon: Zap,
+                title: "Données en Temps Réel",
+                description: "Accès instantané aux dernières données économiques et financières"
+              },
+              {
+                icon: Heart,
+                title: "Information Digestible",
+                description: "Notre mission : rendre l'information économique accessible et compréhensible"
+              },
+              {
+                icon: Globe,
+                title: "Couverture Complète",
+                description: "Analyse de tous les secteurs économiques clés d'Afrique de l'Ouest"
+              }
+            ].map((feature, index) => (
+              <div key={index} className="text-center group">
+                <div className="bg-white/10 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-white/20 transition-colors duration-300">
+                  <feature.icon className="w-10 h-10 text-[#E5DDD5]" />
+                </div>
+                <h3 className="text-xl font-bold mb-4 text-white">
+                  {feature.title}
+                </h3>
+                <p className="text-gray-300 leading-relaxed">
+                  {feature.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Newsletter Section */}
+      <section className="py-20 bg-[#E5DDD5]">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="bg-white rounded-3xl p-12 shadow-xl">
+            <Bell className="w-16 h-16 text-[#373B3A] mx-auto mb-6" />
+            <h2 className="text-3xl font-bold text-[#373B3A] mb-6">
+              Restez Informé
+            </h2>
+            <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+              Recevez chaque semaine notre newsletter avec les analyses économiques les plus importantes et les opportunités d'investissement
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto mb-6">
+              <input
+                type="email"
+                placeholder="Votre adresse email"
+                className="flex-1 px-6 py-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#373B3A] focus:border-transparent text-lg"
+              />
+              <button className="px-8 py-4 bg-[#373B3A] text-white rounded-xl hover:bg-gray-700 transition-colors font-semibold text-lg">
+                S'abonner
+              </button>
+            </div>
+
+            <p className="text-sm text-gray-500">
+              Pas de spam, désabonnement possible à tout moment.
+              Plus de 10,000 professionnels nous font déjà confiance.
+            </p>
+          </div>
+        </div>
+      </section>
 
     </div>
   );
