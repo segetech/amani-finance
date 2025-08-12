@@ -184,7 +184,7 @@ export default function Index() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-3xl font-bold text-amani-primary">
-              Dernières actualités
+              Dernières actualit��s
             </h2>
             <Link
               to="/actualites"
@@ -311,21 +311,6 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Interactive Map Section */}
-      <section id="interactive-map" className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-[#373B3A] mb-6">
-              Explorez l'Économie Africaine
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Découvrez les indicateurs économiques clés des pays d'Afrique de l'Ouest
-              avec notre carte interactive
-            </p>
-          </div>
-          <InteractiveMap />
-        </div>
-      </section>
 
       {/* Services Section */}
       <section className="py-20 bg-white">
