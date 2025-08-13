@@ -785,17 +785,33 @@ export default function IndicesManagement() {
                   />
                 </div>
 
-                {/* Note d'aide */}
+                {/* Note d'aide améliorée */}
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                   <div className="flex items-start gap-3">
                     <Info className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
                     <div className="text-yellow-800 text-sm">
-                      <p className="font-medium mb-1">💡 Conseils pour débutants :</p>
-                      <ul className="space-y-1 text-xs">
-                        <li>• <strong>Variation positive :</strong> Utilisez + devant le nombre (ex: +2.5)</li>
-                        <li>• <strong>Variation négative :</strong> Utilisez - devant le nombre (ex: -1.2)</li>
-                        <li>• <strong>Description :</strong> Expliquez simplement ce que représente cet indice</li>
-                      </ul>
+                      <p className="font-medium mb-2">💡 Guide complet pour débutants :</p>
+                      <div className="grid md:grid-cols-2 gap-4 text-xs">
+                        <div>
+                          <p className="font-medium mb-1">📊 Ce que vous devez remplir :</p>
+                          <ul className="space-y-1">
+                            <li>• <strong>Nom :</strong> Ex: "Or", "BRVM Composite"</li>
+                            <li>• <strong>Valeur :</strong> Le prix actuel (ex: 185.42)</li>
+                            <li>• <strong>Variation :</strong> +4.28 si ça monte, -2.15 si ça baisse</li>
+                          </ul>
+                        </div>
+                        <div>
+                          <p className="font-medium mb-1">✨ Ce qui se fait automatiquement :</p>
+                          <ul className="space-y-1">
+                            <li>• <strong>Pourcentage :</strong> Calculé automatiquement</li>
+                            <li>• <strong>Couleur :</strong> Vert si +, Rouge si -</li>
+                            <li>• <strong>Date :</strong> Mise à jour automatique</li>
+                          </ul>
+                        </div>
+                      </div>
+                      <div className="mt-3 p-2 bg-green-100 rounded border border-green-200">
+                        <p class="font-medium text-green-800">🎯 Astuce : Vous n'avez besoin que du nom, de la valeur actuelle et de combien ça a bougé. Le reste se calcule tout seul !</p>
+                      </div>
                     </div>
                   </div>
                 </div>
