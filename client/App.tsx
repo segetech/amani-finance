@@ -56,6 +56,7 @@ import ScrollToTop from "./components/ScrollToTop";
 import IndicesManagement from "./pages/IndicesManagement";
 import CommoditiesManagement from "./pages/CommoditiesManagement";
 import EditIndice from "./pages/EditIndice";
+import IndicesHelp from "./pages/IndicesHelp";
 import NotFound from "./pages/NotFound";
 import ContentManagement from "./pages/ContentManagement";
 import TasksPermissions from "./pages/TasksPermissions";
