@@ -44,7 +44,8 @@ export default function Articles() {
               Accès refusé
             </h2>
             <p className="text-gray-600 mb-6">
-              Vous n'avez pas les permissions nécessaires pour voir les articles.
+              Vous n'avez pas les permissions nécessaires pour voir les
+              articles.
             </p>
             <Link
               to="/dashboard"
@@ -62,7 +63,8 @@ export default function Articles() {
     {
       id: "1",
       title: "Évolution du FCFA face à l'Euro en 2024",
-      excerpt: "Analyse détaillée des fluctuations monétaires et leur impact sur l'économie sahélienne.",
+      excerpt:
+        "Analyse détaillée des fluctuations monétaires et leur impact sur l'économie sahélienne.",
       author: "Fatou Diallo",
       category: "Marché",
       status: "published",
@@ -76,7 +78,8 @@ export default function Articles() {
     {
       id: "2",
       title: "Perspectives économiques du Mali pour 2024",
-      excerpt: "Les prévisions de croissance et les défis économiques à relever cette année.",
+      excerpt:
+        "Les prévisions de croissance et les défis économiques à relever cette année.",
       author: "Amadou Traoré",
       category: "Économie",
       status: "published",
@@ -90,7 +93,8 @@ export default function Articles() {
     {
       id: "3",
       title: "Investissements miniers au Burkina Faso",
-      excerpt: "Nouvelles opportunités d'investissement dans le secteur minier burkinabé.",
+      excerpt:
+        "Nouvelles opportunités d'investissement dans le secteur minier burkinabé.",
       author: "Adjoa Kone",
       category: "Industrie",
       status: "draft",
@@ -104,7 +108,8 @@ export default function Articles() {
     {
       id: "4",
       title: "BCEAO : Nouvelles directives bancaires",
-      excerpt: "Les dernières régulations de la Banque Centrale et leur impact sur le secteur bancaire.",
+      excerpt:
+        "Les dernières régulations de la Banque Centrale et leur impact sur le secteur bancaire.",
       author: "Mariama Sy",
       category: "Marché",
       status: "review",
@@ -143,21 +148,21 @@ export default function Articles() {
   const stats = [
     {
       label: "Articles publiés",
-      value: articles.filter(a => a.status === "published").length.toString(),
+      value: articles.filter((a) => a.status === "published").length.toString(),
       icon: CheckCircle,
       color: "text-green-600",
       bg: "bg-green-100",
     },
     {
       label: "Brouillons",
-      value: articles.filter(a => a.status === "draft").length.toString(),
+      value: articles.filter((a) => a.status === "draft").length.toString(),
       icon: Edit,
       color: "text-blue-600",
       bg: "bg-blue-100",
     },
     {
       label: "En révision",
-      value: articles.filter(a => a.status === "review").length.toString(),
+      value: articles.filter((a) => a.status === "review").length.toString(),
       icon: AlertCircle,
       color: "text-amber-600",
       bg: "bg-amber-100",
@@ -314,7 +319,9 @@ export default function Articles() {
                   Aucun article trouvé
                 </h3>
                 <p className="text-gray-600 mb-4">
-                  {searchTerm || filterStatus !== "all" || filterCategory !== "all"
+                  {searchTerm ||
+                  filterStatus !== "all" ||
+                  filterCategory !== "all"
                     ? "Aucun article ne correspond à vos critères."
                     : "Commencez par créer votre premier article."}
                 </p>
@@ -368,7 +375,9 @@ export default function Articles() {
                           {article.publishedAt && (
                             <span className="flex items-center gap-1">
                               <Calendar className="w-4 h-4" />
-                              {new Date(article.publishedAt).toLocaleDateString("fr-FR")}
+                              {new Date(article.publishedAt).toLocaleDateString(
+                                "fr-FR",
+                              )}
                             </span>
                           )}
                           <span className="flex items-center gap-1">
