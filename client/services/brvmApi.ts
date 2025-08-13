@@ -40,31 +40,34 @@ export const fetchBRVMData = async (): Promise<BRVMData> => {
   } catch (error) {
     console.warn('API BRVM non disponible, utilisation des données simulées:', error);
     
-    // Données de fallback (mock data)
+    // Données simulées réalistes avec variations
+    const now = new Date();
+    const baseVariation = Math.sin(now.getTime() / (1000 * 60 * 60)) * 2;
+
     return {
       composite: {
         name: "BRVM Composite",
-        value: "185.42",
-        change: "+4.28",
-        changePercent: "+2.3%",
-        isPositive: true,
-        lastUpdate: new Date().toISOString()
+        value: (185.42 + baseVariation).toFixed(2),
+        change: (4.28 + baseVariation * 0.5).toFixed(2),
+        changePercent: `${(2.3 + baseVariation * 0.3).toFixed(1)}%`,
+        isPositive: baseVariation > -1,
+        lastUpdate: now.toISOString()
       },
       fcfa_eur: {
         name: "FCFA/EUR",
-        value: "655.957",
-        change: "-0.65",
-        changePercent: "-0.1%",
-        isPositive: false,
-        lastUpdate: new Date().toISOString()
+        value: (655.957 - baseVariation * 0.1).toFixed(3),
+        change: (-0.65 - baseVariation * 0.1).toFixed(2),
+        changePercent: `${(-0.1 - baseVariation * 0.05).toFixed(1)}%`,
+        isPositive: baseVariation < 0.5,
+        lastUpdate: now.toISOString()
       },
       inflation: {
         name: "Inflation UEMOA",
-        value: "4.2%",
-        change: "+0.5",
-        changePercent: "+0.5%",
+        value: `${(4.2 + Math.abs(baseVariation) * 0.1).toFixed(1)}%`,
+        change: (0.5 + baseVariation * 0.1).toFixed(1),
+        changePercent: `${(0.5 + baseVariation * 0.1).toFixed(1)}%`,
         isPositive: false,
-        lastUpdate: new Date().toISOString()
+        lastUpdate: now.toISOString()
       },
       taux_bceao: {
         name: "Taux BCEAO",
@@ -72,7 +75,7 @@ export const fetchBRVMData = async (): Promise<BRVMData> => {
         change: "0",
         changePercent: "0%",
         isPositive: true,
-        lastUpdate: new Date().toISOString()
+        lastUpdate: now.toISOString()
       }
     };
   }
