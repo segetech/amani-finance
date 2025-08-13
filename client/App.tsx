@@ -49,6 +49,7 @@ import Contact from "./pages/Contact";
 import About from "./pages/About";
 import Newsletter from "./pages/Newsletter";
 import Indices from "./pages/Indices";
+import Calculateur from "./pages/Calculateur";
 import NotFound from "./pages/NotFound";
 import ContentManagement from "./pages/ContentManagement";
 import TasksPermissions from "./pages/TasksPermissions";
