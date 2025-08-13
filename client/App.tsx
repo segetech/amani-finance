@@ -54,6 +54,7 @@ import GuideDebutant from "./pages/GuideDebutant";
 import Actualites from "./pages/Actualites";
 import ScrollToTop from "./components/ScrollToTop";
 import IndicesManagement from "./pages/IndicesManagement";
+import CommoditiesManagement from "./pages/CommoditiesManagement";
 import NotFound from "./pages/NotFound";
 import ContentManagement from "./pages/ContentManagement";
 import TasksPermissions from "./pages/TasksPermissions";
