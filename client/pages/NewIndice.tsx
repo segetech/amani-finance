@@ -747,7 +747,7 @@ export default function NewIndice() {
           {/* Submit */}
           <div className="flex gap-4 justify-end">
             <Link
-              to="/indices"
+              to="/dashboard/indices-management"
               className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
             >
               Annuler
