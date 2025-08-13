@@ -451,6 +451,59 @@ export default function Index() {
         </div>
       </section>
 
+      {/* Commodities Section */}
+      {commoditiesData && (
+        <section className="py-16 bg-gradient-to-br from-amber-50 to-orange-100">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-amani-primary mb-4">
+                Matières Premières
+              </h2>
+              <p className="text-xl text-gray-600">
+                Prix en temps réel des commodités importantes pour l'Afrique
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              {[commoditiesData.gold, commoditiesData.cotton, commoditiesData.oil_brent, commoditiesData.cocoa].map((commodity, index) => (
+                <div key={index} className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-2xl">{getCommodityIcon(commodity.symbol)}</span>
+                    <div className={`flex items-center gap-1 text-sm font-semibold ${commodity.isPositive ? 'text-green-600' : 'text-red-600'}`}>
+                      {commodity.isPositive ? (
+                        <TrendingUp className="w-4 h-4" />
+                      ) : (
+                        <TrendingDown className="w-4 h-4" />
+                      )}
+                      {commodity.changePercent}
+                    </div>
+                  </div>
+
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">{commodity.name}</h3>
+                  <div className="text-2xl font-bold text-amani-primary mb-1">
+                    ${commodity.price}
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    {commodity.unit}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="text-center">
+              <Link
+                to="/indices"
+                className="inline-flex items-center gap-2 bg-amani-primary text-white px-8 py-4 rounded-xl hover:bg-gray-700 transition-colors font-semibold text-lg"
+              >
+                <Globe className="w-6 h-6" />
+                Voir tous les prix
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Interactive Map Section */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
