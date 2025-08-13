@@ -44,25 +44,30 @@ export default function Index() {
   const [loading, setLoading] = React.useState(true);
   const [lastUpdate, setLastUpdate] = React.useState<Date | null>(null);
 
-  // Fonction pour charger les données BRVM
-  const loadBRVMData = async () => {
+  // Fonction pour charger toutes les données (BRVM + Commodités)
+  const loadAllData = async () => {
     try {
       setLoading(true);
-      const data = await fetchBRVMData();
-      setBrvmData(data);
+      const [brvmResponse, commoditiesResponse] = await Promise.allSettled([
+        fetchBRVMData(),
+        fetchCommoditiesData()
+      ]);
+
+      if (brvmResponse.status === 'fulfilled') {
+        setBrvmData(brvmResponse.value);
+      } else {
+        console.error('Erreur BRVM:', brvmResponse.reason);
+      }
+
+      if (commoditiesResponse.status === 'fulfilled') {
+        setCommoditiesData(commoditiesResponse.value);
+      } else {
+        console.error('Erreur commodités:', commoditiesResponse.reason);
+      }
+
       setLastUpdate(new Date());
     } catch (error) {
-      console.error('Erreur lors du chargement des données BRVM:', error);
-      // En cas d'erreur, on garde les données existantes ou on utilise des données par défaut
-      if (!brvmData) {
-        // Si aucune donnée n'existe, on force le fallback
-        try {
-          const fallbackData = await fetchBRVMData();
-          setBrvmData(fallbackData);
-        } catch (fallbackError) {
-          console.error('Erreur fallback:', fallbackError);
-        }
-      }
+      console.error('Erreur lors du chargement des données:', error);
     } finally {
       setLoading(false);
     }
