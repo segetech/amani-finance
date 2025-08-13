@@ -148,19 +148,22 @@ export default function IndicesManagement() {
   };
 
   const addNewIndex = () => {
+    // Calculer automatiquement les valeurs dérivées
+    const calculatedForm = calculateDerivedValues(editForm);
+
     const newIndex: IndexData = {
       id: Date.now().toString(),
-      name: editForm.name || '',
-      symbol: editForm.symbol || '',
-      value: editForm.value || '0',
-      change: editForm.change || '0',
-      changePercent: editForm.changePercent || '0%',
-      isPositive: parseFloat(editForm.change || '0') >= 0,
+      name: calculatedForm.name || '',
+      symbol: calculatedForm.symbol || '',
+      value: calculatedForm.value || '0',
+      change: calculatedForm.change || '0',
+      changePercent: calculatedForm.changePercent || '0%',
+      isPositive: calculatedForm.isPositive ?? parseFloat(calculatedForm.change || '0') >= 0,
       lastUpdate: new Date().toISOString(),
-      description: editForm.description || '',
-      category: editForm.category || 'brvm',
-      unit: editForm.unit,
-      source: editForm.source
+      description: calculatedForm.description || '',
+      category: calculatedForm.category || 'brvm',
+      unit: calculatedForm.unit,
+      source: calculatedForm.source
     };
 
     setIndices(prev => [...prev, newIndex]);
