@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import React from "react";
 import {
   TrendingUp,
   TrendingDown,
@@ -30,8 +31,10 @@ import {
   Zap,
   Heart,
   CheckCircle,
+  RefreshCw,
 } from "lucide-react";
 import InteractiveMap from '../components/InteractiveMap';
+import { fetchBRVMData, BRVMData } from '../services/brvmApi';
 
 export default function Index() {
   // Mock data for demonstration
@@ -429,7 +432,7 @@ export default function Index() {
               Pourquoi Choisir Amani Finance ?
             </h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              Notre expertise au service de votre compréhension de l'��conomie africaine
+              Notre expertise au service de votre compréhension de l'économie africaine
             </p>
           </div>
 
