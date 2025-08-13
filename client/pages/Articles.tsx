@@ -210,7 +210,7 @@ export default function Articles() {
   });
 
   const handleEditArticle = (id: string) => {
-    success("Modification", `Modification de l'article ${id}`);
+    navigate(`/dashboard/articles/${id}/edit`);
   };
 
   const handleDeleteArticle = (id: string) => {
