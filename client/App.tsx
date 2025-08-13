@@ -122,6 +122,7 @@ const App = () => (
               <Route path="/newsletter" element={<Newsletter />} />
               <Route path="/indices" element={<Indices />} />
               <Route path="/calculateur" element={<Calculateur />} />
+              <Route path="/guides/debutant" element={<GuideDebutant />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
