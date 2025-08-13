@@ -155,6 +155,12 @@ export default function DashboardSidebar() {
               icon: Settings,
               permission: "create_indices",
             },
+            {
+              label: "Matières premières",
+              path: "/dashboard/commodities-management",
+              icon: Globe,
+              permission: "create_indices",
+            },
           ],
         },
       ],
