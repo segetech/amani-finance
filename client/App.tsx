@@ -135,6 +135,14 @@ const App = () => (
                 }
               />
               <Route
+                path="/dashboard/podcasts/:id/edit"
+                element={
+                  <ProtectedRoute>
+                    <EditPodcast />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/dashboard/podcasts/:id/analytics"
                 element={
                   <ProtectedRoute>
