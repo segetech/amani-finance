@@ -101,14 +101,39 @@ export default function IndicesManagement() {
 
   const saveEdit = () => {
     if (isEditing && editForm) {
-      setIndices(prev => prev.map(index => 
-        index.id === isEditing 
-          ? { ...index, ...editForm, lastUpdate: new Date().toISOString() }
+      // Calculer automatiquement les valeurs dérivées
+      const updatedForm = calculateDerivedValues(editForm);
+
+      setIndices(prev => prev.map(index =>
+        index.id === isEditing
+          ? { ...index, ...updatedForm, lastUpdate: new Date().toISOString() }
           : index
       ));
       setIsEditing(null);
       setEditForm({});
     }
+  };
+
+  const calculateDerivedValues = (formData: Partial<IndexData>) => {
+    const result = { ...formData };
+
+    // Calculer automatiquement le pourcentage si on a la valeur et la variation
+    if (formData.value && formData.change) {
+      const currentValue = parseFloat(formData.value);
+      const changeValue = parseFloat(formData.change);
+
+      if (!isNaN(currentValue) && !isNaN(changeValue) && currentValue > 0) {
+        const percentage = (changeValue / (currentValue - changeValue)) * 100;
+        result.changePercent = `${changeValue >= 0 ? '+' : ''}${percentage.toFixed(2)}%`;
+      }
+    }
+
+    // Déterminer automatiquement si c'est positif
+    if (formData.change) {
+      result.isPositive = parseFloat(formData.change) >= 0;
+    }
+
+    return result;
   };
 
   const cancelEdit = () => {
