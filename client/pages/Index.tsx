@@ -236,13 +236,18 @@ export default function Index() {
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {keyIndices.map((index, i) => (
-              <div key={i} className="bg-[#E5DDD2] p-4 rounded-lg">
-                <div className="text-sm text-gray-600 mb-1">{index.name}</div>
+              <div key={i} className={`bg-[#E5DDD2] p-4 rounded-lg relative transition-all duration-300 ${loading ? 'opacity-50' : 'opacity-100'}`}>
+                {loading && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-white/50 rounded-lg">
+                    <RefreshCw className="w-5 h-5 animate-spin text-amani-primary" />
+                  </div>
+                )}
+                <div className="text-sm text-gray-600 mb-1 font-medium">{index.name}</div>
                 <div className="text-2xl font-bold text-amani-primary mb-2">
                   {index.value}
                 </div>
                 <div
-                  className={`flex items-center gap-1 text-sm ${index.isPositive ? "text-green-600" : "text-red-600"}`}
+                  className={`flex items-center gap-1 text-sm font-semibold ${index.isPositive ? "text-green-600" : "text-red-600"}`}
                 >
                   {index.isPositive ? (
                     <TrendingUp className="w-4 h-4" />
@@ -250,6 +255,10 @@ export default function Index() {
                     <TrendingDown className="w-4 h-4" />
                   )}
                   {index.change}
+                </div>
+                {/* Indicateur temps réel */}
+                <div className="absolute top-2 right-2">
+                  <div className={`w-2 h-2 rounded-full ${loading ? 'bg-yellow-500' : 'bg-green-500'} animate-pulse`}></div>
                 </div>
               </div>
             ))}
