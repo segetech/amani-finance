@@ -150,6 +150,14 @@ const App = () => (
                 }
               />
               <Route
+                path="/dashboard/indices/:id/edit"
+                element={
+                  <ProtectedRoute>
+                    <EditIndice />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/dashboard/indices-management"
                 element={
                   <ProtectedRoute>
