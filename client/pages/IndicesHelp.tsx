@@ -13,7 +13,7 @@ import {
   Play,
   CheckCircle,
   Lightbulb,
-  ArrowRight
+  ArrowRight,
 } from "lucide-react";
 
 export default function IndicesHelp() {
@@ -29,7 +29,8 @@ export default function IndicesHelp() {
             Guide complet de la gestion des indices
           </h1>
           <p className="text-xl text-gray-600">
-            Tout ce que vous devez savoir pour gérer facilement les indices économiques de votre site
+            Tout ce que vous devez savoir pour gérer facilement les indices
+            économiques de votre site
           </p>
         </div>
 
@@ -39,13 +40,16 @@ export default function IndicesHelp() {
             <Lightbulb className="w-6 h-6 text-yellow-500" />
             1. Qu'est-ce qu'un indice économique ?
           </h2>
-          
+
           <div className="grid md:grid-cols-3 gap-6">
             <div className="bg-green-50 p-6 rounded-xl border border-green-200">
               <BarChart3 className="w-8 h-8 text-green-600 mb-4" />
-              <h3 className="text-lg font-bold text-green-900 mb-3">Indices Boursiers</h3>
+              <h3 className="text-lg font-bold text-green-900 mb-3">
+                Indices Boursiers
+              </h3>
               <p className="text-green-800 text-sm mb-3">
-                Comme un thermomètre pour la bourse. Plus c'est haut, mieux l'économie se porte.
+                Comme un thermomètre pour la bourse. Plus c'est haut, mieux
+                l'économie se porte.
               </p>
               <ul className="text-green-700 text-xs space-y-1">
                 <li>• BRVM Composite = santé économique ouest-africaine</li>
@@ -56,9 +60,12 @@ export default function IndicesHelp() {
 
             <div className="bg-orange-50 p-6 rounded-xl border border-orange-200">
               <Globe className="w-8 h-8 text-orange-600 mb-4" />
-              <h3 className="text-lg font-bold text-orange-900 mb-3">Matières Premières</h3>
+              <h3 className="text-lg font-bold text-orange-900 mb-3">
+                Matières Premières
+              </h3>
               <p className="text-orange-800 text-sm mb-3">
-                Prix des ressources naturelles qui influencent directement votre quotidien.
+                Prix des ressources naturelles qui influencent directement votre
+                quotidien.
               </p>
               <ul className="text-orange-700 text-xs space-y-1">
                 <li>• Or ↑ = gens cherchent sécurité</li>
@@ -69,9 +76,12 @@ export default function IndicesHelp() {
 
             <div className="bg-purple-50 p-6 rounded-xl border border-purple-200">
               <DollarSign className="w-8 h-8 text-purple-600 mb-4" />
-              <h3 className="text-lg font-bold text-purple-900 mb-3">Indicateurs Économiques</h3>
+              <h3 className="text-lg font-bold text-purple-900 mb-3">
+                Indicateurs Économiques
+              </h3>
               <p className="text-purple-800 text-sm mb-3">
-                Données clés qui montrent la santé économique d'un pays ou région.
+                Données clés qui montrent la santé économique d'un pays ou
+                région.
               </p>
               <ul className="text-purple-700 text-xs space-y-1">
                 <li>• Inflation = augmentation des prix</li>
@@ -91,10 +101,14 @@ export default function IndicesHelp() {
 
           <div className="space-y-6">
             <div className="bg-blue-50 p-6 rounded-xl">
-              <h3 className="text-lg font-bold text-blue-900 mb-4">🎯 Ce que VOUS devez faire :</h3>
+              <h3 className="text-lg font-bold text-blue-900 mb-4">
+                🎯 Ce que VOUS devez faire :
+              </h3>
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <h4 className="font-semibold text-blue-800 mb-2">Informations de base :</h4>
+                  <h4 className="font-semibold text-blue-800 mb-2">
+                    Informations de base :
+                  </h4>
                   <ul className="text-blue-700 text-sm space-y-1">
                     <li>✏️ Donner un nom (ex: "Or", "BRVM Composite")</li>
                     <li>📊 Indiquer la valeur actuelle (ex: 185.42)</li>
@@ -103,7 +117,9 @@ export default function IndicesHelp() {
                   </ul>
                 </div>
                 <div>
-                  <h4 className="font-semibold text-blue-800 mb-2">Optionnel :</h4>
+                  <h4 className="font-semibold text-blue-800 mb-2">
+                    Optionnel :
+                  </h4>
                   <ul className="text-blue-700 text-sm space-y-1">
                     <li>🏷️ Symbole technique (XAU/USD, BRVM...)</li>
                     <li>📐 Unité (once troy, USD/baril...)</li>
@@ -114,22 +130,42 @@ export default function IndicesHelp() {
             </div>
 
             <div className="bg-green-50 p-6 rounded-xl">
-              <h3 className="text-lg font-bold text-green-900 mb-4">✨ Ce qui se fait AUTOMATIQUEMENT :</h3>
+              <h3 className="text-lg font-bold text-green-900 mb-4">
+                ✨ Ce qui se fait AUTOMATIQUEMENT :
+              </h3>
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <h4 className="font-semibold text-green-800 mb-2">Calculs automatiques :</h4>
+                  <h4 className="font-semibold text-green-800 mb-2">
+                    Calculs automatiques :
+                  </h4>
                   <ul className="text-green-700 text-sm space-y-1">
-                    <li>🧮 <strong>Pourcentage :</strong> Calculé selon valeur + variation</li>
-                    <li>🎨 <strong>Couleur :</strong> Vert si positif, Rouge si négatif</li>
-                    <li>⏰ <strong>Date de mise à jour :</strong> Maintenant</li>
+                    <li>
+                      🧮 <strong>Pourcentage :</strong> Calculé selon valeur +
+                      variation
+                    </li>
+                    <li>
+                      🎨 <strong>Couleur :</strong> Vert si positif, Rouge si
+                      négatif
+                    </li>
+                    <li>
+                      ⏰ <strong>Date de mise à jour :</strong> Maintenant
+                    </li>
                   </ul>
                 </div>
                 <div>
-                  <h4 className="font-semibold text-green-800 mb-2">Affichage intelligent :</h4>
+                  <h4 className="font-semibold text-green-800 mb-2">
+                    Affichage intelligent :
+                  </h4>
                   <ul className="text-green-700 text-sm space-y-1">
-                    <li>📱 <strong>Responsive :</strong> S'adapte mobile/desktop</li>
-                    <li>🎯 <strong>Icônes :</strong> Flèches haut/bas automatiques</li>
-                    <li>🏷️ <strong>Catégories :</strong> Couleurs selon le type</li>
+                    <li>
+                      📱 <strong>Responsive :</strong> S'adapte mobile/desktop
+                    </li>
+                    <li>
+                      🎯 <strong>Icônes :</strong> Flèches haut/bas automatiques
+                    </li>
+                    <li>
+                      🏷️ <strong>Catégories :</strong> Couleurs selon le type
+                    </li>
                   </ul>
                 </div>
               </div>
@@ -149,34 +185,42 @@ export default function IndicesHelp() {
               {
                 step: 1,
                 title: "Ajouter un nouvel indice",
-                description: "Cliquez sur 'Ajouter un indice' et choisissez la catégorie",
-                color: "blue"
+                description:
+                  "Cliquez sur 'Ajouter un indice' et choisissez la catégorie",
+                color: "blue",
               },
               {
                 step: 2,
                 title: "Remplir les informations essentielles",
-                description: "Nom, valeur actuelle, et variation (+/-). Le système calcule le pourcentage automatiquement",
-                color: "green"
+                description:
+                  "Nom, valeur actuelle, et variation (+/-). Le système calcule le pourcentage automatiquement",
+                color: "green",
               },
               {
                 step: 3,
                 title: "Ajouter une description",
-                description: "Expliquez en termes simples ce que représente cet indice pour les visiteurs",
-                color: "purple"
+                description:
+                  "Expliquez en termes simples ce que représente cet indice pour les visiteurs",
+                color: "purple",
               },
               {
                 step: 4,
                 title: "Sauvegarder et vérifier",
-                description: "L'indice apparaît immédiatement sur votre site. Cliquez 'Voir sur le site' pour vérifier",
-                color: "orange"
-              }
+                description:
+                  "L'indice apparaît immédiatement sur votre site. Cliquez 'Voir sur le site' pour vérifier",
+                color: "orange",
+              },
             ].map((item) => (
               <div key={item.step} className="flex gap-4">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-white bg-${item.color}-500`}>
+                <div
+                  className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-white bg-${item.color}-500`}
+                >
                   {item.step}
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">{item.title}</h3>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">
+                    {item.title}
+                  </h3>
                   <p className="text-gray-600">{item.description}</p>
                 </div>
               </div>
@@ -193,7 +237,9 @@ export default function IndicesHelp() {
 
           <div className="grid md:grid-cols-2 gap-6">
             <div className="border border-gray-200 rounded-lg p-4">
-              <h3 className="font-bold text-gray-900 mb-3">📊 Exemple : Indice BRVM</h3>
+              <h3 className="font-bold text-gray-900 mb-3">
+                📊 Exemple : Indice BRVM
+              </h3>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Vous saisissez :</span>
@@ -214,7 +260,9 @@ export default function IndicesHelp() {
                 <hr className="my-2" />
                 <div className="flex justify-between">
                   <span className="text-green-600">Le système calcule :</span>
-                  <span className="font-medium text-green-600">Le système calcule :</span>
+                  <span className="font-medium text-green-600">
+                    Le système calcule :
+                  </span>
                 </div>
                 <div className="flex justify-between text-green-600">
                   <span>• Pourcentage :</span>
@@ -228,7 +276,9 @@ export default function IndicesHelp() {
             </div>
 
             <div className="border border-gray-200 rounded-lg p-4">
-              <h3 className="font-bold text-gray-900 mb-3">🥇 Exemple : Prix de l'Or</h3>
+              <h3 className="font-bold text-gray-900 mb-3">
+                🥇 Exemple : Prix de l'Or
+              </h3>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Vous saisissez :</span>
@@ -249,7 +299,9 @@ export default function IndicesHelp() {
                 <hr className="my-2" />
                 <div className="flex justify-between">
                   <span className="text-red-600">Le système calcule :</span>
-                  <span className="font-medium text-red-600">Le système calcule :</span>
+                  <span className="font-medium text-red-600">
+                    Le système calcule :
+                  </span>
                 </div>
                 <div className="flex justify-between text-red-600">
                   <span>• Pourcentage :</span>
@@ -273,7 +325,9 @@ export default function IndicesHelp() {
 
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <h3 className="text-lg font-bold text-green-900 mb-4">✅ À faire :</h3>
+              <h3 className="text-lg font-bold text-green-900 mb-4">
+                ✅ À faire :
+              </h3>
               <ul className="space-y-2 text-green-700">
                 <li className="flex items-start gap-2">
                   <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
@@ -295,22 +349,32 @@ export default function IndicesHelp() {
             </div>
 
             <div>
-              <h3 className="text-lg font-bold text-red-900 mb-4">❌ À éviter :</h3>
+              <h3 className="text-lg font-bold text-red-900 mb-4">
+                ❌ À éviter :
+              </h3>
               <ul className="space-y-2 text-red-700">
                 <li className="flex items-start gap-2">
-                  <span className="w-4 h-4 mt-0.5 flex-shrink-0 text-red-500">✗</span>
+                  <span className="w-4 h-4 mt-0.5 flex-shrink-0 text-red-500">
+                    ✗
+                  </span>
                   <span>Noms trop techniques pour les débutants</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="w-4 h-4 mt-0.5 flex-shrink-0 text-red-500">✗</span>
+                  <span className="w-4 h-4 mt-0.5 flex-shrink-0 text-red-500">
+                    ✗
+                  </span>
                   <span>Oublier de mettre le signe + ou -</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="w-4 h-4 mt-0.5 flex-shrink-0 text-red-500">✗</span>
+                  <span className="w-4 h-4 mt-0.5 flex-shrink-0 text-red-500">
+                    ✗
+                  </span>
                   <span>Descriptions trop courtes ou absentes</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="w-4 h-4 mt-0.5 flex-shrink-0 text-red-500">✗</span>
+                  <span className="w-4 h-4 mt-0.5 flex-shrink-0 text-red-500">
+                    ✗
+                  </span>
                   <span>Calculer manuellement les pourcentages</span>
                 </li>
               </ul>
@@ -322,7 +386,8 @@ export default function IndicesHelp() {
         <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-8 text-white text-center">
           <h2 className="text-2xl font-bold mb-4">Prêt à commencer ?</h2>
           <p className="text-blue-100 mb-6">
-            Maintenant que vous comprenez comment ça marche, vous pouvez gérer vos indices facilement !
+            Maintenant que vous comprenez comment ça marche, vous pouvez gérer
+            vos indices facilement !
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <a

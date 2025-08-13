@@ -11,7 +11,7 @@ import {
   DollarSign,
   AlertCircle,
   Info,
-  Eye
+  Eye,
 } from "lucide-react";
 
 interface IndiceData {
@@ -24,7 +24,7 @@ interface IndiceData {
   isPositive: boolean;
   lastUpdate: string;
   description: string;
-  category: 'brvm' | 'commodity' | 'economic';
+  category: "brvm" | "commodity" | "economic";
   unit?: string;
   source?: string;
 }
@@ -32,7 +32,7 @@ interface IndiceData {
 export default function EditIndice() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  
+
   // Mock data - En production, récupérer depuis une API
   const [indice, setIndice] = React.useState<IndiceData>({
     id: id || "1",
@@ -43,9 +43,10 @@ export default function EditIndice() {
     changePercent: "+2.3%",
     isPositive: true,
     lastUpdate: new Date().toISOString(),
-    description: "Indice principal de la Bourse Régionale des Valeurs Mobilières",
+    description:
+      "Indice principal de la Bourse Régionale des Valeurs Mobilières",
     category: "brvm",
-    source: "BRVM"
+    source: "BRVM",
   });
 
   const [formData, setFormData] = React.useState<IndiceData>(indice);
@@ -66,7 +67,7 @@ export default function EditIndice() {
         lastUpdate: new Date().toISOString(),
         description: "Taux de change Franc CFA / Euro",
         category: "economic" as const,
-        source: "BCE"
+        source: "BCE",
       };
       setIndice(mockData);
       setFormData(mockData);
@@ -83,7 +84,7 @@ export default function EditIndice() {
         description: "Prix de l'or en dollars US par once troy",
         category: "commodity" as const,
         unit: "USD/oz",
-        source: "COMEX"
+        source: "COMEX",
       };
       setIndice(mockData);
       setFormData(mockData);
@@ -96,22 +97,22 @@ export default function EditIndice() {
 
     try {
       // Simulation d'API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       // Mettre à jour isPositive basé sur le change
       const updatedData = {
         ...formData,
         isPositive: parseFloat(formData.change) >= 0,
-        lastUpdate: new Date().toISOString()
+        lastUpdate: new Date().toISOString(),
       };
-      
+
       setFormData(updatedData);
       setIndice(updatedData);
       setSaveSuccess(true);
-      
+
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch (error) {
-      console.error('Erreur lors de la sauvegarde:', error);
+      console.error("Erreur lors de la sauvegarde:", error);
     } finally {
       setIsSaving(false);
     }
@@ -121,18 +122,21 @@ export default function EditIndice() {
     const icons = {
       brvm: BarChart3,
       commodity: Globe,
-      economic: DollarSign
+      economic: DollarSign,
     };
     return icons[category as keyof typeof icons] || BarChart3;
   };
 
   const getCategoryColor = (category: string) => {
     const colors = {
-      brvm: 'bg-green-100 text-green-800 border-green-200',
-      commodity: 'bg-orange-100 text-orange-800 border-orange-200',
-      economic: 'bg-purple-100 text-purple-800 border-purple-200'
+      brvm: "bg-green-100 text-green-800 border-green-200",
+      commodity: "bg-orange-100 text-orange-800 border-orange-200",
+      economic: "bg-purple-100 text-purple-800 border-purple-200",
     };
-    return colors[category as keyof typeof colors] || 'bg-gray-100 text-gray-800 border-gray-200';
+    return (
+      colors[category as keyof typeof colors] ||
+      "bg-gray-100 text-gray-800 border-gray-200"
+    );
   };
 
   const CategoryIcon = getCategoryIcon(formData.category);
@@ -144,7 +148,7 @@ export default function EditIndice() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
-              onClick={() => navigate('/dashboard/indices')}
+              onClick={() => navigate("/dashboard/indices")}
               className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />
@@ -163,7 +167,7 @@ export default function EditIndice() {
               </div>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-3">
             <a
               href="/indices"
@@ -184,8 +188,12 @@ export default function EditIndice() {
               <div className="w-2 h-2 bg-white rounded-full"></div>
             </div>
             <div>
-              <h3 className="font-semibold text-green-900">Modifications sauvegardées</h3>
-              <p className="text-green-700 text-sm">L'indice a été mis à jour avec succès.</p>
+              <h3 className="font-semibold text-green-900">
+                Modifications sauvegardées
+              </h3>
+              <p className="text-green-700 text-sm">
+                L'indice a été mis à jour avec succès.
+              </p>
             </div>
           </div>
         )}
@@ -193,7 +201,10 @@ export default function EditIndice() {
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Formulaire principal */}
           <div className="lg:col-span-2">
-            <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-lg border border-gray-200">
+            <form
+              onSubmit={handleSubmit}
+              className="bg-white rounded-xl shadow-lg border border-gray-200"
+            >
               <div className="p-6 border-b border-gray-200">
                 <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                   <CategoryIcon className="w-5 h-5" />
@@ -211,7 +222,12 @@ export default function EditIndice() {
                     <input
                       type="text"
                       value={formData.name}
-                      onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          name: e.target.value,
+                        }))
+                      }
                       className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       required
                     />
@@ -224,7 +240,12 @@ export default function EditIndice() {
                     <input
                       type="text"
                       value={formData.symbol}
-                      onChange={(e) => setFormData(prev => ({ ...prev, symbol: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          symbol: e.target.value,
+                        }))
+                      }
                       className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       required
                     />
@@ -240,7 +261,12 @@ export default function EditIndice() {
                     <input
                       type="text"
                       value={formData.value}
-                      onChange={(e) => setFormData(prev => ({ ...prev, value: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          value: e.target.value,
+                        }))
+                      }
                       className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       required
                     />
@@ -253,7 +279,12 @@ export default function EditIndice() {
                     <input
                       type="text"
                       value={formData.change}
-                      onChange={(e) => setFormData(prev => ({ ...prev, change: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          change: e.target.value,
+                        }))
+                      }
                       className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Ex: +4.28 ou -2.15"
                     />
@@ -266,7 +297,12 @@ export default function EditIndice() {
                     <input
                       type="text"
                       value={formData.changePercent}
-                      onChange={(e) => setFormData(prev => ({ ...prev, changePercent: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          changePercent: e.target.value,
+                        }))
+                      }
                       className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Ex: +2.3% ou -1.5%"
                     />
@@ -281,7 +317,12 @@ export default function EditIndice() {
                     </label>
                     <select
                       value={formData.category}
-                      onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value as any }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          category: e.target.value as any,
+                        }))
+                      }
                       className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       required
                     >
@@ -297,8 +338,13 @@ export default function EditIndice() {
                     </label>
                     <input
                       type="text"
-                      value={formData.source || ''}
-                      onChange={(e) => setFormData(prev => ({ ...prev, source: e.target.value }))}
+                      value={formData.source || ""}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          source: e.target.value,
+                        }))
+                      }
                       className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Ex: BRVM, COMEX, BCEAO"
                     />
@@ -306,15 +352,20 @@ export default function EditIndice() {
                 </div>
 
                 {/* Unité (pour les commodités) */}
-                {formData.category === 'commodity' && (
+                {formData.category === "commodity" && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Unité
                     </label>
                     <input
                       type="text"
-                      value={formData.unit || ''}
-                      onChange={(e) => setFormData(prev => ({ ...prev, unit: e.target.value }))}
+                      value={formData.unit || ""}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          unit: e.target.value,
+                        }))
+                      }
                       className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Ex: USD/oz, cents/livre, USD/baril"
                     />
@@ -328,7 +379,12 @@ export default function EditIndice() {
                   </label>
                   <textarea
                     value={formData.description}
-                    onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        description: e.target.value,
+                      }))
+                    }
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     rows={4}
                     placeholder="Description détaillée de l'indice pour aider les utilisateurs"
@@ -340,12 +396,26 @@ export default function EditIndice() {
                   <div className="flex items-start gap-3">
                     <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                     <div className="text-blue-800 text-sm">
-                      <p className="font-medium mb-1">💡 Conseils pour la modification :</p>
+                      <p className="font-medium mb-1">
+                        💡 Conseils pour la modification :
+                      </p>
                       <ul className="space-y-1 text-xs">
-                        <li>• <strong>Variation positive :</strong> Utilisez + devant le nombre (ex: +2.5)</li>
-                        <li>• <strong>Variation négative :</strong> Utilisez - devant le nombre (ex: -1.2)</li>
-                        <li>• <strong>Valeur :</strong> Utilisez des points pour les décimales (ex: 185.42)</li>
-                        <li>• <strong>Description :</strong> Expliquez l'impact économique pour les débutants</li>
+                        <li>
+                          • <strong>Variation positive :</strong> Utilisez +
+                          devant le nombre (ex: +2.5)
+                        </li>
+                        <li>
+                          • <strong>Variation négative :</strong> Utilisez -
+                          devant le nombre (ex: -1.2)
+                        </li>
+                        <li>
+                          • <strong>Valeur :</strong> Utilisez des points pour
+                          les décimales (ex: 185.42)
+                        </li>
+                        <li>
+                          • <strong>Description :</strong> Expliquez l'impact
+                          économique pour les débutants
+                        </li>
                       </ul>
                     </div>
                   </div>
@@ -355,7 +425,7 @@ export default function EditIndice() {
               <div className="p-6 border-t border-gray-200 flex justify-end gap-3">
                 <button
                   type="button"
-                  onClick={() => navigate('/dashboard/indices')}
+                  onClick={() => navigate("/dashboard/indices")}
                   className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
                 >
                   Annuler
@@ -389,13 +459,15 @@ export default function EditIndice() {
                 <Eye className="w-5 h-5" />
                 Aperçu
               </h3>
-              
+
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <CategoryIcon className="w-6 h-6 text-gray-600" />
                   <div>
                     <h4 className="font-semibold text-lg">{formData.name}</h4>
-                    <span className={`text-xs px-2 py-1 rounded-full font-medium border ${getCategoryColor(formData.category)}`}>
+                    <span
+                      className={`text-xs px-2 py-1 rounded-full font-medium border ${getCategoryColor(formData.category)}`}
+                    >
                       {formData.category.toUpperCase()}
                     </span>
                   </div>
@@ -404,16 +476,25 @@ export default function EditIndice() {
                 <div className="text-center py-4 border border-gray-200 rounded-lg">
                   <div className="text-3xl font-bold text-gray-900 mb-2">
                     {formData.value}
-                    {formData.unit && <span className="text-sm text-gray-500 ml-1">({formData.unit})</span>}
+                    {formData.unit && (
+                      <span className="text-sm text-gray-500 ml-1">
+                        ({formData.unit})
+                      </span>
+                    )}
                   </div>
-                  
-                  <div className={`flex items-center justify-center gap-1 font-semibold ${
-                    parseFloat(formData.change) >= 0 ? 'text-green-600' : 'text-red-600'
-                  }`}>
-                    {parseFloat(formData.change) >= 0 ? 
-                      <TrendingUp className="w-4 h-4" /> : 
+
+                  <div
+                    className={`flex items-center justify-center gap-1 font-semibold ${
+                      parseFloat(formData.change) >= 0
+                        ? "text-green-600"
+                        : "text-red-600"
+                    }`}
+                  >
+                    {parseFloat(formData.change) >= 0 ? (
+                      <TrendingUp className="w-4 h-4" />
+                    ) : (
                       <TrendingDown className="w-4 h-4" />
-                    }
+                    )}
                     <span>{formData.change}</span>
                     <span>({formData.changePercent})</span>
                   </div>
@@ -428,7 +509,7 @@ export default function EditIndice() {
                 <div className="text-xs text-gray-500 space-y-1">
                   {formData.source && <div>Source: {formData.source}</div>}
                   <div>Symbole: {formData.symbol}</div>
-                  <div>Dernière MAJ: {new Date().toLocaleString('fr-FR')}</div>
+                  <div>Dernière MAJ: {new Date().toLocaleString("fr-FR")}</div>
                 </div>
               </div>
             </div>
@@ -438,7 +519,7 @@ export default function EditIndice() {
               <h3 className="text-lg font-bold text-gray-900 mb-4">
                 Modifications récentes
               </h3>
-              
+
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                   <span>Valeur mise à jour</span>

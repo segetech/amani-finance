@@ -16,7 +16,7 @@ import {
   Eye,
   RefreshCw,
   HelpCircle,
-  Info
+  Info,
 } from "lucide-react";
 
 interface IndexData {
@@ -29,7 +29,7 @@ interface IndexData {
   isPositive: boolean;
   lastUpdate: string;
   description: string;
-  category: 'brvm' | 'commodity' | 'economic';
+  category: "brvm" | "commodity" | "economic";
   unit?: string;
   source?: string;
 }
@@ -45,9 +45,10 @@ export default function IndicesManagement() {
       changePercent: "+2.3%",
       isPositive: true,
       lastUpdate: new Date().toISOString(),
-      description: "Indice principal de la Bourse Régionale des Valeurs Mobilières",
+      description:
+        "Indice principal de la Bourse Régionale des Valeurs Mobilières",
       category: "brvm",
-      source: "BRVM"
+      source: "BRVM",
     },
     {
       id: "2",
@@ -60,7 +61,7 @@ export default function IndicesManagement() {
       lastUpdate: new Date().toISOString(),
       description: "Taux de change Franc CFA / Euro",
       category: "economic",
-      source: "BCE"
+      source: "BCE",
     },
     {
       id: "3",
@@ -74,25 +75,36 @@ export default function IndicesManagement() {
       description: "Prix de l'or en dollars US par once troy",
       category: "commodity",
       unit: "USD/oz",
-      source: "COMEX"
-    }
+      source: "COMEX",
+    },
   ]);
 
   const [isEditing, setIsEditing] = React.useState<string | null>(null);
   const [editForm, setEditForm] = React.useState<Partial<IndexData>>({});
   const [showAddForm, setShowAddForm] = React.useState(false);
-  const [selectedCategory, setSelectedCategory] = React.useState<string>('all');
+  const [selectedCategory, setSelectedCategory] = React.useState<string>("all");
 
   const categories = [
-    { id: 'all', name: 'Tous les indices', icon: BarChart3, color: 'blue' },
-    { id: 'brvm', name: 'BRVM & Bourse', icon: TrendingUp, color: 'green' },
-    { id: 'commodity', name: 'Matières Premières', icon: Globe, color: 'orange' },
-    { id: 'economic', name: 'Indicateurs Économiques', icon: DollarSign, color: 'purple' }
+    { id: "all", name: "Tous les indices", icon: BarChart3, color: "blue" },
+    { id: "brvm", name: "BRVM & Bourse", icon: TrendingUp, color: "green" },
+    {
+      id: "commodity",
+      name: "Matières Premières",
+      icon: Globe,
+      color: "orange",
+    },
+    {
+      id: "economic",
+      name: "Indicateurs Économiques",
+      icon: DollarSign,
+      color: "purple",
+    },
   ];
 
-  const filteredIndices = selectedCategory === 'all' 
-    ? indices 
-    : indices.filter(index => index.category === selectedCategory);
+  const filteredIndices =
+    selectedCategory === "all"
+      ? indices
+      : indices.filter((index) => index.category === selectedCategory);
 
   const startEdit = (index: IndexData) => {
     setIsEditing(index.id);
@@ -103,20 +115,28 @@ export default function IndicesManagement() {
   const saveEdit = () => {
     if (isEditing && editForm) {
       // Calculer automatiquement les valeurs dérivées avec l'ancienne valeur
-      const updatedForm = calculateDerivedValues(editForm, editForm.originalValue);
+      const updatedForm = calculateDerivedValues(
+        editForm,
+        editForm.originalValue,
+      );
 
-      setIndices(prev => prev.map(index =>
-        index.id === isEditing
-          ? { ...index, ...updatedForm, lastUpdate: new Date().toISOString() }
-          : index
-      ));
+      setIndices((prev) =>
+        prev.map((index) =>
+          index.id === isEditing
+            ? { ...index, ...updatedForm, lastUpdate: new Date().toISOString() }
+            : index,
+        ),
+      );
       setIsEditing(null);
       setEditForm({});
     }
   };
 
   // Calculer automatiquement la variation depuis l'ancienne valeur
-  const calculateDerivedValues = (formData: Partial<IndexData>, originalValue?: string) => {
+  const calculateDerivedValues = (
+    formData: Partial<IndexData>,
+    originalValue?: string,
+  ) => {
     const result = { ...formData };
 
     // Si on a une nouvelle valeur et l'ancienne valeur, calculer la variation automatiquement
@@ -128,8 +148,8 @@ export default function IndicesManagement() {
         const changeValue = newValue - oldValue;
         const percentage = (changeValue / oldValue) * 100;
 
-        result.change = `${changeValue >= 0 ? '+' : ''}${changeValue.toFixed(2)}`;
-        result.changePercent = `${changeValue >= 0 ? '+' : ''}${percentage.toFixed(2)}%`;
+        result.change = `${changeValue >= 0 ? "+" : ""}${changeValue.toFixed(2)}`;
+        result.changePercent = `${changeValue >= 0 ? "+" : ""}${percentage.toFixed(2)}%`;
         result.isPositive = changeValue >= 0;
       }
     }
@@ -140,7 +160,7 @@ export default function IndicesManagement() {
 
       if (!isNaN(currentValue) && !isNaN(changeValue) && currentValue > 0) {
         const percentage = (changeValue / (currentValue - changeValue)) * 100;
-        result.changePercent = `${changeValue >= 0 ? '+' : ''}${percentage.toFixed(2)}%`;
+        result.changePercent = `${changeValue >= 0 ? "+" : ""}${percentage.toFixed(2)}%`;
         result.isPositive = changeValue >= 0;
       }
     }
@@ -154,8 +174,8 @@ export default function IndicesManagement() {
   };
 
   const deleteIndex = (id: string) => {
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer cet indice ?')) {
-      setIndices(prev => prev.filter(index => index.id !== id));
+    if (window.confirm("Êtes-vous sûr de vouloir supprimer cet indice ?")) {
+      setIndices((prev) => prev.filter((index) => index.id !== id));
     }
   };
 
@@ -165,38 +185,42 @@ export default function IndicesManagement() {
 
     const newIndex: IndexData = {
       id: Date.now().toString(),
-      name: calculatedForm.name || '',
-      symbol: calculatedForm.symbol || '',
-      value: calculatedForm.value || '0',
-      change: calculatedForm.change || '0',
-      changePercent: calculatedForm.changePercent || '0%',
-      isPositive: calculatedForm.isPositive ?? parseFloat(calculatedForm.change || '0') >= 0,
+      name: calculatedForm.name || "",
+      symbol: calculatedForm.symbol || "",
+      value: calculatedForm.value || "0",
+      change: calculatedForm.change || "0",
+      changePercent: calculatedForm.changePercent || "0%",
+      isPositive:
+        calculatedForm.isPositive ??
+        parseFloat(calculatedForm.change || "0") >= 0,
       lastUpdate: new Date().toISOString(),
-      description: calculatedForm.description || '',
-      category: calculatedForm.category || 'brvm',
+      description: calculatedForm.description || "",
+      category: calculatedForm.category || "brvm",
       unit: calculatedForm.unit,
-      source: calculatedForm.source
+      source: calculatedForm.source,
     };
 
-    setIndices(prev => [...prev, newIndex]);
+    setIndices((prev) => [...prev, newIndex]);
     setShowAddForm(false);
     setEditForm({});
   };
 
   const getCategoryColor = (category: string) => {
     const colors = {
-      brvm: 'bg-green-100 text-green-800',
-      commodity: 'bg-orange-100 text-orange-800',
-      economic: 'bg-purple-100 text-purple-800'
+      brvm: "bg-green-100 text-green-800",
+      commodity: "bg-orange-100 text-orange-800",
+      economic: "bg-purple-100 text-purple-800",
     };
-    return colors[category as keyof typeof colors] || 'bg-gray-100 text-gray-800';
+    return (
+      colors[category as keyof typeof colors] || "bg-gray-100 text-gray-800"
+    );
   };
 
   const getCategoryIcon = (category: string) => {
     const icons = {
       brvm: TrendingUp,
       commodity: Globe,
-      economic: DollarSign
+      economic: DollarSign,
     };
     return icons[category as keyof typeof icons] || BarChart3;
   };
@@ -212,7 +236,8 @@ export default function IndicesManagement() {
               Gestion des Indices
             </h1>
             <p className="mt-2 text-gray-600">
-              Gérez tous les indices, matières premières et indicateurs économiques affichés sur votre site
+              Gérez tous les indices, matières premières et indicateurs
+              économiques affichés sur votre site
             </p>
           </div>
           <button
@@ -235,32 +260,71 @@ export default function IndicesManagement() {
 
               <div className="grid md:grid-cols-2 gap-6 text-sm">
                 <div>
-                  <h4 className="font-semibold text-blue-900 mb-2">🎯 Qu'est-ce qu'un indice ?</h4>
+                  <h4 className="font-semibold text-blue-900 mb-2">
+                    🎯 Qu'est-ce qu'un indice ?
+                  </h4>
                   <div className="text-blue-800 space-y-2">
-                    <p><strong>📊 BRVM Composite :</strong> Thermomètre de la bourse ouest-africaine. Si il monte = entreprises vont bien, économie forte.</p>
-                    <p><strong>🥇 Or/Argent :</strong> Prix des métaux précieux. Si ils montent = les gens cherchent la sécurité, possible crise.</p>
-                    <p><strong>🛢️ Pétrole :</strong> Plus cher = transport coûteux, inflation sur tout le reste.</p>
-                    <p><strong>🌾 Coton/Cacao :</strong> Important pour l'Afrique de l'Ouest. Prix élevé = plus de revenus pour les agriculteurs.</p>
+                    <p>
+                      <strong>📊 BRVM Composite :</strong> Thermomètre de la
+                      bourse ouest-africaine. Si il monte = entreprises vont
+                      bien, économie forte.
+                    </p>
+                    <p>
+                      <strong>🥇 Or/Argent :</strong> Prix des métaux précieux.
+                      Si ils montent = les gens cherchent la sécurité, possible
+                      crise.
+                    </p>
+                    <p>
+                      <strong>🛢️ Pétrole :</strong> Plus cher = transport
+                      coûteux, inflation sur tout le reste.
+                    </p>
+                    <p>
+                      <strong>🌾 Coton/Cacao :</strong> Important pour l'Afrique
+                      de l'Ouest. Prix élevé = plus de revenus pour les
+                      agriculteurs.
+                    </p>
                   </div>
                 </div>
 
                 <div>
-                  <h4 className="font-semibold text-blue-900 mb-2">🤖 Nouveau système intelligent !</h4>
+                  <h4 className="font-semibold text-blue-900 mb-2">
+                    🤖 Nouveau système intelligent !
+                  </h4>
                   <div className="text-blue-800 space-y-2">
-                    <p><strong>1. Ancienne valeur :</strong> Ce que c'était avant (ex: 185.42 points)</p>
-                    <p><strong>2. Nouvelle valeur :</strong> Ce que c'est maintenant (ex: 189.70 points)</p>
-                    <p><strong>3. Variation :</strong> ✨ Calculée automatiquement (+4.28)</p>
-                    <p><strong>4. Pourcentage :</strong> ✨ Calculé automatiquement (+2.3%)</p>
-                    <p><strong>5. Flèches :</strong> ✨ 📈 Verte si hausse, 📉 Rouge si baisse</p>
-                    <p><strong>🚀 Modification :</strong> Tapez juste la nouvelle valeur, tout se calcule automatiquement !</p>
+                    <p>
+                      <strong>1. Ancienne valeur :</strong> Ce que c'était avant
+                      (ex: 185.42 points)
+                    </p>
+                    <p>
+                      <strong>2. Nouvelle valeur :</strong> Ce que c'est
+                      maintenant (ex: 189.70 points)
+                    </p>
+                    <p>
+                      <strong>3. Variation :</strong> ✨ Calculée
+                      automatiquement (+4.28)
+                    </p>
+                    <p>
+                      <strong>4. Pourcentage :</strong> ✨ Calculé
+                      automatiquement (+2.3%)
+                    </p>
+                    <p>
+                      <strong>5. Flèches :</strong> ✨ 📈 Verte si hausse, 📉
+                      Rouge si baisse
+                    </p>
+                    <p>
+                      <strong>🚀 Modification :</strong> Tapez juste la nouvelle
+                      valeur, tout se calcule automatiquement !
+                    </p>
                   </div>
                 </div>
               </div>
 
               <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
                 <p className="text-green-800 text-sm">
-                  <strong>🚀 Super astuce :</strong> Maintenant vous n'avez qu'à taper l'ancienne valeur et la nouvelle valeur.
-                  La variation (+/-), le pourcentage (%) et les flèches (📈📉) se calculent automatiquement !
+                  <strong>🚀 Super astuce :</strong> Maintenant vous n'avez qu'à
+                  taper l'ancienne valeur et la nouvelle valeur. La variation
+                  (+/-), le pourcentage (%) et les flèches (📈📉) se calculent
+                  automatiquement !
                 </p>
               </div>
             </div>
@@ -269,7 +333,7 @@ export default function IndicesManagement() {
 
         {/* Filtres par catégorie */}
         <div className="flex flex-wrap gap-3">
-          {categories.map(category => {
+          {categories.map((category) => {
             const Icon = category.icon;
             const isActive = selectedCategory === category.id;
             return (
@@ -278,16 +342,20 @@ export default function IndicesManagement() {
                 onClick={() => setSelectedCategory(category.id)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
                   isActive
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                    ? "bg-blue-600 text-white"
+                    : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
                 }`}
               >
                 <Icon className="w-4 h-4" />
                 {category.name}
-                <span className={`text-xs px-2 py-1 rounded-full ${
-                  isActive ? 'bg-white/20' : 'bg-gray-200'
-                }`}>
-                  {category.id === 'all' ? indices.length : indices.filter(i => i.category === category.id).length}
+                <span
+                  className={`text-xs px-2 py-1 rounded-full ${
+                    isActive ? "bg-white/20" : "bg-gray-200"
+                  }`}
+                >
+                  {category.id === "all"
+                    ? indices.length
+                    : indices.filter((i) => i.category === category.id).length}
                 </span>
               </button>
             );
@@ -314,12 +382,15 @@ export default function IndicesManagement() {
 
           {/* Version mobile/tablette responsive */}
           <div className="divide-y divide-gray-200">
-            {filteredIndices.map(index => {
+            {filteredIndices.map((index) => {
               const CategoryIcon = getCategoryIcon(index.category);
               const isEditingThis = isEditing === index.id;
 
               return (
-                <div key={index.id} className="p-4 md:p-6 hover:bg-gray-50 transition-colors">
+                <div
+                  key={index.id}
+                  className="p-4 md:p-6 hover:bg-gray-50 transition-colors"
+                >
                   {/* Version mobile - Layout vertical */}
                   <div className="block lg:hidden space-y-4">
                     {/* En-tête avec nom et actions */}
@@ -330,19 +401,30 @@ export default function IndicesManagement() {
                           {isEditingThis ? (
                             <input
                               type="text"
-                              value={editForm.name || ''}
-                              onChange={(e) => setEditForm(prev => ({ ...prev, name: e.target.value }))}
+                              value={editForm.name || ""}
+                              onChange={(e) =>
+                                setEditForm((prev) => ({
+                                  ...prev,
+                                  name: e.target.value,
+                                }))
+                              }
                               className="font-semibold text-lg border border-gray-300 rounded px-2 py-1 w-full"
                               placeholder="Nom de l'indice"
                             />
                           ) : (
-                            <h3 className="font-semibold text-lg text-gray-900 truncate">{index.name}</h3>
+                            <h3 className="font-semibold text-lg text-gray-900 truncate">
+                              {index.name}
+                            </h3>
                           )}
                           <div className="flex items-center gap-2 mt-1">
-                            <span className={`text-xs px-2 py-1 rounded-full font-medium ${getCategoryColor(index.category)}`}>
+                            <span
+                              className={`text-xs px-2 py-1 rounded-full font-medium ${getCategoryColor(index.category)}`}
+                            >
                               {index.category.toUpperCase()}
                             </span>
-                            <span className="text-xs text-gray-500">{index.symbol}</span>
+                            <span className="text-xs text-gray-500">
+                              {index.symbol}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -394,48 +476,69 @@ export default function IndicesManagement() {
                         {isEditingThis ? (
                           <input
                             type="text"
-                            value={editForm.value || ''}
+                            value={editForm.value || ""}
                             onChange={(e) => {
-                              const newForm = { ...editForm, value: e.target.value };
+                              const newForm = {
+                                ...editForm,
+                                value: e.target.value,
+                              };
                               // Calculer automatiquement la variation depuis l'ancienne valeur
-                              const calculated = calculateDerivedValues(newForm, editForm.originalValue);
+                              const calculated = calculateDerivedValues(
+                                newForm,
+                                editForm.originalValue,
+                              );
                               setEditForm(calculated);
                             }}
                             className="text-xl font-bold border border-blue-300 rounded px-2 py-1 text-center w-full focus:ring-2 focus:ring-blue-500"
                             placeholder="Nouvelle valeur"
                           />
                         ) : (
-                          <div className="text-xl font-bold text-gray-900">{index.value}</div>
+                          <div className="text-xl font-bold text-gray-900">
+                            {index.value}
+                          </div>
                         )}
-                        {index.unit && <div className="text-xs text-gray-500 mt-1">{index.unit}</div>}
+                        {index.unit && (
+                          <div className="text-xs text-gray-500 mt-1">
+                            {index.unit}
+                          </div>
+                        )}
                       </div>
 
                       <div className="bg-gray-50 p-3 rounded-lg text-center">
-                        <div className="text-xs text-gray-500 mb-1">Variation</div>
+                        <div className="text-xs text-gray-500 mb-1">
+                          Variation
+                        </div>
                         {isEditingThis ? (
                           <div className="space-y-2">
                             <div className="text-xs text-gray-500 mb-1">
                               Ancienne: {editForm.originalValue}
                             </div>
                             <div className="text-sm font-medium text-blue-600">
-                              {editForm.changePercent || '✨ Auto-calculé'}
+                              {editForm.changePercent || "✨ Auto-calculé"}
                             </div>
                             <div className="text-xs text-green-600">
-                              Variation: {editForm.change || '✨ Auto'}
+                              Variation: {editForm.change || "✨ Auto"}
                             </div>
                           </div>
                         ) : (
-                          <div className={`font-semibold ${
-                            index.isPositive ? 'text-green-600' : 'text-red-600'
-                          }`}>
+                          <div
+                            className={`font-semibold ${
+                              index.isPositive
+                                ? "text-green-600"
+                                : "text-red-600"
+                            }`}
+                          >
                             <div className="flex items-center justify-center gap-1">
-                              {index.isPositive ?
-                                <TrendingUp className="w-4 h-4" /> :
+                              {index.isPositive ? (
+                                <TrendingUp className="w-4 h-4" />
+                              ) : (
                                 <TrendingDown className="w-4 h-4" />
-                              }
+                              )}
                               {index.change}
                             </div>
-                            <div className="text-sm">({index.changePercent})</div>
+                            <div className="text-sm">
+                              ({index.changePercent})
+                            </div>
                           </div>
                         )}
                       </div>
@@ -445,18 +548,30 @@ export default function IndicesManagement() {
                     <div>
                       {isEditingThis ? (
                         <textarea
-                          value={editForm.description || ''}
-                          onChange={(e) => setEditForm(prev => ({ ...prev, description: e.target.value }))}
+                          value={editForm.description || ""}
+                          onChange={(e) =>
+                            setEditForm((prev) => ({
+                              ...prev,
+                              description: e.target.value,
+                            }))
+                          }
                           className="border border-gray-300 rounded px-3 py-2 w-full text-sm"
                           rows={3}
                           placeholder="Description de l'indice pour aider les utilisateurs"
                         />
                       ) : (
                         <div>
-                          <p className="text-sm text-gray-600 leading-relaxed">{index.description}</p>
+                          <p className="text-sm text-gray-600 leading-relaxed">
+                            {index.description}
+                          </p>
                           <div className="flex flex-wrap gap-3 mt-2 text-xs text-gray-500">
                             {index.source && <span>📊 {index.source}</span>}
-                            <span>🕒 {new Date(index.lastUpdate).toLocaleString('fr-FR')}</span>
+                            <span>
+                              🕒{" "}
+                              {new Date(index.lastUpdate).toLocaleString(
+                                "fr-FR",
+                              )}
+                            </span>
                           </div>
                         </div>
                       )}
@@ -466,10 +581,22 @@ export default function IndicesManagement() {
                       <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                         <div className="text-blue-800 text-sm">
                           <strong>🚀 Nouveau système intelligent :</strong>
-                          <br />📊 Ancienne valeur : <strong>{editForm.originalValue}</strong>
-                          <br />📈 Nouvelle valeur : <strong>{editForm.value || 'Tapez ici...'}</strong>
-                          <br />⚡ Variation : <strong>{editForm.change || 'Calculée automatiquement'}</strong>
-                          <br />📊 Pourcentage : <strong>{editForm.changePercent || 'Calculé automatiquement'}</strong>
+                          <br />
+                          📊 Ancienne valeur :{" "}
+                          <strong>{editForm.originalValue}</strong>
+                          <br />
+                          📈 Nouvelle valeur :{" "}
+                          <strong>{editForm.value || "Tapez ici..."}</strong>
+                          <br />⚡ Variation :{" "}
+                          <strong>
+                            {editForm.change || "Calculée automatiquement"}
+                          </strong>
+                          <br />
+                          📊 Pourcentage :{" "}
+                          <strong>
+                            {editForm.changePercent ||
+                              "Calculé automatiquement"}
+                          </strong>
                         </div>
                       </div>
                     )}
@@ -486,19 +613,30 @@ export default function IndicesManagement() {
                             {isEditingThis ? (
                               <input
                                 type="text"
-                                value={editForm.name || ''}
-                                onChange={(e) => setEditForm(prev => ({ ...prev, name: e.target.value }))}
+                                value={editForm.name || ""}
+                                onChange={(e) =>
+                                  setEditForm((prev) => ({
+                                    ...prev,
+                                    name: e.target.value,
+                                  }))
+                                }
                                 className="font-semibold text-lg border border-gray-300 rounded px-2 py-1 w-full"
                                 placeholder="Nom de l'indice"
                               />
                             ) : (
-                              <h3 className="font-semibold text-lg text-gray-900">{index.name}</h3>
+                              <h3 className="font-semibold text-lg text-gray-900">
+                                {index.name}
+                              </h3>
                             )}
                             <div className="flex items-center gap-2 mt-1">
-                              <span className={`text-xs px-2 py-1 rounded-full font-medium ${getCategoryColor(index.category)}`}>
+                              <span
+                                className={`text-xs px-2 py-1 rounded-full font-medium ${getCategoryColor(index.category)}`}
+                              >
                                 {index.category.toUpperCase()}
                               </span>
-                              <span className="text-xs text-gray-500">{index.symbol}</span>
+                              <span className="text-xs text-gray-500">
+                                {index.symbol}
+                              </span>
                             </div>
                           </div>
                         </div>
@@ -509,19 +647,31 @@ export default function IndicesManagement() {
                         {isEditingThis ? (
                           <input
                             type="text"
-                            value={editForm.value || ''}
+                            value={editForm.value || ""}
                             onChange={(e) => {
-                              const newForm = { ...editForm, value: e.target.value };
-                              const calculated = calculateDerivedValues(newForm, editForm.originalValue);
+                              const newForm = {
+                                ...editForm,
+                                value: e.target.value,
+                              };
+                              const calculated = calculateDerivedValues(
+                                newForm,
+                                editForm.originalValue,
+                              );
                               setEditForm(calculated);
                             }}
                             className="text-2xl font-bold border border-blue-300 rounded px-2 py-1 text-center w-28 focus:ring-2 focus:ring-blue-500"
                             placeholder="Nouvelle"
                           />
                         ) : (
-                          <div className="text-2xl font-bold text-gray-900">{index.value}</div>
+                          <div className="text-2xl font-bold text-gray-900">
+                            {index.value}
+                          </div>
                         )}
-                        {index.unit && <div className="text-xs text-gray-500">{index.unit}</div>}
+                        {index.unit && (
+                          <div className="text-xs text-gray-500">
+                            {index.unit}
+                          </div>
+                        )}
                       </div>
 
                       {/* Variation */}
@@ -532,23 +682,30 @@ export default function IndicesManagement() {
                               Ancien: {editForm.originalValue}
                             </div>
                             <div className="text-sm font-medium text-blue-600">
-                              {editForm.changePercent || '✨ Auto'}
+                              {editForm.changePercent || "✨ Auto"}
                             </div>
                             <div className="text-xs text-green-600">
-                              {editForm.change || '✨ Calculé'}
+                              {editForm.change || "✨ Calculé"}
                             </div>
                           </div>
                         ) : (
-                          <div className={`flex items-center justify-center gap-1 font-semibold ${
-                            index.isPositive ? 'text-green-600' : 'text-red-600'
-                          }`}>
-                            {index.isPositive ?
-                              <TrendingUp className="w-4 h-4" /> :
+                          <div
+                            className={`flex items-center justify-center gap-1 font-semibold ${
+                              index.isPositive
+                                ? "text-green-600"
+                                : "text-red-600"
+                            }`}
+                          >
+                            {index.isPositive ? (
+                              <TrendingUp className="w-4 h-4" />
+                            ) : (
                               <TrendingDown className="w-4 h-4" />
-                            }
+                            )}
                             <div>
                               <div>{index.change}</div>
-                              <div className="text-sm">({index.changePercent})</div>
+                              <div className="text-sm">
+                                ({index.changePercent})
+                              </div>
                             </div>
                           </div>
                         )}
@@ -558,18 +715,32 @@ export default function IndicesManagement() {
                       <div className="col-span-2">
                         {isEditingThis ? (
                           <textarea
-                            value={editForm.description || ''}
-                            onChange={(e) => setEditForm(prev => ({ ...prev, description: e.target.value }))}
+                            value={editForm.description || ""}
+                            onChange={(e) =>
+                              setEditForm((prev) => ({
+                                ...prev,
+                                description: e.target.value,
+                              }))
+                            }
                             className="border border-gray-300 rounded px-2 py-1 w-full text-sm"
                             rows={2}
                             placeholder="Description de l'indice"
                           />
                         ) : (
                           <div>
-                            <p className="text-sm text-gray-600 line-clamp-2">{index.description}</p>
+                            <p className="text-sm text-gray-600 line-clamp-2">
+                              {index.description}
+                            </p>
                             <div className="flex items-center gap-4 mt-1 text-xs text-gray-500">
-                              {index.source && <span>Source: {index.source}</span>}
-                              <span>Mis à jour: {new Date(index.lastUpdate).toLocaleString('fr-FR')}</span>
+                              {index.source && (
+                                <span>Source: {index.source}</span>
+                              )}
+                              <span>
+                                Mis à jour:{" "}
+                                {new Date(index.lastUpdate).toLocaleString(
+                                  "fr-FR",
+                                )}
+                              </span>
                             </div>
                           </div>
                         )}
@@ -623,8 +794,12 @@ export default function IndicesManagement() {
           {filteredIndices.length === 0 && (
             <div className="p-12 text-center">
               <BarChart3 className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Aucun indice dans cette catégorie</h3>
-              <p className="text-gray-600 mb-6">Commencez par ajouter votre premier indice.</p>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Aucun indice dans cette catégorie
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Commencez par ajouter votre premier indice.
+              </p>
               <button
                 onClick={() => setShowAddForm(true)}
                 className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
@@ -641,7 +816,9 @@ export default function IndicesManagement() {
             <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
               <div className="p-6 border-b border-gray-200">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-bold text-gray-900">Ajouter un nouvel indice</h2>
+                  <h2 className="text-2xl font-bold text-gray-900">
+                    Ajouter un nouvel indice
+                  </h2>
                   <button
                     onClick={() => {
                       setShowAddForm(false);
@@ -661,23 +838,30 @@ export default function IndicesManagement() {
                     Catégorie *
                   </label>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    {categories.filter(c => c.id !== 'all').map(category => {
-                      const Icon = category.icon;
-                      return (
-                        <button
-                          key={category.id}
-                          onClick={() => setEditForm(prev => ({ ...prev, category: category.id as any }))}
-                          className={`p-4 border rounded-lg text-left transition-colors ${
-                            editForm.category === category.id
-                              ? 'border-blue-500 bg-blue-50'
-                              : 'border-gray-200 hover:border-gray-300'
-                          }`}
-                        >
-                          <Icon className="w-6 h-6 mb-2 text-blue-600" />
-                          <div className="font-medium">{category.name}</div>
-                        </button>
-                      );
-                    })}
+                    {categories
+                      .filter((c) => c.id !== "all")
+                      .map((category) => {
+                        const Icon = category.icon;
+                        return (
+                          <button
+                            key={category.id}
+                            onClick={() =>
+                              setEditForm((prev) => ({
+                                ...prev,
+                                category: category.id as any,
+                              }))
+                            }
+                            className={`p-4 border rounded-lg text-left transition-colors ${
+                              editForm.category === category.id
+                                ? "border-blue-500 bg-blue-50"
+                                : "border-gray-200 hover:border-gray-300"
+                            }`}
+                          >
+                            <Icon className="w-6 h-6 mb-2 text-blue-600" />
+                            <div className="font-medium">{category.name}</div>
+                          </button>
+                        );
+                      })}
                   </div>
                 </div>
 
@@ -689,8 +873,13 @@ export default function IndicesManagement() {
                     </label>
                     <input
                       type="text"
-                      value={editForm.name || ''}
-                      onChange={(e) => setEditForm(prev => ({ ...prev, name: e.target.value }))}
+                      value={editForm.name || ""}
+                      onChange={(e) =>
+                        setEditForm((prev) => ({
+                          ...prev,
+                          name: e.target.value,
+                        }))
+                      }
                       className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Ex: BRVM Composite, Or, USD/FCFA"
                     />
@@ -703,8 +892,13 @@ export default function IndicesManagement() {
                     </label>
                     <input
                       type="text"
-                      value={editForm.symbol || ''}
-                      onChange={(e) => setEditForm(prev => ({ ...prev, symbol: e.target.value }))}
+                      value={editForm.symbol || ""}
+                      onChange={(e) =>
+                        setEditForm((prev) => ({
+                          ...prev,
+                          symbol: e.target.value,
+                        }))
+                      }
                       className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Ex: BRVM, XAU/USD, USD/XOF"
                     />
@@ -717,10 +911,13 @@ export default function IndicesManagement() {
                     </label>
                     <input
                       type="text"
-                      value={editForm.value || ''}
+                      value={editForm.value || ""}
                       onChange={(e) => {
                         const newForm = { ...editForm, value: e.target.value };
-                        const calculated = calculateDerivedValues(newForm, editForm.originalValue);
+                        const calculated = calculateDerivedValues(
+                          newForm,
+                          editForm.originalValue,
+                        );
                         setEditForm(calculated);
                       }}
                       className="w-full border border-blue-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -735,10 +932,16 @@ export default function IndicesManagement() {
                     </label>
                     <input
                       type="text"
-                      value={editForm.originalValue || ''}
+                      value={editForm.originalValue || ""}
                       onChange={(e) => {
-                        const newForm = { ...editForm, originalValue: e.target.value };
-                        const calculated = calculateDerivedValues(newForm, e.target.value);
+                        const newForm = {
+                          ...editForm,
+                          originalValue: e.target.value,
+                        };
+                        const calculated = calculateDerivedValues(
+                          newForm,
+                          e.target.value,
+                        );
                         setEditForm(calculated);
                       }}
                       className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -749,20 +952,33 @@ export default function IndicesManagement() {
                   {/* Calcul automatique en temps réel */}
                   <div className="col-span-2">
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                      <h4 className="font-medium text-blue-900 mb-3">🤖 Calcul automatique en temps réel</h4>
+                      <h4 className="font-medium text-blue-900 mb-3">
+                        🤖 Calcul automatique en temps réel
+                      </h4>
                       <div className="grid grid-cols-3 gap-4 text-sm">
                         <div>
-                          <div className="text-blue-700 font-medium">Ancienne</div>
-                          <div className="text-lg font-bold text-blue-900">{editForm.originalValue || '---'}</div>
+                          <div className="text-blue-700 font-medium">
+                            Ancienne
+                          </div>
+                          <div className="text-lg font-bold text-blue-900">
+                            {editForm.originalValue || "---"}
+                          </div>
                         </div>
                         <div>
-                          <div className="text-blue-700 font-medium">Nouvelle</div>
-                          <div className="text-lg font-bold text-blue-900">{editForm.value || '---'}</div>
+                          <div className="text-blue-700 font-medium">
+                            Nouvelle
+                          </div>
+                          <div className="text-lg font-bold text-blue-900">
+                            {editForm.value || "---"}
+                          </div>
                         </div>
                         <div>
-                          <div className="text-blue-700 font-medium">Résultat</div>
+                          <div className="text-blue-700 font-medium">
+                            Résultat
+                          </div>
                           <div className="text-lg font-bold text-green-600">
-                            {editForm.change || '✨ Auto'} ({editForm.changePercent || '✨ Auto'})
+                            {editForm.change || "✨ Auto"} (
+                            {editForm.changePercent || "✨ Auto"})
                           </div>
                         </div>
                       </div>
@@ -776,8 +992,13 @@ export default function IndicesManagement() {
                     </label>
                     <input
                       type="text"
-                      value={editForm.unit || ''}
-                      onChange={(e) => setEditForm(prev => ({ ...prev, unit: e.target.value }))}
+                      value={editForm.unit || ""}
+                      onChange={(e) =>
+                        setEditForm((prev) => ({
+                          ...prev,
+                          unit: e.target.value,
+                        }))
+                      }
                       className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Ex: USD/oz, cents/livre, points"
                     />
@@ -790,8 +1011,13 @@ export default function IndicesManagement() {
                     </label>
                     <input
                       type="text"
-                      value={editForm.source || ''}
-                      onChange={(e) => setEditForm(prev => ({ ...prev, source: e.target.value }))}
+                      value={editForm.source || ""}
+                      onChange={(e) =>
+                        setEditForm((prev) => ({
+                          ...prev,
+                          source: e.target.value,
+                        }))
+                      }
                       className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Ex: BRVM, COMEX, BCEAO"
                     />
@@ -804,8 +1030,13 @@ export default function IndicesManagement() {
                     Description
                   </label>
                   <textarea
-                    value={editForm.description || ''}
-                    onChange={(e) => setEditForm(prev => ({ ...prev, description: e.target.value }))}
+                    value={editForm.description || ""}
+                    onChange={(e) =>
+                      setEditForm((prev) => ({
+                        ...prev,
+                        description: e.target.value,
+                      }))
+                    }
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     rows={3}
                     placeholder="Description de l'indice pour aider les utilisateurs à comprendre"
@@ -817,27 +1048,53 @@ export default function IndicesManagement() {
                   <div className="flex items-start gap-3">
                     <Info className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
                     <div className="text-yellow-800 text-sm">
-                      <p className="font-medium mb-2">💡 Guide complet pour débutants :</p>
+                      <p className="font-medium mb-2">
+                        💡 Guide complet pour débutants :
+                      </p>
                       <div className="grid md:grid-cols-2 gap-4 text-xs">
                         <div>
-                          <p className="font-medium mb-1">📊 Ce que vous devez remplir :</p>
+                          <p className="font-medium mb-1">
+                            📊 Ce que vous devez remplir :
+                          </p>
                           <ul className="space-y-1">
-                            <li>• <strong>Nom :</strong> Ex: "Or", "BRVM Composite"</li>
-                            <li>• <strong>Valeur :</strong> Le prix actuel (ex: 185.42)</li>
-                            <li>• <strong>Variation :</strong> +4.28 si ça monte, -2.15 si ça baisse</li>
+                            <li>
+                              • <strong>Nom :</strong> Ex: "Or", "BRVM
+                              Composite"
+                            </li>
+                            <li>
+                              • <strong>Valeur :</strong> Le prix actuel (ex:
+                              185.42)
+                            </li>
+                            <li>
+                              • <strong>Variation :</strong> +4.28 si ça monte,
+                              -2.15 si ça baisse
+                            </li>
                           </ul>
                         </div>
                         <div>
-                          <p className="font-medium mb-1">✨ Ce qui se fait automatiquement :</p>
+                          <p className="font-medium mb-1">
+                            ✨ Ce qui se fait automatiquement :
+                          </p>
                           <ul className="space-y-1">
-                            <li>• <strong>Pourcentage :</strong> Calculé automatiquement</li>
-                            <li>• <strong>Couleur :</strong> Vert si +, Rouge si -</li>
-                            <li>• <strong>Date :</strong> Mise à jour automatique</li>
+                            <li>
+                              • <strong>Pourcentage :</strong> Calculé
+                              automatiquement
+                            </li>
+                            <li>
+                              • <strong>Couleur :</strong> Vert si +, Rouge si -
+                            </li>
+                            <li>
+                              • <strong>Date :</strong> Mise à jour automatique
+                            </li>
                           </ul>
                         </div>
                       </div>
                       <div className="mt-3 p-2 bg-green-100 rounded border border-green-200">
-                        <p className="font-medium text-green-800">🎯 Nouveau système : Entrez l'ancienne valeur et la nouvelle valeur. La variation et le pourcentage se calculent automatiquement !</p>
+                        <p className="font-medium text-green-800">
+                          🎯 Nouveau système : Entrez l'ancienne valeur et la
+                          nouvelle valeur. La variation et le pourcentage se
+                          calculent automatiquement !
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -856,7 +1113,9 @@ export default function IndicesManagement() {
                 </button>
                 <button
                   onClick={addNewIndex}
-                  disabled={!editForm.name || !editForm.symbol || !editForm.value}
+                  disabled={
+                    !editForm.name || !editForm.symbol || !editForm.value
+                  }
                   className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Ajouter l'indice

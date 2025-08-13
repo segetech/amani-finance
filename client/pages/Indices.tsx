@@ -178,7 +178,6 @@ export default function Indices() {
         </div>
       </section>
 
-
       {/* Filtres de catégories */}
       <section className="py-8 bg-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
