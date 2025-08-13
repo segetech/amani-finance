@@ -299,17 +299,177 @@ export default function IndicesManagement() {
             </div>
           </div>
 
+          {/* Version mobile/tablette responsive */}
           <div className="divide-y divide-gray-200">
             {filteredIndices.map(index => {
               const CategoryIcon = getCategoryIcon(index.category);
               const isEditingThis = isEditing === index.id;
 
               return (
-                <div key={index.id} className="p-6 hover:bg-gray-50 transition-colors">
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1 grid grid-cols-1 lg:grid-cols-6 gap-4 items-center">
+                <div key={index.id} className="p-4 md:p-6 hover:bg-gray-50 transition-colors">
+                  {/* Version mobile - Layout vertical */}
+                  <div className="block lg:hidden space-y-4">
+                    {/* En-tête avec nom et actions */}
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-3 flex-1">
+                        <CategoryIcon className="w-5 h-5 text-gray-600 flex-shrink-0" />
+                        <div className="min-w-0 flex-1">
+                          {isEditingThis ? (
+                            <input
+                              type="text"
+                              value={editForm.name || ''}
+                              onChange={(e) => setEditForm(prev => ({ ...prev, name: e.target.value }))}
+                              className="font-semibold text-lg border border-gray-300 rounded px-2 py-1 w-full"
+                              placeholder="Nom de l'indice"
+                            />
+                          ) : (
+                            <h3 className="font-semibold text-lg text-gray-900 truncate">{index.name}</h3>
+                          )}
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className={`text-xs px-2 py-1 rounded-full font-medium ${getCategoryColor(index.category)}`}>
+                              {index.category.toUpperCase()}
+                            </span>
+                            <span className="text-xs text-gray-500">{index.symbol}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Actions mobiles */}
+                      <div className="flex items-center gap-2 ml-2">
+                        {isEditingThis ? (
+                          <>
+                            <button
+                              onClick={saveEdit}
+                              className="bg-green-600 text-white p-2 rounded-lg hover:bg-green-700 transition-colors"
+                              title="Sauvegarder"
+                            >
+                              <Save className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={cancelEdit}
+                              className="bg-gray-600 text-white p-2 rounded-lg hover:bg-gray-700 transition-colors"
+                              title="Annuler"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <button
+                              onClick={() => startEdit(index)}
+                              className="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition-colors"
+                              title="Modifier"
+                            >
+                              <Edit3 className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => deleteIndex(index.id)}
+                              className="bg-red-600 text-white p-2 rounded-lg hover:bg-red-700 transition-colors"
+                              title="Supprimer"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Valeur et variation en mobile */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-gray-50 p-3 rounded-lg text-center">
+                        <div className="text-xs text-gray-500 mb-1">Valeur</div>
+                        {isEditingThis ? (
+                          <input
+                            type="text"
+                            value={editForm.value || ''}
+                            onChange={(e) => {
+                              const newForm = { ...editForm, value: e.target.value };
+                              // Calculer automatiquement le pourcentage
+                              const calculated = calculateDerivedValues(newForm);
+                              setEditForm(calculated);
+                            }}
+                            className="text-xl font-bold border border-gray-300 rounded px-2 py-1 text-center w-full"
+                            placeholder="185.42"
+                          />
+                        ) : (
+                          <div className="text-xl font-bold text-gray-900">{index.value}</div>
+                        )}
+                        {index.unit && <div className="text-xs text-gray-500 mt-1">{index.unit}</div>}
+                      </div>
+
+                      <div className="bg-gray-50 p-3 rounded-lg text-center">
+                        <div className="text-xs text-gray-500 mb-1">Variation</div>
+                        {isEditingThis ? (
+                          <div className="space-y-2">
+                            <input
+                              type="text"
+                              value={editForm.change || ''}
+                              onChange={(e) => {
+                                const newForm = { ...editForm, change: e.target.value };
+                                // Calculer automatiquement le pourcentage
+                                const calculated = calculateDerivedValues(newForm);
+                                setEditForm(calculated);
+                              }}
+                              className="border border-gray-300 rounded px-2 py-1 text-center w-full"
+                              placeholder="+4.28"
+                            />
+                            <div className="text-sm font-medium text-gray-600">
+                              {editForm.changePercent || 'Auto-calculé'}
+                            </div>
+                          </div>
+                        ) : (
+                          <div className={`font-semibold ${
+                            index.isPositive ? 'text-green-600' : 'text-red-600'
+                          }`}>
+                            <div className="flex items-center justify-center gap-1">
+                              {index.isPositive ?
+                                <TrendingUp className="w-4 h-4" /> :
+                                <TrendingDown className="w-4 h-4" />
+                              }
+                              {index.change}
+                            </div>
+                            <div className="text-sm">({index.changePercent})</div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Description en mobile */}
+                    <div>
+                      {isEditingThis ? (
+                        <textarea
+                          value={editForm.description || ''}
+                          onChange={(e) => setEditForm(prev => ({ ...prev, description: e.target.value }))}
+                          className="border border-gray-300 rounded px-3 py-2 w-full text-sm"
+                          rows={3}
+                          placeholder="Description de l'indice pour aider les utilisateurs"
+                        />
+                      ) : (
+                        <div>
+                          <p className="text-sm text-gray-600 leading-relaxed">{index.description}</p>
+                          <div className="flex flex-wrap gap-3 mt-2 text-xs text-gray-500">
+                            {index.source && <span>📊 {index.source}</span>}
+                            <span>🕒 {new Date(index.lastUpdate).toLocaleString('fr-FR')}</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {isEditingThis && (
+                      <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                        <div className="text-green-800 text-sm">
+                          <strong>✨ Calcul automatique :</strong> Entrez juste la valeur et la variation,
+                          le pourcentage se calcule automatiquement !
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Version desktop - Layout horizontal */}
+                  <div className="hidden lg:flex items-center justify-between">
+                    <div className="flex-1 grid grid-cols-6 gap-4 items-center">
                       {/* Nom et catégorie */}
-                      <div className="lg:col-span-2">
+                      <div className="col-span-2">
                         <div className="flex items-center gap-3">
                           <CategoryIcon className="w-5 h-5 text-gray-600" />
                           <div>
@@ -340,8 +500,13 @@ export default function IndicesManagement() {
                           <input
                             type="text"
                             value={editForm.value || ''}
-                            onChange={(e) => setEditForm(prev => ({ ...prev, value: e.target.value }))}
-                            className="text-2xl font-bold border border-gray-300 rounded px-2 py-1 text-center w-24"
+                            onChange={(e) => {
+                              const newForm = { ...editForm, value: e.target.value };
+                              const calculated = calculateDerivedValues(newForm);
+                              setEditForm(calculated);
+                            }}
+                            className="text-2xl font-bold border border-gray-300 rounded px-2 py-1 text-center w-28"
+                            placeholder="185.42"
                           />
                         ) : (
                           <div className="text-2xl font-bold text-gray-900">{index.value}</div>
@@ -356,24 +521,24 @@ export default function IndicesManagement() {
                             <input
                               type="text"
                               value={editForm.change || ''}
-                              onChange={(e) => setEditForm(prev => ({ ...prev, change: e.target.value }))}
+                              onChange={(e) => {
+                                const newForm = { ...editForm, change: e.target.value };
+                                const calculated = calculateDerivedValues(newForm);
+                                setEditForm(calculated);
+                              }}
                               className="border border-gray-300 rounded px-2 py-1 text-center w-20"
-                              placeholder="+2.5"
+                              placeholder="+4.28"
                             />
-                            <input
-                              type="text"
-                              value={editForm.changePercent || ''}
-                              onChange={(e) => setEditForm(prev => ({ ...prev, changePercent: e.target.value }))}
-                              className="border border-gray-300 rounded px-2 py-1 text-center w-20"
-                              placeholder="+1.2%"
-                            />
+                            <div className="text-xs text-green-600 font-medium">
+                              {editForm.changePercent || 'Auto'}
+                            </div>
                           </div>
                         ) : (
                           <div className={`flex items-center justify-center gap-1 font-semibold ${
                             index.isPositive ? 'text-green-600' : 'text-red-600'
                           }`}>
-                            {index.isPositive ? 
-                              <TrendingUp className="w-4 h-4" /> : 
+                            {index.isPositive ?
+                              <TrendingUp className="w-4 h-4" /> :
                               <TrendingDown className="w-4 h-4" />
                             }
                             <div>
@@ -385,7 +550,7 @@ export default function IndicesManagement() {
                       </div>
 
                       {/* Description */}
-                      <div className="lg:col-span-2">
+                      <div className="col-span-2">
                         {isEditingThis ? (
                           <textarea
                             value={editForm.description || ''}
@@ -406,7 +571,7 @@ export default function IndicesManagement() {
                       </div>
                     </div>
 
-                    {/* Actions */}
+                    {/* Actions desktop */}
                     <div className="flex items-center gap-2 ml-4">
                       {isEditingThis ? (
                         <>
