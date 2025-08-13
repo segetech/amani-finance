@@ -18,16 +18,19 @@ export interface BRVMData {
 // Fonction pour récupérer les données BRVM
 export const fetchBRVMData = async (): Promise<BRVMData> => {
   try {
-    // Pour l'instant, on simule les données
-    // En production, ceci appellerait votre backend/API
-    const response = await fetch('/api/brvm-indices');
-    
+    // Essayer d'abord notre fonction Netlify
+    const response = await fetch('/.netlify/functions/brvm-scraper');
+
     if (!response.ok) {
       throw new Error('Erreur lors de la récupération des données BRVM');
     }
-    
-    const data = await response.json();
-    return data;
+
+    const result = await response.json();
+    if (result.success && result.data) {
+      return result.data;
+    } else {
+      throw new Error(result.error || 'Données BRVM invalides');
+    }
   } catch (error) {
     console.error('Erreur BRVM API:', error);
     
