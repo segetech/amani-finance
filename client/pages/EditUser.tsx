@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
+import DashboardLayout from "../components/DashboardLayout";
 import {
   demoAccounts,
   getRoleDisplayName,
@@ -43,8 +44,8 @@ export default function EditUser() {
   // Check permissions
   if (!user || !hasPermission("manage_users")) {
     return (
-      <div className="min-h-screen bg-[#E5DDD2] flex items-center justify-center">
-        <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md">
+      <DashboardLayout title="Accès refusé">
+        <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md mx-auto">
           <h2 className="text-2xl font-bold text-amani-primary mb-4">
             Accès refusé
           </h2>
@@ -59,7 +60,7 @@ export default function EditUser() {
             Retour à la gestion des utilisateurs
           </Link>
         </div>
-      </div>
+      </DashboardLayout>
     );
   }
 
@@ -187,12 +188,12 @@ export default function EditUser() {
 
   if (!userToEdit) {
     return (
-      <div className="min-h-screen bg-[#E5DDD2] flex items-center justify-center">
-        <div className="text-center">
+      <DashboardLayout title="Chargement...">
+        <div className="text-center py-12">
           <div className="w-16 h-16 border-4 border-amani-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">Chargement des données utilisateur...</p>
         </div>
-      </div>
+      </DashboardLayout>
     );
   }
 
