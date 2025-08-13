@@ -439,6 +439,97 @@ export default function Indices() {
           </section>
         )}
 
+      {/* Section d'explication pour débutants */}
+      <section className="py-12 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-amani-primary mb-4">
+              Comprendre les marchés financiers
+            </h2>
+            <p className="text-xl text-gray-600">
+              Guide pour débutants - Tout ce que vous devez savoir
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-8">
+            <ExplanationCard
+              title="Qu'est-ce qu'un indice boursier ?"
+              icon={BarChart3}
+            >
+              <p>
+                Un <strong>indice boursier</strong> est comme un thermomètre qui
+                mesure la santé du marché des actions. Il calcule la moyenne des
+                prix de plusieurs entreprises cotées en bourse.
+              </p>
+              <p>
+                <strong>BRVM Composite</strong> : Indice principal de la Bourse
+                Régionale des Valeurs Mobilières, qui regroupe les 8 pays de
+                l'UEMOA (Bénin, Burkina Faso, Côte d'Ivoire, Guinée-Bissau,
+                Mali, Niger, Sénégal, Togo).
+              </p>
+            </ExplanationCard>
+
+            <ExplanationCard
+              title="Pourquoi suivre les commodités ?"
+              icon={Globe}
+            >
+              <p>
+                Les <strong>matières premières</strong> (or, pétrole, coton,
+                cacao) sont essentielles pour l'économie africaine. Leurs prix
+                influencent directement :
+              </p>
+              <ul className="list-disc list-inside space-y-1 ml-4">
+                <li>Les revenus des pays exportateurs</li>
+                <li>Le coût de la vie (inflation)</li>
+                <li>Les investissements dans l'agriculture et l'industrie</li>
+                <li>La valeur de la monnaie (FCFA)</li>
+              </ul>
+            </ExplanationCard>
+
+            <ExplanationCard
+              title="Comment lire les variations ?"
+              icon={TrendingUp}
+            >
+              <p>
+                <strong className="text-green-600">Vert (+)</strong> : Le prix
+                monte, c'est généralement bon signe pour l'économie du pays
+                exportateur.
+              </p>
+              <p>
+                <strong className="text-red-600">Rouge (-)</strong> : Le prix
+                baisse, cela peut signaler des difficultés économiques.
+              </p>
+              <p>
+                <strong>Pourcentage</strong> : Indique l'ampleur du changement.
+                +2% sur l'or = hausse significative.
+              </p>
+            </ExplanationCard>
+
+            <ExplanationCard title="Impact sur votre quotidien" icon={Target}>
+              <p>Ces prix vous affectent directement :</p>
+              <ul className="list-disc list-inside space-y-1 ml-4">
+                <li>
+                  <strong>Pétrole ↑</strong> = Essence plus chère, transport
+                  plus coûteux
+                </li>
+                <li>
+                  <strong>Cacao ↑</strong> = Plus de revenus pour les
+                  producteurs ivoiriens
+                </li>
+                <li>
+                  <strong>Or ↑</strong> = Opportunités d'investissement,
+                  inflation possible
+                </li>
+                <li>
+                  <strong>Coton ↓</strong> = Difficultés pour les agriculteurs
+                  du Mali
+                </li>
+              </ul>
+            </ExplanationCard>
+          </div>
+        </div>
+      </section>
+
       {/* Section d'apprentissage */}
       <section className="py-16 bg-gradient-to-br from-blue-50 to-indigo-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
