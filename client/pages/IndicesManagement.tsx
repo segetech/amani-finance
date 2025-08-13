@@ -212,7 +212,7 @@ export default function IndicesManagement() {
               Gestion des Indices
             </h1>
             <p className="mt-2 text-gray-600">
-              Gérez tous les indices, matières premières et indicateurs économiques affichés sur votre site
+              G��rez tous les indices, matières premières et indicateurs économiques affichés sur votre site
             </p>
           </div>
           <button
@@ -251,7 +251,7 @@ export default function IndicesManagement() {
                     <p><strong>2. Variation :</strong> Combien ça a bougé (+4.28 = a monté de 4.28 points)</p>
                     <p><strong>3. Pourcentage :</strong> Le système calcule automatiquement (+2.3%)</p>
                     <p><strong>4. Couleur :</strong> Vert = hausse (bon), Rouge = baisse (attention)</p>
-                    <p><strong>���️ Modification :</strong> Changez juste la valeur et variation, le reste se calcule automatiquement !</p>
+                    <p><strong>✏️ Modification :</strong> Changez juste la valeur et variation, le reste se calcule automatiquement !</p>
                   </div>
                 </div>
               </div>
@@ -709,17 +709,21 @@ export default function IndicesManagement() {
                     />
                   </div>
 
-                  {/* Valeur */}
+                  {/* Nouvelle valeur */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Valeur actuelle *
+                      Nouvelle valeur * 🔄
                     </label>
                     <input
                       type="text"
                       value={editForm.value || ''}
-                      onChange={(e) => setEditForm(prev => ({ ...prev, value: e.target.value }))}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="Ex: 185.42, 2025.50"
+                      onChange={(e) => {
+                        const newForm = { ...editForm, value: e.target.value };
+                        const calculated = calculateDerivedValues(newForm, editForm.originalValue);
+                        setEditForm(calculated);
+                      }}
+                      className="w-full border border-blue-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Ex: 189.70, 2040.75"
                     />
                   </div>
 
