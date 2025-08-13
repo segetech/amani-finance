@@ -27,6 +27,7 @@ import {
   LogOut,
   FolderOpen,
   CheckSquare,
+  HelpCircle,
 } from "lucide-react";
 import { useState } from "react";
 
