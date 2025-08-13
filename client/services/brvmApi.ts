@@ -18,21 +18,27 @@ export interface BRVMData {
 // Fonction pour récupérer les données BRVM
 export const fetchBRVMData = async (): Promise<BRVMData> => {
   try {
-    // Essayer d'abord notre fonction Netlify
-    const response = await fetch('/.netlify/functions/brvm-scraper');
+    // Essayer d'abord notre fonction Netlify (seulement en production)
+    const isProduction = window.location.hostname !== 'localhost' && !window.location.hostname.includes('127.0.0.1');
 
-    if (!response.ok) {
-      throw new Error('Erreur lors de la récupération des données BRVM');
+    if (isProduction) {
+      const response = await fetch('/.netlify/functions/brvm-scraper');
+
+      if (response.ok) {
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const result = await response.json();
+          if (result.success && result.data) {
+            return result.data;
+          }
+        }
+      }
     }
 
-    const result = await response.json();
-    if (result.success && result.data) {
-      return result.data;
-    } else {
-      throw new Error(result.error || 'Données BRVM invalides');
-    }
+    // Fallback vers simulation locale ou erreur
+    throw new Error('Fonction Netlify non disponible');
   } catch (error) {
-    console.error('Erreur BRVM API:', error);
+    console.warn('API BRVM non disponible, utilisation des données simulées:', error);
     
     // Données de fallback (mock data)
     return {
