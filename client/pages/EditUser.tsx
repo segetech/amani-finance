@@ -249,9 +249,12 @@ export default function EditUser() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#E5DDD2]">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
+    <DashboardLayout
+      title="Modifier l'utilisateur"
+      subtitle={`Modifier les informations de ${userToEdit.firstName} ${userToEdit.lastName}`}
+    >
+      <div className="max-w-4xl mx-auto space-y-8">
+        {/* Navigation */}
         <div className="mb-8">
           <Link
             to="/dashboard/users"
@@ -260,17 +263,6 @@ export default function EditUser() {
             <ArrowLeft className="w-4 h-4" />
             Retour à la gestion des utilisateurs
           </Link>
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-            <div>
-              <h1 className="text-4xl font-bold text-amani-primary mb-2">
-                Modifier l'utilisateur
-              </h1>
-              <p className="text-gray-600">
-                Modifier les informations de {userToEdit.firstName}{" "}
-                {userToEdit.lastName}
-              </p>
-            </div>
-          </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-8">
@@ -536,6 +528,6 @@ export default function EditUser() {
           </div>
         </form>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }
