@@ -102,8 +102,8 @@ export default function IndicesManagement() {
 
   const saveEdit = () => {
     if (isEditing && editForm) {
-      // Calculer automatiquement les valeurs dérivées
-      const updatedForm = calculateDerivedValues(editForm);
+      // Calculer automatiquement les valeurs dérivées avec l'ancienne valeur
+      const updatedForm = calculateDerivedValues(editForm, editForm.originalValue);
 
       setIndices(prev => prev.map(index =>
         index.id === isEditing
@@ -396,12 +396,12 @@ export default function IndicesManagement() {
                             value={editForm.value || ''}
                             onChange={(e) => {
                               const newForm = { ...editForm, value: e.target.value };
-                              // Calculer automatiquement le pourcentage
-                              const calculated = calculateDerivedValues(newForm);
+                              // Calculer automatiquement la variation depuis l'ancienne valeur
+                              const calculated = calculateDerivedValues(newForm, editForm.originalValue);
                               setEditForm(calculated);
                             }}
-                            className="text-xl font-bold border border-gray-300 rounded px-2 py-1 text-center w-full"
-                            placeholder="185.42"
+                            className="text-xl font-bold border border-blue-300 rounded px-2 py-1 text-center w-full focus:ring-2 focus:ring-blue-500"
+                            placeholder="Nouvelle valeur"
                           />
                         ) : (
                           <div className="text-xl font-bold text-gray-900">{index.value}</div>
@@ -413,20 +413,14 @@ export default function IndicesManagement() {
                         <div className="text-xs text-gray-500 mb-1">Variation</div>
                         {isEditingThis ? (
                           <div className="space-y-2">
-                            <input
-                              type="text"
-                              value={editForm.change || ''}
-                              onChange={(e) => {
-                                const newForm = { ...editForm, change: e.target.value };
-                                // Calculer automatiquement le pourcentage
-                                const calculated = calculateDerivedValues(newForm);
-                                setEditForm(calculated);
-                              }}
-                              className="border border-gray-300 rounded px-2 py-1 text-center w-full"
-                              placeholder="+4.28"
-                            />
-                            <div className="text-sm font-medium text-gray-600">
-                              {editForm.changePercent || 'Auto-calculé'}
+                            <div className="text-xs text-gray-500 mb-1">
+                              Ancienne: {editForm.originalValue}
+                            </div>
+                            <div className="text-sm font-medium text-blue-600">
+                              {editForm.changePercent || '✨ Auto-calculé'}
+                            </div>
+                            <div className="text-xs text-green-600">
+                              Variation: {editForm.change || '✨ Auto'}
                             </div>
                           </div>
                         ) : (
@@ -468,10 +462,13 @@ export default function IndicesManagement() {
                     </div>
 
                     {isEditingThis && (
-                      <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                        <div className="text-green-800 text-sm">
-                          <strong>✨ Calcul automatique :</strong> Entrez juste la valeur et la variation,
-                          le pourcentage se calcule automatiquement !
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                        <div className="text-blue-800 text-sm">
+                          <strong>🚀 Nouveau système intelligent :</strong>
+                          <br />📊 Ancienne valeur : <strong>{editForm.originalValue}</strong>
+                          <br />📈 Nouvelle valeur : <strong>{editForm.value || 'Tapez ici...'}</strong>
+                          <br />⚡ Variation : <strong>{editForm.change || 'Calculée automatiquement'}</strong>
+                          <br />📊 Pourcentage : <strong>{editForm.changePercent || 'Calculé automatiquement'}</strong>
                         </div>
                       </div>
                     )}
@@ -514,11 +511,11 @@ export default function IndicesManagement() {
                             value={editForm.value || ''}
                             onChange={(e) => {
                               const newForm = { ...editForm, value: e.target.value };
-                              const calculated = calculateDerivedValues(newForm);
+                              const calculated = calculateDerivedValues(newForm, editForm.originalValue);
                               setEditForm(calculated);
                             }}
-                            className="text-2xl font-bold border border-gray-300 rounded px-2 py-1 text-center w-28"
-                            placeholder="185.42"
+                            className="text-2xl font-bold border border-blue-300 rounded px-2 py-1 text-center w-28 focus:ring-2 focus:ring-blue-500"
+                            placeholder="Nouvelle"
                           />
                         ) : (
                           <div className="text-2xl font-bold text-gray-900">{index.value}</div>
@@ -529,20 +526,15 @@ export default function IndicesManagement() {
                       {/* Variation */}
                       <div className="text-center">
                         {isEditingThis ? (
-                          <div className="space-y-1">
-                            <input
-                              type="text"
-                              value={editForm.change || ''}
-                              onChange={(e) => {
-                                const newForm = { ...editForm, change: e.target.value };
-                                const calculated = calculateDerivedValues(newForm);
-                                setEditForm(calculated);
-                              }}
-                              className="border border-gray-300 rounded px-2 py-1 text-center w-20"
-                              placeholder="+4.28"
-                            />
-                            <div className="text-xs text-green-600 font-medium">
-                              {editForm.changePercent || 'Auto'}
+                          <div className="text-center space-y-1">
+                            <div className="text-xs text-gray-500">
+                              Ancien: {editForm.originalValue}
+                            </div>
+                            <div className="text-sm font-medium text-blue-600">
+                              {editForm.changePercent || '✨ Auto'}
+                            </div>
+                            <div className="text-xs text-green-600">
+                              {editForm.change || '✨ Calculé'}
                             </div>
                           </div>
                         ) : (
