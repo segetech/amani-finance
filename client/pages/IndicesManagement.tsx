@@ -719,26 +719,26 @@ export default function IndicesManagement() {
                     />
                   </div>
 
-                  {/* Variation */}
+                  {/* Variation avec calcul automatique */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Variation
+                      Variation (le pourcentage se calcule automatiquement ✨)
                     </label>
-                    <div className="flex gap-2">
+                    <div className="space-y-3">
                       <input
                         type="text"
                         value={editForm.change || ''}
-                        onChange={(e) => setEditForm(prev => ({ ...prev, change: e.target.value }))}
-                        className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="+4.28"
+                        onChange={(e) => {
+                          const newForm = { ...editForm, change: e.target.value };
+                          const calculated = calculateDerivedValues(newForm);
+                          setEditForm(calculated);
+                        }}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="+4.28 (positif) ou -2.15 (négatif)"
                       />
-                      <input
-                        type="text"
-                        value={editForm.changePercent || ''}
-                        onChange={(e) => setEditForm(prev => ({ ...prev, changePercent: e.target.value }))}
-                        className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="+2.3%"
-                      />
+                      <div className="text-sm text-green-600 font-medium bg-green-50 px-3 py-2 rounded-lg border border-green-200">
+                        📊 Pourcentage calculé automatiquement: {editForm.changePercent || 'Entrez la valeur et variation ci-dessus'}
+                      </div>
                     </div>
                   </div>
 
