@@ -72,43 +72,189 @@ const App = () => (
               <Route path="/article/:id" element={<Article />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
-              <Route path="/dashboard" element={<ProtectedRoute><DashboardMain /></ProtectedRoute>} />
-              <Route path="/dashboard/content-management" element={<ProtectedRoute><ContentManagement /></ProtectedRoute>} />
-              <Route path="/dashboard/tasks-permissions" element={<ProtectedRoute><TasksPermissions /></ProtectedRoute>} />
-              <Route path="/dashboard/articles" element={<ProtectedRoute><Articles /></ProtectedRoute>} />
-              <Route path="/dashboard/articles/new" element={<ProtectedRoute><NewArticle /></ProtectedRoute>} />
-              <Route path="/dashboard/podcasts" element={<ProtectedRoute><PodcastsManager /></ProtectedRoute>} />
-              <Route path="/dashboard/podcasts/new" element={<ProtectedRoute><NewPodcast /></ProtectedRoute>} />
-              <Route path="/dashboard/indices" element={<ProtectedRoute><IndicesManager /></ProtectedRoute>} />
-              <Route path="/dashboard/indices/new" element={<ProtectedRoute><NewIndice /></ProtectedRoute>} />
-              <Route path="/dashboard/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
-              <Route path="/dashboard/moderation" element={<ProtectedRoute><Moderation /></ProtectedRoute>} />
-              <Route path="/dashboard/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-              <Route path="/dashboard/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+              <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <DashboardMain />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/content-management"
+                element={
+                  <ProtectedRoute>
+                    <ContentManagement />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/tasks-permissions"
+                element={
+                  <ProtectedRoute>
+                    <TasksPermissions />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/articles"
+                element={
+                  <ProtectedRoute>
+                    <Articles />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/articles/new"
+                element={
+                  <ProtectedRoute>
+                    <NewArticle />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/podcasts"
+                element={
+                  <ProtectedRoute>
+                    <PodcastsManager />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/podcasts/new"
+                element={
+                  <ProtectedRoute>
+                    <NewPodcast />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/indices"
+                element={
+                  <ProtectedRoute>
+                    <IndicesManager />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/indices/new"
+                element={
+                  <ProtectedRoute>
+                    <NewIndice />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/analytics"
+                element={
+                  <ProtectedRoute>
+                    <Analytics />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/moderation"
+                element={
+                  <ProtectedRoute>
+                    <Moderation />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/settings"
+                element={
+                  <ProtectedRoute>
+                    <Settings />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/profile"
+                element={
+                  <ProtectedRoute>
+                    <Profile />
+                  </ProtectedRoute>
+                }
+              />
               <Route
                 path="/dashboard/permissions"
-                element={<ProtectedRoute><PermissionsManager /></ProtectedRoute>}
+                element={
+                  <ProtectedRoute>
+                    <PermissionsManager />
+                  </ProtectedRoute>
+                }
               />
-              <Route path="/dashboard/users" element={<ProtectedRoute><Users /></ProtectedRoute>} />
+              <Route
+                path="/dashboard/users"
+                element={
+                  <ProtectedRoute>
+                    <Users />
+                  </ProtectedRoute>
+                }
+              />
               <Route
                 path="/dashboard/users/new"
-                element={<ProtectedRoute><NewUserAdvanced /></ProtectedRoute>}
+                element={
+                  <ProtectedRoute>
+                    <NewUserAdvanced />
+                  </ProtectedRoute>
+                }
               />
               <Route
                 path="/dashboard/user-activity"
-                element={<ProtectedRoute><UserActivity /></ProtectedRoute>}
+                element={
+                  <ProtectedRoute>
+                    <UserActivity />
+                  </ProtectedRoute>
+                }
               />
-              <Route path="/dashboard/reports" element={<ProtectedRoute><ReportsManager /></ProtectedRoute>} />
-              <Route path="/dashboard/banned-users" element={<ProtectedRoute><BannedUsers /></ProtectedRoute>} />
-              <Route path="/dashboard/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
-              <Route path="/dashboard/logs" element={<ProtectedRoute><Logs /></ProtectedRoute>} />
+              <Route
+                path="/dashboard/reports"
+                element={
+                  <ProtectedRoute>
+                    <ReportsManager />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/banned-users"
+                element={
+                  <ProtectedRoute>
+                    <BannedUsers />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/notifications"
+                element={
+                  <ProtectedRoute>
+                    <Notifications />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/logs"
+                element={
+                  <ProtectedRoute>
+                    <Logs />
+                  </ProtectedRoute>
+                }
+              />
               <Route
                 path="/dashboard/integrations"
-                element={<ProtectedRoute><Integrations /></ProtectedRoute>}
+                element={
+                  <ProtectedRoute>
+                    <Integrations />
+                  </ProtectedRoute>
+                }
               />
               <Route
                 path="/dashboard/users/edit/:userId"
-                element={<ProtectedRoute><EditUser /></ProtectedRoute>}
+                element={
+                  <ProtectedRoute>
+                    <EditUser />
+                  </ProtectedRoute>
+                }
               />
               <Route path="/marche" element={<Marche />} />
               <Route path="/economie" element={<Economie />} />

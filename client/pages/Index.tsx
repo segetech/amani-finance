@@ -33,14 +33,19 @@ import {
   CheckCircle,
   RefreshCw,
 } from "lucide-react";
-import InteractiveMap from '../components/InteractiveMap';
-import { fetchBRVMData, BRVMData } from '../services/brvmApi';
-import { fetchCommoditiesData, CommoditiesData, getCommodityIcon } from '../services/commoditiesApi';
+import InteractiveMap from "../components/InteractiveMap";
+import { fetchBRVMData, BRVMData } from "../services/brvmApi";
+import {
+  fetchCommoditiesData,
+  CommoditiesData,
+  getCommodityIcon,
+} from "../services/commoditiesApi";
 
 export default function Index() {
   // État pour les données BRVM et commodités en temps réel
   const [brvmData, setBrvmData] = React.useState<BRVMData | null>(null);
-  const [commoditiesData, setCommoditiesData] = React.useState<CommoditiesData | null>(null);
+  const [commoditiesData, setCommoditiesData] =
+    React.useState<CommoditiesData | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [lastUpdate, setLastUpdate] = React.useState<Date | null>(null);
 
@@ -50,24 +55,24 @@ export default function Index() {
       setLoading(true);
       const [brvmResponse, commoditiesResponse] = await Promise.allSettled([
         fetchBRVMData(),
-        fetchCommoditiesData()
+        fetchCommoditiesData(),
       ]);
 
-      if (brvmResponse.status === 'fulfilled') {
+      if (brvmResponse.status === "fulfilled") {
         setBrvmData(brvmResponse.value);
       } else {
-        console.error('Erreur BRVM:', brvmResponse.reason);
+        console.error("Erreur BRVM:", brvmResponse.reason);
       }
 
-      if (commoditiesResponse.status === 'fulfilled') {
+      if (commoditiesResponse.status === "fulfilled") {
         setCommoditiesData(commoditiesResponse.value);
       } else {
-        console.error('Erreur commodités:', commoditiesResponse.reason);
+        console.error("Erreur commodités:", commoditiesResponse.reason);
       }
 
       setLastUpdate(new Date());
     } catch (error) {
-      console.error('Erreur lors du chargement des données:', error);
+      console.error("Erreur lors du chargement des données:", error);
     } finally {
       setLoading(false);
     }
@@ -86,8 +91,18 @@ export default function Index() {
       // Données de fallback
       return [
         { name: "BRVM", value: "185.42", change: "+2.3%", isPositive: true },
-        { name: "FCFA/EUR", value: "655.957", change: "-0.1%", isPositive: false },
-        { name: "Inflation", value: "4.2%", change: "+0.5%", isPositive: false },
+        {
+          name: "FCFA/EUR",
+          value: "655.957",
+          change: "-0.1%",
+          isPositive: false,
+        },
+        {
+          name: "Inflation",
+          value: "4.2%",
+          change: "+0.5%",
+          isPositive: false,
+        },
         { name: "Taux BCEAO", value: "3.5%", change: "0%", isPositive: true },
       ];
     }
@@ -97,25 +112,25 @@ export default function Index() {
         name: "BRVM",
         value: brvmData.composite.value,
         change: brvmData.composite.changePercent,
-        isPositive: brvmData.composite.isPositive
+        isPositive: brvmData.composite.isPositive,
       },
       {
         name: "FCFA/EUR",
         value: brvmData.fcfa_eur.value,
         change: brvmData.fcfa_eur.changePercent,
-        isPositive: brvmData.fcfa_eur.isPositive
+        isPositive: brvmData.fcfa_eur.isPositive,
       },
       {
         name: "Inflation",
         value: brvmData.inflation.value,
         change: brvmData.inflation.changePercent,
-        isPositive: brvmData.inflation.isPositive
+        isPositive: brvmData.inflation.isPositive,
       },
       {
         name: "Taux BCEAO",
         value: brvmData.taux_bceao.value,
         change: brvmData.taux_bceao.changePercent,
-        isPositive: brvmData.taux_bceao.isPositive
+        isPositive: brvmData.taux_bceao.isPositive,
       },
     ];
   }, [brvmData]);
@@ -233,7 +248,7 @@ export default function Index() {
               </h2>
               {lastUpdate && (
                 <p className="text-sm text-gray-500 mt-1">
-                  Dernière mise à jour: {lastUpdate.toLocaleTimeString('fr-FR')}
+                  Dernière mise à jour: {lastUpdate.toLocaleTimeString("fr-FR")}
                   <span className="ml-2 text-xs bg-green-100 text-green-600 px-2 py-1 rounded-full">
                     Simulation
                   </span>
@@ -246,23 +261,33 @@ export default function Index() {
                 disabled={loading}
                 className="flex items-center gap-2 text-amani-primary hover:underline disabled:opacity-50"
               >
-                <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+                <RefreshCw
+                  className={`w-4 h-4 ${loading ? "animate-spin" : ""}`}
+                />
                 Actualiser
               </button>
-              <Link to="/indices" className="text-amani-primary hover:underline">
+              <Link
+                to="/indices"
+                className="text-amani-primary hover:underline"
+              >
                 Voir tous les indices →
               </Link>
             </div>
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {keyIndices.map((index, i) => (
-              <div key={i} className={`bg-[#E5DDD2] p-4 rounded-lg relative transition-all duration-300 ${loading ? 'opacity-50' : 'opacity-100'}`}>
+              <div
+                key={i}
+                className={`bg-[#E5DDD2] p-4 rounded-lg relative transition-all duration-300 ${loading ? "opacity-50" : "opacity-100"}`}
+              >
                 {loading && (
                   <div className="absolute inset-0 flex items-center justify-center bg-white/50 rounded-lg">
                     <RefreshCw className="w-5 h-5 animate-spin text-amani-primary" />
                   </div>
                 )}
-                <div className="text-sm text-gray-600 mb-1 font-medium">{index.name}</div>
+                <div className="text-sm text-gray-600 mb-1 font-medium">
+                  {index.name}
+                </div>
                 <div className="text-2xl font-bold text-amani-primary mb-2">
                   {index.value}
                 </div>
@@ -278,7 +303,9 @@ export default function Index() {
                 </div>
                 {/* Indicateur temps réel */}
                 <div className="absolute top-2 right-2">
-                  <div className={`w-2 h-2 rounded-full ${loading ? 'bg-yellow-500' : 'bg-green-500'} animate-pulse`}></div>
+                  <div
+                    className={`w-2 h-2 rounded-full ${loading ? "bg-yellow-500" : "bg-green-500"} animate-pulse`}
+                  ></div>
                 </div>
               </div>
             ))}
@@ -293,9 +320,11 @@ export default function Index() {
             <h2 className="text-4xl font-bold text-amani-primary mb-4">
               Dernières actualités
             </h2>
-            <p className="text-xl text-gray-600">Restez informé des derniers développements économiques</p>
+            <p className="text-xl text-gray-600">
+              Restez informé des derniers développements économiques
+            </p>
           </div>
-          
+
           <div className="grid lg:grid-cols-3 gap-8 mb-16">
             {/* Featured Article - Left (2/3) */}
             <div className="lg:col-span-2">
@@ -311,10 +340,13 @@ export default function Index() {
                     🔥 À LA UNE
                   </span>
                   <h3 className="text-3xl lg:text-4xl font-bold text-white mb-4 leading-tight">
-                    Le Mali annonce de nouveaux investissements dans les infrastructures
+                    Le Mali annonce de nouveaux investissements dans les
+                    infrastructures
                   </h3>
                   <p className="text-xl text-gray-200 mb-6 leading-relaxed">
-                    Le gouvernement malien a dévoilé un plan d'investissement de 500 milliards de FCFA pour moderniser les infrastructures du pays et stimuler la croissance économique.
+                    Le gouvernement malien a dévoilé un plan d'investissement de
+                    500 milliards de FCFA pour moderniser les infrastructures du
+                    pays et stimuler la croissance économique.
                   </p>
                   <div className="flex items-center gap-6 text-white">
                     <div className="flex items-center gap-2">
@@ -348,49 +380,55 @@ export default function Index() {
                   Voir tout →
                 </Link>
               </div>
-              
+
               <div className="space-y-6">
                 {[
                   {
                     title: "La BCEAO maintient son taux directeur à 3.5%",
                     category: "Finance",
                     time: "Il y a 2 heures",
-                    color: "bg-blue-500"
+                    color: "bg-blue-500",
                   },
                   {
                     title: "Croissance du secteur agricole au Burkina Faso",
                     category: "Agriculture",
                     time: "Il y a 4 heures",
-                    color: "bg-green-500"
+                    color: "bg-green-500",
                   },
                   {
                     title: "Nouveau partenariat commercial Mali-Sénégal",
                     category: "Commerce",
                     time: "Il y a 6 heures",
-                    color: "bg-purple-500"
+                    color: "bg-purple-500",
                   },
                   {
                     title: "Innovation technologique dans la fintech africaine",
                     category: "Tech",
                     time: "Il y a 8 heures",
-                    color: "bg-orange-500"
+                    color: "bg-orange-500",
                   },
                   {
                     title: "Inflation modérée dans la zone UEMOA",
                     category: "Économie",
                     time: "Il y a 12 heures",
-                    color: "bg-red-500"
-                  }
+                    color: "bg-red-500",
+                  },
                 ].map((item, index) => (
                   <div key={index} className="group cursor-pointer">
                     <div className="flex gap-3">
-                      <div className={`flex-shrink-0 w-3 h-3 ${item.color} rounded-full mt-2`}></div>
+                      <div
+                        className={`flex-shrink-0 w-3 h-3 ${item.color} rounded-full mt-2`}
+                      ></div>
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className={`text-xs px-2 py-1 ${item.color} text-white rounded-full font-medium`}>
+                          <span
+                            className={`text-xs px-2 py-1 ${item.color} text-white rounded-full font-medium`}
+                          >
                             {item.category}
                           </span>
-                          <span className="text-xs text-gray-500">{item.time}</span>
+                          <span className="text-xs text-gray-500">
+                            {item.time}
+                          </span>
                         </div>
                         <h5 className="font-medium text-gray-900 leading-tight group-hover:text-blue-600 transition-colors">
                           {item.title}
@@ -465,11 +503,23 @@ export default function Index() {
             </div>
 
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              {[commoditiesData.gold, commoditiesData.cotton, commoditiesData.oil_brent, commoditiesData.cocoa].map((commodity, index) => (
-                <div key={index} className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300">
+              {[
+                commoditiesData.gold,
+                commoditiesData.cotton,
+                commoditiesData.oil_brent,
+                commoditiesData.cocoa,
+              ].map((commodity, index) => (
+                <div
+                  key={index}
+                  className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300"
+                >
                   <div className="flex items-center justify-between mb-4">
-                    <span className="text-2xl">{getCommodityIcon(commodity.symbol)}</span>
-                    <div className={`flex items-center gap-1 text-sm font-semibold ${commodity.isPositive ? 'text-green-600' : 'text-red-600'}`}>
+                    <span className="text-2xl">
+                      {getCommodityIcon(commodity.symbol)}
+                    </span>
+                    <div
+                      className={`flex items-center gap-1 text-sm font-semibold ${commodity.isPositive ? "text-green-600" : "text-red-600"}`}
+                    >
                       {commodity.isPositive ? (
                         <TrendingUp className="w-4 h-4" />
                       ) : (
@@ -479,13 +529,13 @@ export default function Index() {
                     </div>
                   </div>
 
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">{commodity.name}</h3>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">
+                    {commodity.name}
+                  </h3>
                   <div className="text-2xl font-bold text-amani-primary mb-1">
                     ${commodity.price}
                   </div>
-                  <div className="text-sm text-gray-500">
-                    {commodity.unit}
-                  </div>
+                  <div className="text-sm text-gray-500">{commodity.unit}</div>
                 </div>
               ))}
             </div>
@@ -522,7 +572,8 @@ export default function Index() {
               Nos Services
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Une gamme complète de services pour comprendre l'économie africaine
+              Une gamme complète de services pour comprendre l'économie
+              africaine
             </p>
           </div>
 
@@ -531,42 +582,53 @@ export default function Index() {
               {
                 icon: BarChart3,
                 title: "Analyses de Marché",
-                description: "Données en temps réel sur les indices boursiers, taux de change et indicateurs économiques",
-                color: "bg-blue-500"
+                description:
+                  "Données en temps réel sur les indices boursiers, taux de change et indicateurs économiques",
+                color: "bg-blue-500",
               },
               {
                 icon: Lightbulb,
                 title: "Insights Stratégiques",
-                description: "Analyses approfondies et prospectives par nos experts économistes",
-                color: "bg-yellow-500"
+                description:
+                  "Analyses approfondies et prospectives par nos experts économistes",
+                color: "bg-yellow-500",
               },
               {
                 icon: Globe,
                 title: "Veille Économique",
-                description: "Actualités et tendances des économies africaines mises à jour quotidiennement",
-                color: "bg-green-500"
+                description:
+                  "Actualités et tendances des économies africaines mises à jour quotidiennement",
+                color: "bg-green-500",
               },
               {
                 icon: Video,
                 title: "Podcasts Experts",
-                description: "Interviews exclusives avec les leaders économiques et analyses sectorielles",
-                color: "bg-purple-500"
+                description:
+                  "Interviews exclusives avec les leaders économiques et analyses sectorielles",
+                color: "bg-purple-500",
               },
               {
                 icon: Target,
                 title: "Opportunités d'Investissement",
-                description: "Identification et analyse des meilleures opportunités d'investissement",
-                color: "bg-red-500"
+                description:
+                  "Identification et analyse des meilleures opportunités d'investissement",
+                color: "bg-red-500",
               },
               {
                 icon: Shield,
                 title: "Conseil Stratégique",
-                description: "Accompagnement personnalisé pour vos décisions d'investissement",
-                color: "bg-indigo-500"
-              }
+                description:
+                  "Accompagnement personnalisé pour vos décisions d'investissement",
+                color: "bg-indigo-500",
+              },
             ].map((service, index) => (
-              <div key={index} className="bg-gray-50 rounded-2xl p-8 hover:shadow-xl transition-all duration-300 group">
-                <div className={`${service.color} w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
+              <div
+                key={index}
+                className="bg-gray-50 rounded-2xl p-8 hover:shadow-xl transition-all duration-300 group"
+              >
+                <div
+                  className={`${service.color} w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}
+                >
                   <service.icon className="w-8 h-8 text-white" />
                 </div>
                 <h3 className="text-xl font-bold text-[#373B3A] mb-4">
@@ -589,7 +651,8 @@ export default function Index() {
               Pourquoi Choisir Amani Finance ?
             </h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              Notre expertise au service de votre compréhension de l'économie africaine
+              Notre expertise au service de votre compréhension de l'économie
+              africaine
             </p>
           </div>
 
@@ -598,23 +661,27 @@ export default function Index() {
               {
                 icon: CheckCircle,
                 title: "Expertise Locale",
-                description: "Une équipe d'experts basés en Afrique avec une connaissance approfondie des marchés locaux"
+                description:
+                  "Une équipe d'experts basés en Afrique avec une connaissance approfondie des marchés locaux",
               },
               {
                 icon: Zap,
                 title: "Données en Temps Réel",
-                description: "Accès instantané aux dernières données économiques et financières"
+                description:
+                  "Accès instantané aux dernières données économiques et financières",
               },
               {
                 icon: Heart,
                 title: "Information Digestible",
-                description: "Notre mission : rendre l'information économique accessible et compréhensible"
+                description:
+                  "Notre mission : rendre l'information économique accessible et compréhensible",
               },
               {
                 icon: Globe,
                 title: "Couverture Complète",
-                description: "Analyse de tous les secteurs économiques clés d'Afrique de l'Ouest"
-              }
+                description:
+                  "Analyse de tous les secteurs économiques clés d'Afrique de l'Ouest",
+              },
             ].map((feature, index) => (
               <div key={index} className="text-center group">
                 <div className="bg-white/10 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-white/20 transition-colors duration-300">
@@ -643,7 +710,8 @@ export default function Index() {
                 className="h-12 w-auto mb-4 brightness-0 invert"
               />
               <p className="text-gray-300 mb-4">
-                Votre source d'information économique pour l'Afrique de l'Ouest et le Mali.
+                Votre source d'information économique pour l'Afrique de l'Ouest
+                et le Mali.
               </p>
               <div className="flex gap-4">
                 <a
@@ -730,12 +798,18 @@ export default function Index() {
                   <span>Faladie, Bamako, Mali</span>
                 </li>
                 <li>
-                  <a href="mailto:info@amani-finance.com" className="hover:text-white flex items-center gap-2">
+                  <a
+                    href="mailto:info@amani-finance.com"
+                    className="hover:text-white flex items-center gap-2"
+                  >
                     📧 info@amani-finance.com
                   </a>
                 </li>
                 <li>
-                  <a href="tel:+22320224567" className="hover:text-white flex items-center gap-2">
+                  <a
+                    href="tel:+22320224567"
+                    className="hover:text-white flex items-center gap-2"
+                  >
                     📞 +223 20 22 45 67
                   </a>
                 </li>
@@ -755,7 +829,8 @@ export default function Index() {
           <div className="border-t border-white/20 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center text-gray-300">
             <p>&copy; 2025 Amani Finance. Tous droits réservés.</p>
             <p className="flex items-center gap-1 mt-2 md:mt-0">
-              Créé avec <Heart className="w-4 h-4 text-red-500 fill-current" /> par
+              Créé avec <Heart className="w-4 h-4 text-red-500 fill-current" />{" "}
+              par
               <a
                 href="https://www.aikio.co"
                 target="_blank"

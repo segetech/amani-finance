@@ -19,14 +19,16 @@ export interface BRVMData {
 export const fetchBRVMData = async (): Promise<BRVMData> => {
   try {
     // Essayer d'abord notre fonction Netlify (seulement en production)
-    const isProduction = window.location.hostname !== 'localhost' && !window.location.hostname.includes('127.0.0.1');
+    const isProduction =
+      window.location.hostname !== "localhost" &&
+      !window.location.hostname.includes("127.0.0.1");
 
     if (isProduction) {
-      const response = await fetch('/.netlify/functions/brvm-scraper');
+      const response = await fetch("/.netlify/functions/brvm-scraper");
 
       if (response.ok) {
-        const contentType = response.headers.get('content-type');
-        if (contentType && contentType.includes('application/json')) {
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
           const result = await response.json();
           if (result.success && result.data) {
             return result.data;
@@ -36,10 +38,13 @@ export const fetchBRVMData = async (): Promise<BRVMData> => {
     }
 
     // Fallback vers simulation locale ou erreur
-    throw new Error('Fonction Netlify non disponible');
+    throw new Error("Fonction Netlify non disponible");
   } catch (error) {
-    console.warn('API BRVM non disponible, utilisation des données simulées:', error);
-    
+    console.warn(
+      "API BRVM non disponible, utilisation des données simulées:",
+      error,
+    );
+
     // Données simulées réalistes avec variations
     const now = new Date();
     const baseVariation = Math.sin(now.getTime() / (1000 * 60 * 60)) * 2;
@@ -51,7 +56,7 @@ export const fetchBRVMData = async (): Promise<BRVMData> => {
         change: (4.28 + baseVariation * 0.5).toFixed(2),
         changePercent: `${(2.3 + baseVariation * 0.3).toFixed(1)}%`,
         isPositive: baseVariation > -1,
-        lastUpdate: now.toISOString()
+        lastUpdate: now.toISOString(),
       },
       fcfa_eur: {
         name: "FCFA/EUR",
@@ -59,7 +64,7 @@ export const fetchBRVMData = async (): Promise<BRVMData> => {
         change: (-0.65 - baseVariation * 0.1).toFixed(2),
         changePercent: `${(-0.1 - baseVariation * 0.05).toFixed(1)}%`,
         isPositive: baseVariation < 0.5,
-        lastUpdate: now.toISOString()
+        lastUpdate: now.toISOString(),
       },
       inflation: {
         name: "Inflation UEMOA",
@@ -67,7 +72,7 @@ export const fetchBRVMData = async (): Promise<BRVMData> => {
         change: (0.5 + baseVariation * 0.1).toFixed(1),
         changePercent: `${(0.5 + baseVariation * 0.1).toFixed(1)}%`,
         isPositive: false,
-        lastUpdate: now.toISOString()
+        lastUpdate: now.toISOString(),
       },
       taux_bceao: {
         name: "Taux BCEAO",
@@ -75,8 +80,8 @@ export const fetchBRVMData = async (): Promise<BRVMData> => {
         change: "0",
         changePercent: "0%",
         isPositive: true,
-        lastUpdate: now.toISOString()
-      }
+        lastUpdate: now.toISOString(),
+      },
     };
   }
 };
@@ -95,17 +100,17 @@ export const useBRVMData = () => {
         setData(brvmData);
         setError(null);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Erreur inconnue');
+        setError(err instanceof Error ? err.message : "Erreur inconnue");
       } finally {
         setLoading(false);
       }
     };
 
     loadData();
-    
+
     // Rafraîchir toutes les 5 minutes
     const interval = setInterval(loadData, 5 * 60 * 1000);
-    
+
     return () => clearInterval(interval);
   }, []);
 

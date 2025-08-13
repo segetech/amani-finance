@@ -33,39 +33,43 @@ export interface CommoditiesData {
 export const fetchCommoditiesData = async (): Promise<CommoditiesData> => {
   try {
     // Essayer d'abord l'API de commodités
-    const response = await fetch('/.netlify/functions/commodities-scraper');
-    
+    const response = await fetch("/.netlify/functions/commodities-scraper");
+
     if (response.ok) {
-      const contentType = response.headers.get('content-type');
-      if (contentType && contentType.includes('application/json')) {
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
         const result = await response.json();
         if (result.success && result.data) {
           return result.data;
         }
       }
     }
-    
-    throw new Error('API commodités non disponible');
+
+    throw new Error("API commodités non disponible");
   } catch (error) {
-    console.warn('API commodités non disponible, utilisation des données simulées:', error);
-    
+    console.warn(
+      "API commodités non disponible, utilisation des données simulées:",
+      error,
+    );
+
     // Données simulées réalistes
     const now = new Date();
     const hourlyVariation = Math.sin(now.getTime() / (1000 * 60 * 60)) * 2;
-    
+
     return {
       gold: {
         name: "Or",
         symbol: "XAU/USD",
-        price: (2025.50 + hourlyVariation * 15).toFixed(2),
+        price: (2025.5 + hourlyVariation * 15).toFixed(2),
         currency: "USD",
         change: (hourlyVariation * 15).toFixed(2),
-        changePercent: `${hourlyVariation >= 0 ? '+' : ''}${((hourlyVariation * 15) / 2025.50 * 100).toFixed(2)}%`,
+        changePercent: `${hourlyVariation >= 0 ? "+" : ""}${(((hourlyVariation * 15) / 2025.5) * 100).toFixed(2)}%`,
         isPositive: hourlyVariation >= 0,
         lastUpdate: now.toISOString(),
         unit: "once troy",
-        description: "Métal précieux de référence, refuge en temps d'incertitude économique",
-        source: "simulation"
+        description:
+          "Métal précieux de référence, refuge en temps d'incertitude économique",
+        source: "simulation",
       },
       cotton: {
         name: "Coton",
@@ -73,12 +77,12 @@ export const fetchCommoditiesData = async (): Promise<CommoditiesData> => {
         price: (75.25 + hourlyVariation * 2).toFixed(2),
         currency: "USD",
         change: (hourlyVariation * 2).toFixed(2),
-        changePercent: `${hourlyVariation >= 0 ? '+' : ''}${((hourlyVariation * 2) / 75.25 * 100).toFixed(2)}%`,
+        changePercent: `${hourlyVariation >= 0 ? "+" : ""}${(((hourlyVariation * 2) / 75.25) * 100).toFixed(2)}%`,
         isPositive: hourlyVariation >= 0,
         lastUpdate: now.toISOString(),
         unit: "cents/livre",
         description: "Fibre textile importante pour l'économie ouest-africaine",
-        source: "simulation"
+        source: "simulation",
       },
       oil_brent: {
         name: "Pétrole Brent",
@@ -86,25 +90,25 @@ export const fetchCommoditiesData = async (): Promise<CommoditiesData> => {
         price: (82.45 + hourlyVariation * 3).toFixed(2),
         currency: "USD",
         change: (hourlyVariation * 3).toFixed(2),
-        changePercent: `${hourlyVariation >= 0 ? '+' : ''}${((hourlyVariation * 3) / 82.45 * 100).toFixed(2)}%`,
+        changePercent: `${hourlyVariation >= 0 ? "+" : ""}${(((hourlyVariation * 3) / 82.45) * 100).toFixed(2)}%`,
         isPositive: hourlyVariation >= 0,
         lastUpdate: now.toISOString(),
         unit: "USD/baril",
         description: "Référence mondiale pour le prix du pétrole",
-        source: "simulation"
+        source: "simulation",
       },
       oil_wti: {
         name: "Pétrole WTI",
         symbol: "CL",
-        price: (78.90 + hourlyVariation * 2.8).toFixed(2),
+        price: (78.9 + hourlyVariation * 2.8).toFixed(2),
         currency: "USD",
         change: (hourlyVariation * 2.8).toFixed(2),
-        changePercent: `${hourlyVariation >= 0 ? '+' : ''}${((hourlyVariation * 2.8) / 78.90 * 100).toFixed(2)}%`,
+        changePercent: `${hourlyVariation >= 0 ? "+" : ""}${(((hourlyVariation * 2.8) / 78.9) * 100).toFixed(2)}%`,
         isPositive: hourlyVariation >= 0,
         lastUpdate: now.toISOString(),
         unit: "USD/baril",
         description: "Pétrole léger américain, référence pour les États-Unis",
-        source: "simulation"
+        source: "simulation",
       },
       silver: {
         name: "Argent",
@@ -112,25 +116,26 @@ export const fetchCommoditiesData = async (): Promise<CommoditiesData> => {
         price: (24.85 + hourlyVariation * 0.8).toFixed(2),
         currency: "USD",
         change: (hourlyVariation * 0.8).toFixed(2),
-        changePercent: `${hourlyVariation >= 0 ? '+' : ''}${((hourlyVariation * 0.8) / 24.85 * 100).toFixed(2)}%`,
+        changePercent: `${hourlyVariation >= 0 ? "+" : ""}${(((hourlyVariation * 0.8) / 24.85) * 100).toFixed(2)}%`,
         isPositive: hourlyVariation >= 0,
         lastUpdate: now.toISOString(),
         unit: "once troy",
         description: "Métal précieux industriel et d'investissement",
-        source: "simulation"
+        source: "simulation",
       },
       platinum: {
         name: "Platine",
         symbol: "XPT/USD",
-        price: (985.30 + hourlyVariation * 25).toFixed(2),
+        price: (985.3 + hourlyVariation * 25).toFixed(2),
         currency: "USD",
         change: (hourlyVariation * 25).toFixed(2),
-        changePercent: `${hourlyVariation >= 0 ? '+' : ''}${((hourlyVariation * 25) / 985.30 * 100).toFixed(2)}%`,
+        changePercent: `${hourlyVariation >= 0 ? "+" : ""}${(((hourlyVariation * 25) / 985.3) * 100).toFixed(2)}%`,
         isPositive: hourlyVariation >= 0,
         lastUpdate: now.toISOString(),
         unit: "once troy",
-        description: "Métal précieux rare utilisé dans l'automobile et la bijouterie",
-        source: "simulation"
+        description:
+          "Métal précieux rare utilisé dans l'automobile et la bijouterie",
+        source: "simulation",
       },
       copper: {
         name: "Cuivre",
@@ -138,12 +143,13 @@ export const fetchCommoditiesData = async (): Promise<CommoditiesData> => {
         price: (3.85 + hourlyVariation * 0.15).toFixed(3),
         currency: "USD",
         change: (hourlyVariation * 0.15).toFixed(3),
-        changePercent: `${hourlyVariation >= 0 ? '+' : ''}${((hourlyVariation * 0.15) / 3.85 * 100).toFixed(2)}%`,
+        changePercent: `${hourlyVariation >= 0 ? "+" : ""}${(((hourlyVariation * 0.15) / 3.85) * 100).toFixed(2)}%`,
         isPositive: hourlyVariation >= 0,
         lastUpdate: now.toISOString(),
         unit: "USD/livre",
-        description: "Métal industriel indicateur de la santé économique mondiale",
-        source: "simulation"
+        description:
+          "Métal industriel indicateur de la santé économique mondiale",
+        source: "simulation",
       },
       coffee: {
         name: "Café Arabica",
@@ -151,28 +157,30 @@ export const fetchCommoditiesData = async (): Promise<CommoditiesData> => {
         price: (155.75 + hourlyVariation * 5).toFixed(2),
         currency: "USD",
         change: (hourlyVariation * 5).toFixed(2),
-        changePercent: `${hourlyVariation >= 0 ? '+' : ''}${((hourlyVariation * 5) / 155.75 * 100).toFixed(2)}%`,
+        changePercent: `${hourlyVariation >= 0 ? "+" : ""}${(((hourlyVariation * 5) / 155.75) * 100).toFixed(2)}%`,
         isPositive: hourlyVariation >= 0,
         lastUpdate: now.toISOString(),
         unit: "cents/livre",
-        description: "Café de qualité supérieure, important pour l'économie africaine",
-        source: "simulation"
+        description:
+          "Café de qualité supérieure, important pour l'économie africaine",
+        source: "simulation",
       },
       cocoa: {
         name: "Cacao",
         symbol: "CC",
-        price: (3250.80 + hourlyVariation * 80).toFixed(2),
+        price: (3250.8 + hourlyVariation * 80).toFixed(2),
         currency: "USD",
         change: (hourlyVariation * 80).toFixed(2),
-        changePercent: `${hourlyVariation >= 0 ? '+' : ''}${((hourlyVariation * 80) / 3250.80 * 100).toFixed(2)}%`,
+        changePercent: `${hourlyVariation >= 0 ? "+" : ""}${(((hourlyVariation * 80) / 3250.8) * 100).toFixed(2)}%`,
         isPositive: hourlyVariation >= 0,
         lastUpdate: now.toISOString(),
         unit: "USD/tonne",
-        description: "Matière première majeure pour la Côte d'Ivoire et le Ghana",
-        source: "simulation"
+        description:
+          "Matière première majeure pour la Côte d'Ivoire et le Ghana",
+        source: "simulation",
       },
       timestamp: now.toISOString(),
-      source: 'simulation'
+      source: "simulation",
     };
   }
 };
@@ -191,17 +199,17 @@ export const useCommoditiesData = () => {
         setData(commoditiesData);
         setError(null);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Erreur inconnue');
+        setError(err instanceof Error ? err.message : "Erreur inconnue");
       } finally {
         setLoading(false);
       }
     };
 
     loadData();
-    
+
     // Rafraîchir toutes les 10 minutes (les commodités bougent moins vite que les actions)
     const interval = setInterval(loadData, 10 * 60 * 1000);
-    
+
     return () => clearInterval(interval);
   }, []);
 
@@ -211,25 +219,25 @@ export const useCommoditiesData = () => {
 // Utilitaires pour les commodités
 export const getCommodityColor = (commodity: Commodity): string => {
   if (commodity.isPositive) {
-    return 'text-green-600';
+    return "text-green-600";
   } else {
-    return 'text-red-600';
+    return "text-red-600";
   }
 };
 
 export const getCommodityIcon = (symbol: string): string => {
   const icons: { [key: string]: string } = {
-    'XAU/USD': '🥇',
-    'CT': '🤍',
-    'BZ': '🛢️',
-    'CL': '⛽',
-    'XAG/USD': '🥈',
-    'XPT/USD': '💍',
-    'HG': '🔩',
-    'KC': '☕',
-    'CC': '🍫'
+    "XAU/USD": "🥇",
+    CT: "🤍",
+    BZ: "🛢️",
+    CL: "⛽",
+    "XAG/USD": "🥈",
+    "XPT/USD": "💍",
+    HG: "🔩",
+    KC: "☕",
+    CC: "🍫",
   };
-  return icons[symbol] || '📊';
+  return icons[symbol] || "📊";
 };
 
 export const formatCommodityPrice = (commodity: Commodity): string => {
@@ -241,5 +249,5 @@ export default {
   useCommoditiesData,
   getCommodityColor,
   getCommodityIcon,
-  formatCommodityPrice
+  formatCommodityPrice,
 };
