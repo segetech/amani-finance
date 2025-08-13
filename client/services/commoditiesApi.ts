@@ -1,4 +1,5 @@
 // Service pour récupérer les prix des commodités (or, coton, pétrole, métaux précieux)
+import React from "react";
 
 export interface Commodity {
   name: string;
