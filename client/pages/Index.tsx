@@ -242,7 +242,7 @@ export default function Index() {
             </div>
             <div className="flex items-center gap-4">
               <button
-                onClick={loadBRVMData}
+                onClick={loadAllData}
                 disabled={loading}
                 className="flex items-center gap-2 text-amani-primary hover:underline disabled:opacity-50"
               >
