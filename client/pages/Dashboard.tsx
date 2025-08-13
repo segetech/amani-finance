@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { getRoleDisplayName, getRoleColor } from "../lib/demoAccounts";
+import DashboardLayout from "../components/DashboardLayout";
 import {
   BarChart3,
   Users,
@@ -24,8 +25,8 @@ export default function Dashboard() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-[#E5DDD2] flex items-center justify-center">
-        <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md">
+      <DashboardLayout title="Accès refusé">
+        <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md mx-auto">
           <h2 className="text-2xl font-bold text-amani-primary mb-4">
             Accès refusé
           </h2>
@@ -39,7 +40,7 @@ export default function Dashboard() {
             Se connecter
           </Link>
         </div>
-      </div>
+      </DashboardLayout>
     );
   }
 
