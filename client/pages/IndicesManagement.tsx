@@ -96,7 +96,8 @@ export default function IndicesManagement() {
 
   const startEdit = (index: IndexData) => {
     setIsEditing(index.id);
-    setEditForm(index);
+    // Stocker l'ancienne valeur pour le calcul automatique
+    setEditForm({ ...index, originalValue: index.value });
   };
 
   const saveEdit = () => {
@@ -114,23 +115,34 @@ export default function IndicesManagement() {
     }
   };
 
-  const calculateDerivedValues = (formData: Partial<IndexData>) => {
+  // Calculer automatiquement la variation depuis l'ancienne valeur
+  const calculateDerivedValues = (formData: Partial<IndexData>, originalValue?: string) => {
     const result = { ...formData };
 
-    // Calculer automatiquement le pourcentage si on a la valeur et la variation
-    if (formData.value && formData.change) {
+    // Si on a une nouvelle valeur et l'ancienne valeur, calculer la variation automatiquement
+    if (formData.value && originalValue) {
+      const newValue = parseFloat(formData.value);
+      const oldValue = parseFloat(originalValue);
+
+      if (!isNaN(newValue) && !isNaN(oldValue) && oldValue > 0) {
+        const changeValue = newValue - oldValue;
+        const percentage = (changeValue / oldValue) * 100;
+
+        result.change = `${changeValue >= 0 ? '+' : ''}${changeValue.toFixed(2)}`;
+        result.changePercent = `${changeValue >= 0 ? '+' : ''}${percentage.toFixed(2)}%`;
+        result.isPositive = changeValue >= 0;
+      }
+    }
+    // Si on modifie manuellement la variation (mode expert)
+    else if (formData.value && formData.change) {
       const currentValue = parseFloat(formData.value);
       const changeValue = parseFloat(formData.change);
 
       if (!isNaN(currentValue) && !isNaN(changeValue) && currentValue > 0) {
         const percentage = (changeValue / (currentValue - changeValue)) * 100;
         result.changePercent = `${changeValue >= 0 ? '+' : ''}${percentage.toFixed(2)}%`;
+        result.isPositive = changeValue >= 0;
       }
-    }
-
-    // Déterminer automatiquement si c'est positif
-    if (formData.change) {
-      result.isPositive = parseFloat(formData.change) >= 0;
     }
 
     return result;
