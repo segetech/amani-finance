@@ -120,6 +120,7 @@ const App = () => (
               <Route path="/about" element={<About />} />
               <Route path="/newsletter" element={<Newsletter />} />
               <Route path="/indices" element={<Indices />} />
+              <Route path="/calculateur" element={<Calculateur />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
