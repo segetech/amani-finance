@@ -206,16 +206,33 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Key Indices Widget */}
+      {/* Key Indices Widget - BRVM en temps réel */}
       <section className="py-8 bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-amani-primary">
-              Indices clés
-            </h2>
-            <Link to="/indices" className="text-amani-primary hover:underline">
-              Voir tous les indices →
-            </Link>
+            <div>
+              <h2 className="text-2xl font-bold text-amani-primary">
+                Indices BRVM en temps réel
+              </h2>
+              {lastUpdate && (
+                <p className="text-sm text-gray-500 mt-1">
+                  Dernière mise à jour: {lastUpdate.toLocaleTimeString('fr-FR')}
+                </p>
+              )}
+            </div>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={loadBRVMData}
+                disabled={loading}
+                className="flex items-center gap-2 text-amani-primary hover:underline disabled:opacity-50"
+              >
+                <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+                Actualiser
+              </button>
+              <Link to="/indices" className="text-amani-primary hover:underline">
+                Voir tous les indices →
+              </Link>
+            </div>
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {keyIndices.map((index, i) => (
