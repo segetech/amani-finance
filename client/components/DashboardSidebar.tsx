@@ -149,6 +149,12 @@ export default function DashboardSidebar() {
               icon: BarChart3,
               permission: "create_indices",
             },
+            {
+              label: "Gestion des indices",
+              path: "/dashboard/indices-management",
+              icon: Settings,
+              permission: "create_indices",
+            },
           ],
         },
       ],
