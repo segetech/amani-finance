@@ -212,7 +212,7 @@ export default function IndicesManagement() {
               Gestion des Indices
             </h1>
             <p className="mt-2 text-gray-600">
-              G��rez tous les indices, matières premières et indicateurs économiques affichés sur votre site
+              Gérez tous les indices, matières premières et indicateurs économiques affichés sur votre site
             </p>
           </div>
           <button
@@ -245,21 +245,22 @@ export default function IndicesManagement() {
                 </div>
 
                 <div>
-                  <h4 className="font-semibold text-blue-900 mb-2">⚙️ Comment ça marche ici ?</h4>
+                  <h4 className="font-semibold text-blue-900 mb-2">🤖 Nouveau système intelligent !</h4>
                   <div className="text-blue-800 space-y-2">
-                    <p><strong>1. Valeur actuelle :</strong> Le prix maintenant (ex: 185.42 points pour BRVM)</p>
-                    <p><strong>2. Variation :</strong> Combien ça a bougé (+4.28 = a monté de 4.28 points)</p>
-                    <p><strong>3. Pourcentage :</strong> Le système calcule automatiquement (+2.3%)</p>
-                    <p><strong>4. Couleur :</strong> Vert = hausse (bon), Rouge = baisse (attention)</p>
-                    <p><strong>✏️ Modification :</strong> Changez juste la valeur et variation, le reste se calcule automatiquement !</p>
+                    <p><strong>1. Ancienne valeur :</strong> Ce que c'était avant (ex: 185.42 points)</p>
+                    <p><strong>2. Nouvelle valeur :</strong> Ce que c'est maintenant (ex: 189.70 points)</p>
+                    <p><strong>3. Variation :</strong> ✨ Calculée automatiquement (+4.28)</p>
+                    <p><strong>4. Pourcentage :</strong> ✨ Calculé automatiquement (+2.3%)</p>
+                    <p><strong>5. Flèches :</strong> ✨ 📈 Verte si hausse, 📉 Rouge si baisse</p>
+                    <p><strong>🚀 Modification :</strong> Tapez juste la nouvelle valeur, tout se calcule automatiquement !</p>
                   </div>
                 </div>
               </div>
 
-              <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <p className="text-yellow-800 text-sm">
-                  <strong>💡 Astuce :</strong> Vous n'avez qu'à mettre la nouvelle valeur et dire si ça a monté (+) ou baissé (-).
-                  Le pourcentage se calcule tout seul !
+              <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                <p className="text-green-800 text-sm">
+                  <strong>🚀 Super astuce :</strong> Maintenant vous n'avez qu'à taper l'ancienne valeur et la nouvelle valeur.
+                  La variation (+/-), le pourcentage (%) et les flèches (📈📉) se calculent automatiquement !
                 </p>
               </div>
             </div>
