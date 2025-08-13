@@ -124,6 +124,7 @@ const App = () => (
               <Route path="/indices" element={<Indices />} />
               <Route path="/calculateur" element={<Calculateur />} />
               <Route path="/guides/debutant" element={<GuideDebutant />} />
+              <Route path="/actualites" element={<Actualites />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
