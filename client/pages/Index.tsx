@@ -51,6 +51,16 @@ export default function Index() {
       setLastUpdate(new Date());
     } catch (error) {
       console.error('Erreur lors du chargement des données BRVM:', error);
+      // En cas d'erreur, on garde les données existantes ou on utilise des données par défaut
+      if (!brvmData) {
+        // Si aucune donnée n'existe, on force le fallback
+        try {
+          const fallbackData = await fetchBRVMData();
+          setBrvmData(fallbackData);
+        } catch (fallbackError) {
+          console.error('Erreur fallback:', fallbackError);
+        }
+      }
     } finally {
       setLoading(false);
     }
