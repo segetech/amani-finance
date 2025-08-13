@@ -634,9 +634,9 @@ export default function IndicesManager() {
 
                         {hasPermission("view_analytics") && (
                           <Link
-                            to="/dashboard/analytics"
+                            to={`/dashboard/indices/${indice.id}/analytics`}
                             className="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
-                            title="Voir les analytics"
+                            title="Voir les analytics de cet indice"
                           >
                             <BarChart3 className="w-4 h-4" />
                           </Link>
