@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
+import DashboardLayout from "../components/DashboardLayout";
 import {
   demoAccounts,
   getRoleDisplayName,
@@ -45,8 +46,8 @@ export default function Users() {
   // Check permissions
   if (!user || !hasPermission("manage_users")) {
     return (
-      <div className="min-h-screen bg-[#E5DDD2] flex items-center justify-center">
-        <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md">
+      <DashboardLayout title="Accès refusé">
+        <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md mx-auto">
           <h2 className="text-2xl font-bold text-amani-primary mb-4">
             Accès refusé
           </h2>
@@ -61,7 +62,7 @@ export default function Users() {
             Retour au tableau de bord
           </Link>
         </div>
-      </div>
+      </DashboardLayout>
     );
   }
 
@@ -266,9 +267,12 @@ export default function Users() {
   };
 
   return (
-    <div className="min-h-screen bg-[#E5DDD2]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
+    <DashboardLayout
+      title="Gestion des utilisateurs"
+      subtitle="Gérez les comptes utilisateurs, rôles et permissions"
+    >
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Navigation */}
         <div className="mb-8">
           <Link
             to="/dashboard"
@@ -278,14 +282,6 @@ export default function Users() {
             Retour au tableau de bord
           </Link>
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-            <div>
-              <h1 className="text-4xl font-bold text-amani-primary mb-2">
-                Gestion des utilisateurs
-              </h1>
-              <p className="text-gray-600">
-                Gérez les comptes utilisateurs, rôles et permissions
-              </p>
-            </div>
             <div className="flex gap-3">
               <button
                 onClick={handleExportUsers}
@@ -908,6 +904,6 @@ export default function Users() {
           </div>
         )}
       </div>
-    </div>
+    </DashboardLayout>
   );
 }
