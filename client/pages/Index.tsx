@@ -38,8 +38,9 @@ import { fetchBRVMData, BRVMData } from '../services/brvmApi';
 import { fetchCommoditiesData, CommoditiesData, getCommodityIcon } from '../services/commoditiesApi';
 
 export default function Index() {
-  // État pour les données BRVM en temps réel
+  // État pour les données BRVM et commodités en temps réel
   const [brvmData, setBrvmData] = React.useState<BRVMData | null>(null);
+  const [commoditiesData, setCommoditiesData] = React.useState<CommoditiesData | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [lastUpdate, setLastUpdate] = React.useState<Date | null>(null);
 
