@@ -810,7 +810,7 @@ export default function IndicesManagement() {
                         </div>
                       </div>
                       <div className="mt-3 p-2 bg-green-100 rounded border border-green-200">
-                        <p class="font-medium text-green-800">🎯 Astuce : Vous n'avez besoin que du nom, de la valeur actuelle et de combien ça a bougé. Le reste se calcule tout seul !</p>
+                        <p className="font-medium text-green-800">🎯 Astuce : Vous n'avez besoin que du nom, de la valeur actuelle et de combien ça a bougé. Le reste se calcule tout seul !</p>
                       </div>
                     </div>
                   </div>
