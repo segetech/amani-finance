@@ -19,8 +19,12 @@ interface BRVMData {
 // Fonction pour scraper les données BRVM
 const scrapeBRVMData = async (): Promise<BRVMData> => {
   try {
-    // Note: En production, vous utiliseriez Puppeteer ou une API tierce
-    // Pour l'instant, on simule avec des données réalistes qui changent
+    // TODO: Implémenter le vrai scraping avec Puppeteer
+    // const scraper = new BRVMScraper();
+    // const realData = await scraper.getRealBRVMData();
+    // return realData;
+
+    // TEMPORAIRE: Simulation en attendant l'implémentation du scraper réel
     
     const now = new Date();
     const baseVariation = Math.sin(now.getTime() / (1000 * 60 * 60)) * 2; // Variation basée sur l'heure
