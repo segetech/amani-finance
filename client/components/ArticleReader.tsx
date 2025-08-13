@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { UnifiedContent } from '../types/database';
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { UnifiedContent } from "../types/database";
 import {
   Share2,
   Copy,
@@ -19,7 +19,7 @@ import {
   Clock,
   Tag,
   TrendingUp,
-} from 'lucide-react';
+} from "lucide-react";
 
 interface ArticleReaderProps {
   article: UnifiedContent;
@@ -29,12 +29,12 @@ interface ArticleReaderProps {
   onShare?: (platform: string) => void;
 }
 
-export default function ArticleReader({ 
-  article, 
-  relatedArticles = [], 
-  onLike, 
-  onBookmark, 
-  onShare 
+export default function ArticleReader({
+  article,
+  relatedArticles = [],
+  onLike,
+  onBookmark,
+  onShare,
 }: ArticleReaderProps) {
   const [isLiked, setIsLiked] = useState(article.is_liked_by_user || false);
   const [isBookmarked, setIsBookmarked] = useState(false);
@@ -58,95 +58,102 @@ export default function ArticleReader({
   useEffect(() => {
     // Titre de la page
     document.title = article.meta_title || `${article.title} | Amani Finance`;
-    
+
     // Meta description
-    const metaDescription = document.querySelector('meta[name="description"]') || 
-      document.createElement('meta');
-    metaDescription.setAttribute('name', 'description');
-    metaDescription.setAttribute('content', article.meta_description || article.summary);
+    const metaDescription =
+      document.querySelector('meta[name="description"]') ||
+      document.createElement("meta");
+    metaDescription.setAttribute("name", "description");
+    metaDescription.setAttribute(
+      "content",
+      article.meta_description || article.summary,
+    );
     if (!document.querySelector('meta[name="description"]')) {
       document.head.appendChild(metaDescription);
     }
 
     // Open Graph pour réseaux sociaux
     const setOGMeta = (property: string, content: string) => {
-      let meta = document.querySelector(`meta[property="${property}"]`) || 
-        document.createElement('meta');
-      meta.setAttribute('property', property);
-      meta.setAttribute('content', content);
+      let meta =
+        document.querySelector(`meta[property="${property}"]`) ||
+        document.createElement("meta");
+      meta.setAttribute("property", property);
+      meta.setAttribute("content", content);
       if (!document.querySelector(`meta[property="${property}"]`)) {
         document.head.appendChild(meta);
       }
     };
 
-    setOGMeta('og:title', article.title);
-    setOGMeta('og:description', article.summary);
-    setOGMeta('og:url', currentUrl);
-    setOGMeta('og:type', 'article');
-    setOGMeta('og:site_name', 'Amani Finance');
+    setOGMeta("og:title", article.title);
+    setOGMeta("og:description", article.summary);
+    setOGMeta("og:url", currentUrl);
+    setOGMeta("og:type", "article");
+    setOGMeta("og:site_name", "Amani Finance");
     if (article.featured_image) {
-      setOGMeta('og:image', article.featured_image);
-      setOGMeta('og:image:alt', article.featured_image_alt || article.title);
+      setOGMeta("og:image", article.featured_image);
+      setOGMeta("og:image:alt", article.featured_image_alt || article.title);
     }
 
     // Twitter Card
     const setTwitterMeta = (name: string, content: string) => {
-      let meta = document.querySelector(`meta[name="${name}"]`) || 
-        document.createElement('meta');
-      meta.setAttribute('name', name);
-      meta.setAttribute('content', content);
+      let meta =
+        document.querySelector(`meta[name="${name}"]`) ||
+        document.createElement("meta");
+      meta.setAttribute("name", name);
+      meta.setAttribute("content", content);
       if (!document.querySelector(`meta[name="${name}"]`)) {
         document.head.appendChild(meta);
       }
     };
 
-    setTwitterMeta('twitter:card', 'summary_large_image');
-    setTwitterMeta('twitter:title', article.title);
-    setTwitterMeta('twitter:description', article.summary);
-    setTwitterMeta('twitter:site', '@AmaniFinance');
+    setTwitterMeta("twitter:card", "summary_large_image");
+    setTwitterMeta("twitter:title", article.title);
+    setTwitterMeta("twitter:description", article.summary);
+    setTwitterMeta("twitter:site", "@AmaniFinance");
     if (article.featured_image) {
-      setTwitterMeta('twitter:image', article.featured_image);
+      setTwitterMeta("twitter:image", article.featured_image);
     }
 
     // JSON-LD pour le référencement structuré
     const jsonLd = {
       "@context": "https://schema.org",
       "@type": "Article",
-      "headline": article.title,
-      "description": article.summary,
-      "image": article.featured_image,
-      "author": {
+      headline: article.title,
+      description: article.summary,
+      image: article.featured_image,
+      author: {
         "@type": "Person",
-        "name": `${article.author.first_name} ${article.author.last_name}`,
+        name: `${article.author.first_name} ${article.author.last_name}`,
       },
-      "publisher": {
+      publisher: {
         "@type": "Organization",
-        "name": "Amani Finance",
-        "logo": {
+        name: "Amani Finance",
+        logo: {
           "@type": "ImageObject",
-          "url": `${window.location.origin}/logo.png`
-        }
+          url: `${window.location.origin}/logo.png`,
+        },
       },
-      "datePublished": article.published_at,
-      "dateModified": article.updated_at,
-      "mainEntityOfPage": {
+      datePublished: article.published_at,
+      dateModified: article.updated_at,
+      mainEntityOfPage: {
         "@type": "WebPage",
-        "@id": currentUrl
-      }
+        "@id": currentUrl,
+      },
     };
 
-    let scriptTag = document.querySelector('#article-jsonld') || 
-      document.createElement('script');
-    scriptTag.setAttribute('type', 'application/ld+json');
-    scriptTag.setAttribute('id', 'article-jsonld');
+    let scriptTag =
+      document.querySelector("#article-jsonld") ||
+      document.createElement("script");
+    scriptTag.setAttribute("type", "application/ld+json");
+    scriptTag.setAttribute("id", "article-jsonld");
     scriptTag.textContent = JSON.stringify(jsonLd);
-    if (!document.querySelector('#article-jsonld')) {
+    if (!document.querySelector("#article-jsonld")) {
       document.head.appendChild(scriptTag);
     }
 
     return () => {
       // Nettoyage lors du démontage du composant
-      document.title = 'Amani Finance';
+      document.title = "Amani Finance";
     };
   }, [article, currentUrl]);
 
@@ -166,20 +173,24 @@ export default function ArticleReader({
       setCopySuccess(true);
       setTimeout(() => setCopySuccess(false), 2000);
     } catch (err) {
-      console.error('Erreur lors de la copie:', err);
+      console.error("Erreur lors de la copie:", err);
     }
   };
 
   const handleShare = (platform: string) => {
     onShare?.(platform);
-    window.open(shareUrls[platform as keyof typeof shareUrls], '_blank', 'width=600,height=400');
+    window.open(
+      shareUrls[platform as keyof typeof shareUrls],
+      "_blank",
+      "width=600,height=400",
+    );
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('fr-FR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
+    return new Date(dateString).toLocaleDateString("fr-FR", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
@@ -202,25 +213,27 @@ export default function ArticleReader({
               <button
                 onClick={handleLike}
                 className={`p-2 rounded-full transition-colors ${
-                  isLiked 
-                    ? 'bg-red-100 text-red-600' 
-                    : 'bg-gray-100 text-gray-600 hover:bg-red-100 hover:text-red-600'
+                  isLiked
+                    ? "bg-red-100 text-red-600"
+                    : "bg-gray-100 text-gray-600 hover:bg-red-100 hover:text-red-600"
                 }`}
                 title="J'aime"
               >
-                <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
+                <Heart className={`w-5 h-5 ${isLiked ? "fill-current" : ""}`} />
               </button>
 
               <button
                 onClick={handleBookmark}
                 className={`p-2 rounded-full transition-colors ${
-                  isBookmarked 
-                    ? 'bg-blue-100 text-blue-600' 
-                    : 'bg-gray-100 text-gray-600 hover:bg-blue-100 hover:text-blue-600'
+                  isBookmarked
+                    ? "bg-blue-100 text-blue-600"
+                    : "bg-gray-100 text-gray-600 hover:bg-blue-100 hover:text-blue-600"
                 }`}
                 title="Sauvegarder"
               >
-                <Bookmark className={`w-5 h-5 ${isBookmarked ? 'fill-current' : ''}`} />
+                <Bookmark
+                  className={`w-5 h-5 ${isBookmarked ? "fill-current" : ""}`}
+                />
               </button>
 
               <div className="relative">
@@ -238,9 +251,9 @@ export default function ArticleReader({
                     <div className="px-4 py-2 text-sm font-medium text-gray-900 border-b border-gray-100">
                       Partager cet article
                     </div>
-                    
+
                     <button
-                      onClick={() => handleShare('facebook')}
+                      onClick={() => handleShare("facebook")}
                       className="w-full flex items-center gap-3 px-4 py-2 text-left hover:bg-blue-50 transition-colors"
                     >
                       <Facebook className="w-5 h-5 text-blue-600" />
@@ -248,7 +261,7 @@ export default function ArticleReader({
                     </button>
 
                     <button
-                      onClick={() => handleShare('twitter')}
+                      onClick={() => handleShare("twitter")}
                       className="w-full flex items-center gap-3 px-4 py-2 text-left hover:bg-blue-50 transition-colors"
                     >
                       <Twitter className="w-5 h-5 text-blue-400" />
@@ -256,7 +269,7 @@ export default function ArticleReader({
                     </button>
 
                     <button
-                      onClick={() => handleShare('linkedin')}
+                      onClick={() => handleShare("linkedin")}
                       className="w-full flex items-center gap-3 px-4 py-2 text-left hover:bg-blue-50 transition-colors"
                     >
                       <Linkedin className="w-5 h-5 text-blue-700" />
@@ -264,7 +277,7 @@ export default function ArticleReader({
                     </button>
 
                     <button
-                      onClick={() => handleShare('whatsapp')}
+                      onClick={() => handleShare("whatsapp")}
                       className="w-full flex items-center gap-3 px-4 py-2 text-left hover:bg-green-50 transition-colors"
                     >
                       <WhatsApp className="w-5 h-5 text-green-600" />
@@ -279,7 +292,7 @@ export default function ArticleReader({
                     >
                       <Copy className="w-5 h-5 text-gray-600" />
                       <span className="text-gray-700">
-                        {copySuccess ? 'Lien copié !' : 'Copier le lien'}
+                        {copySuccess ? "Lien copié !" : "Copier le lien"}
                       </span>
                     </button>
                   </div>
@@ -323,22 +336,28 @@ export default function ArticleReader({
                 {article.author.first_name} {article.author.last_name}
               </span>
             </div>
-            
+
             <div className="flex items-center gap-2">
               <Calendar className="w-4 h-4" />
-              <span className="text-sm">{formatDate(article.published_at || article.created_at)}</span>
+              <span className="text-sm">
+                {formatDate(article.published_at || article.created_at)}
+              </span>
             </div>
 
             {article.read_time && (
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4" />
-                <span className="text-sm">{article.read_time} min de lecture</span>
+                <span className="text-sm">
+                  {article.read_time} min de lecture
+                </span>
               </div>
             )}
 
             <div className="flex items-center gap-2">
               <Eye className="w-4 h-4" />
-              <span className="text-sm">{article.views.toLocaleString()} vues</span>
+              <span className="text-sm">
+                {article.views.toLocaleString()} vues
+              </span>
             </div>
           </div>
 
@@ -372,7 +391,7 @@ export default function ArticleReader({
         {/* Corps de l'article */}
         <div className="prose prose-lg max-w-none">
           {article.content ? (
-            <div 
+            <div
               className="text-gray-700 leading-relaxed"
               dangerouslySetInnerHTML={{ __html: article.content }}
             />
@@ -382,8 +401,8 @@ export default function ArticleReader({
                 <strong>📝 Contenu en cours de rédaction</strong>
               </p>
               <p className="text-amber-700">
-                Le résumé ci-dessus contient l'essentiel de l'information. 
-                Le contenu complet sera publié prochainement.
+                Le résumé ci-dessus contient l'essentiel de l'information. Le
+                contenu complet sera publié prochainement.
               </p>
             </div>
           )}
@@ -396,12 +415,12 @@ export default function ArticleReader({
               <button
                 onClick={handleLike}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                  isLiked 
-                    ? 'bg-red-100 text-red-600' 
-                    : 'bg-gray-100 text-gray-600 hover:bg-red-100 hover:text-red-600'
+                  isLiked
+                    ? "bg-red-100 text-red-600"
+                    : "bg-gray-100 text-gray-600 hover:bg-red-100 hover:text-red-600"
                 }`}
               >
-                <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
+                <Heart className={`w-5 h-5 ${isLiked ? "fill-current" : ""}`} />
                 <span>{article.likes + (isLiked ? 1 : 0)}</span>
               </button>
 
@@ -414,19 +433,19 @@ export default function ArticleReader({
             <div className="flex items-center gap-2">
               <span className="text-gray-600 text-sm">Partager :</span>
               <button
-                onClick={() => handleShare('twitter')}
+                onClick={() => handleShare("twitter")}
                 className="p-2 text-blue-400 hover:bg-blue-50 rounded-lg transition-colors"
               >
                 <Twitter className="w-5 h-5" />
               </button>
               <button
-                onClick={() => handleShare('facebook')}
+                onClick={() => handleShare("facebook")}
                 className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
               >
                 <Facebook className="w-5 h-5" />
               </button>
               <button
-                onClick={() => handleShare('linkedin')}
+                onClick={() => handleShare("linkedin")}
                 className="p-2 text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
               >
                 <Linkedin className="w-5 h-5" />
@@ -440,7 +459,9 @@ export default function ArticleReader({
           <section className="mt-16">
             <div className="flex items-center gap-2 mb-8">
               <TrendingUp className="w-6 h-6 text-blue-600" />
-              <h2 className="text-2xl font-bold text-gray-900">Articles similaires</h2>
+              <h2 className="text-2xl font-bold text-gray-900">
+                Articles similaires
+              </h2>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -459,21 +480,24 @@ export default function ArticleReader({
                       />
                     </div>
                   )}
-                  
+
                   <div className="p-6">
                     <div className="flex items-center gap-2 mb-3">
                       <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
                         {relatedArticle.category_info.name}
                       </span>
                       <span className="text-gray-400 text-xs">
-                        {formatDate(relatedArticle.published_at || relatedArticle.created_at)}
+                        {formatDate(
+                          relatedArticle.published_at ||
+                            relatedArticle.created_at,
+                        )}
                       </span>
                     </div>
-                    
+
                     <h3 className="font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors line-clamp-2">
                       {relatedArticle.title}
                     </h3>
-                    
+
                     <p className="text-gray-600 text-sm line-clamp-3 mb-4">
                       {relatedArticle.summary}
                     </p>
@@ -518,7 +542,10 @@ export default function ArticleReader({
 }
 
 // Hook pour le cache du click-outside
-function useClickOutside(ref: React.RefObject<HTMLElement>, handler: () => void) {
+function useClickOutside(
+  ref: React.RefObject<HTMLElement>,
+  handler: () => void,
+) {
   useEffect(() => {
     const listener = (event: MouseEvent | TouchEvent) => {
       if (!ref.current || ref.current.contains(event.target as Node)) {
@@ -527,12 +554,12 @@ function useClickOutside(ref: React.RefObject<HTMLElement>, handler: () => void)
       handler();
     };
 
-    document.addEventListener('mousedown', listener);
-    document.addEventListener('touchstart', listener);
+    document.addEventListener("mousedown", listener);
+    document.addEventListener("touchstart", listener);
 
     return () => {
-      document.removeEventListener('mousedown', listener);
-      document.removeEventListener('touchstart', listener);
+      document.removeEventListener("mousedown", listener);
+      document.removeEventListener("touchstart", listener);
     };
   }, [ref, handler]);
 }
