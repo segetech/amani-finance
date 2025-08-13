@@ -269,11 +269,11 @@ export default function NewIndice() {
         {/* Navigation */}
         <div className="mb-8">
           <Link
-            to="/indices"
+            to="/dashboard/indices-management"
             className="inline-flex items-center gap-2 text-amani-primary hover:text-amani-primary/80 mb-4"
           >
             <ArrowLeft className="w-4 h-4" />
-            Retour aux indices économiques
+            Retour à la gestion des indices
           </Link>
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
