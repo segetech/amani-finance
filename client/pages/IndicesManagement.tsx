@@ -251,7 +251,7 @@ export default function IndicesManagement() {
                     <p><strong>2. Variation :</strong> Combien ça a bougé (+4.28 = a monté de 4.28 points)</p>
                     <p><strong>3. Pourcentage :</strong> Le système calcule automatiquement (+2.3%)</p>
                     <p><strong>4. Couleur :</strong> Vert = hausse (bon), Rouge = baisse (attention)</p>
-                    <p><strong>✏️ Modification :</strong> Changez juste la valeur et variation, le reste se calcule automatiquement !</p>
+                    <p><strong>���️ Modification :</strong> Changez juste la valeur et variation, le reste se calcule automatiquement !</p>
                   </div>
                 </div>
               </div>
@@ -723,25 +723,43 @@ export default function IndicesManagement() {
                     />
                   </div>
 
-                  {/* Variation avec calcul automatique */}
+                  {/* Ancienne valeur pour comparaison */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Variation (le pourcentage se calcule automatiquement ✨)
+                      Ancienne valeur (pour calcul automatique ✨)
                     </label>
-                    <div className="space-y-3">
-                      <input
-                        type="text"
-                        value={editForm.change || ''}
-                        onChange={(e) => {
-                          const newForm = { ...editForm, change: e.target.value };
-                          const calculated = calculateDerivedValues(newForm);
-                          setEditForm(calculated);
-                        }}
-                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="+4.28 (positif) ou -2.15 (négatif)"
-                      />
-                      <div className="text-sm text-green-600 font-medium bg-green-50 px-3 py-2 rounded-lg border border-green-200">
-                        📊 Pourcentage calculé automatiquement: {editForm.changePercent || 'Entrez la valeur et variation ci-dessus'}
+                    <input
+                      type="text"
+                      value={editForm.originalValue || ''}
+                      onChange={(e) => {
+                        const newForm = { ...editForm, originalValue: e.target.value };
+                        const calculated = calculateDerivedValues(newForm, e.target.value);
+                        setEditForm(calculated);
+                      }}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Ex: 185.42 (valeur précédente)"
+                    />
+                  </div>
+
+                  {/* Calcul automatique en temps réel */}
+                  <div className="col-span-2">
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                      <h4 className="font-medium text-blue-900 mb-3">🤖 Calcul automatique en temps réel</h4>
+                      <div className="grid grid-cols-3 gap-4 text-sm">
+                        <div>
+                          <div className="text-blue-700 font-medium">Ancienne</div>
+                          <div className="text-lg font-bold text-blue-900">{editForm.originalValue || '---'}</div>
+                        </div>
+                        <div>
+                          <div className="text-blue-700 font-medium">Nouvelle</div>
+                          <div className="text-lg font-bold text-blue-900">{editForm.value || '---'}</div>
+                        </div>
+                        <div>
+                          <div className="text-blue-700 font-medium">Résultat</div>
+                          <div className="text-lg font-bold text-green-600">
+                            {editForm.change || '✨ Auto'} ({editForm.changePercent || '✨ Auto'})
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -814,7 +832,7 @@ export default function IndicesManagement() {
                         </div>
                       </div>
                       <div className="mt-3 p-2 bg-green-100 rounded border border-green-200">
-                        <p className="font-medium text-green-800">🎯 Astuce : Vous n'avez besoin que du nom, de la valeur actuelle et de combien ça a bougé. Le reste se calcule tout seul !</p>
+                        <p className="font-medium text-green-800">🎯 Nouveau système : Entrez l'ancienne valeur et la nouvelle valeur. La variation et le pourcentage se calculent automatiquement !</p>
                       </div>
                     </div>
                   </div>
