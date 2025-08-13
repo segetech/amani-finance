@@ -148,6 +148,14 @@ const App = () => (
                 }
               />
               <Route
+                path="/dashboard/indices-management"
+                element={
+                  <ProtectedRoute>
+                    <IndicesManagement />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/dashboard/analytics"
                 element={
                   <ProtectedRoute>
