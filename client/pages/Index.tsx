@@ -37,13 +37,71 @@ import InteractiveMap from '../components/InteractiveMap';
 import { fetchBRVMData, BRVMData } from '../services/brvmApi';
 
 export default function Index() {
-  // Mock data for demonstration
-  const keyIndices = [
-    { name: "BRVM", value: "185.42", change: "+2.3%", isPositive: true },
-    { name: "FCFA/EUR", value: "655.957", change: "-0.1%", isPositive: false },
-    { name: "Inflation", value: "4.2%", change: "+0.5%", isPositive: false },
-    { name: "Taux BCEAO", value: "3.5%", change: "0%", isPositive: true },
-  ];
+  // État pour les données BRVM en temps réel
+  const [brvmData, setBrvmData] = React.useState<BRVMData | null>(null);
+  const [loading, setLoading] = React.useState(true);
+  const [lastUpdate, setLastUpdate] = React.useState<Date | null>(null);
+
+  // Fonction pour charger les données BRVM
+  const loadBRVMData = async () => {
+    try {
+      setLoading(true);
+      const data = await fetchBRVMData();
+      setBrvmData(data);
+      setLastUpdate(new Date());
+    } catch (error) {
+      console.error('Erreur lors du chargement des données BRVM:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Charger les données au démarrage et toutes les 5 minutes
+  React.useEffect(() => {
+    loadBRVMData();
+    const interval = setInterval(loadBRVMData, 5 * 60 * 1000); // 5 minutes
+    return () => clearInterval(interval);
+  }, []);
+
+  // Convertir les données BRVM pour l'affichage
+  const keyIndices = React.useMemo(() => {
+    if (!brvmData) {
+      // Données de fallback
+      return [
+        { name: "BRVM", value: "185.42", change: "+2.3%", isPositive: true },
+        { name: "FCFA/EUR", value: "655.957", change: "-0.1%", isPositive: false },
+        { name: "Inflation", value: "4.2%", change: "+0.5%", isPositive: false },
+        { name: "Taux BCEAO", value: "3.5%", change: "0%", isPositive: true },
+      ];
+    }
+
+    return [
+      {
+        name: "BRVM",
+        value: brvmData.composite.value,
+        change: brvmData.composite.changePercent,
+        isPositive: brvmData.composite.isPositive
+      },
+      {
+        name: "FCFA/EUR",
+        value: brvmData.fcfa_eur.value,
+        change: brvmData.fcfa_eur.changePercent,
+        isPositive: brvmData.fcfa_eur.isPositive
+      },
+      {
+        name: "Inflation",
+        value: brvmData.inflation.value,
+        change: brvmData.inflation.changePercent,
+        isPositive: brvmData.inflation.isPositive
+      },
+      {
+        name: "Taux BCEAO",
+        value: brvmData.taux_bceao.value,
+        change: brvmData.taux_bceao.changePercent,
+        isPositive: brvmData.taux_bceao.isPositive
+      },
+    ];
+  }, [brvmData]);
 
   const latestNews = [
     {
