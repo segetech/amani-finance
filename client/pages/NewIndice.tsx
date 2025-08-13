@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
+import DashboardLayout from "../components/DashboardLayout";
 import {
   ArrowLeft,
   Save,
@@ -54,8 +55,8 @@ export default function NewIndice() {
   // Check permissions
   if (!user || !hasPermission("create_indices")) {
     return (
-      <div className="min-h-screen bg-[#E5DDD2] flex items-center justify-center">
-        <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md">
+      <DashboardLayout title="Accès refusé">
+        <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md mx-auto">
           <h2 className="text-2xl font-bold text-amani-primary mb-4">
             Accès refusé
           </h2>
@@ -70,7 +71,7 @@ export default function NewIndice() {
             Retour au tableau de bord
           </Link>
         </div>
-      </div>
+      </DashboardLayout>
     );
   }
 
@@ -260,9 +261,12 @@ export default function NewIndice() {
   };
 
   return (
-    <div className="min-h-screen bg-[#E5DDD2]">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
+    <DashboardLayout
+      title="Nouvel indice économique"
+      subtitle="Créez et publiez un nouvel indicateur économique"
+    >
+      <div className="max-w-4xl mx-auto space-y-8">
+        {/* Navigation */}
         <div className="mb-8">
           <Link
             to="/indices"
@@ -271,19 +275,9 @@ export default function NewIndice() {
             <ArrowLeft className="w-4 h-4" />
             Retour aux indices économiques
           </Link>
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-            <div>
-              <h1 className="text-4xl font-bold text-amani-primary mb-2">
-                Nouvel indice économique
-              </h1>
-              <p className="text-gray-600">
-                Créez et publiez un nouvel indicateur économique
-              </p>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-              <span>Sauvegarde automatique activée</span>
-            </div>
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+            <span>Sauvegarde automatique activée</span>
           </div>
         </div>
 
@@ -782,6 +776,6 @@ export default function NewIndice() {
           </div>
         </form>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }
