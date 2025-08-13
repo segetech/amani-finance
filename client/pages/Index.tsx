@@ -35,6 +35,7 @@ import {
 } from "lucide-react";
 import InteractiveMap from '../components/InteractiveMap';
 import { fetchBRVMData, BRVMData } from '../services/brvmApi';
+import { fetchCommoditiesData, CommoditiesData, getCommodityIcon } from '../services/commoditiesApi';
 
 export default function Index() {
   // État pour les données BRVM en temps réel
