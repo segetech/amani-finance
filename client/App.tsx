@@ -52,6 +52,7 @@ import Indices from "./pages/Indices";
 import Calculateur from "./pages/Calculateur";
 import GuideDebutant from "./pages/GuideDebutant";
 import Actualites from "./pages/Actualites";
+import ScrollToTop from "./components/ScrollToTop";
 import NotFound from "./pages/NotFound";
 import ContentManagement from "./pages/ContentManagement";
 import TasksPermissions from "./pages/TasksPermissions";
