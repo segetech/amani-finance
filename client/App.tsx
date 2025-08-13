@@ -157,6 +157,14 @@ const App = () => (
                 }
               />
               <Route
+                path="/dashboard/commodities-management"
+                element={
+                  <ProtectedRoute>
+                    <CommoditiesManagement />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/dashboard/analytics"
                 element={
                   <ProtectedRoute>
