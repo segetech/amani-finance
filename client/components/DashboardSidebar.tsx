@@ -161,6 +161,12 @@ export default function DashboardSidebar() {
               icon: Globe,
               permission: "create_indices",
             },
+            {
+              label: "Guide d'aide",
+              path: "/dashboard/indices-help",
+              icon: HelpCircle,
+              permission: "create_indices",
+            },
           ],
         },
       ],
