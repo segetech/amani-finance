@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { getRoleDisplayName } from "../lib/demoAccounts";
+import DashboardLayout from "../components/DashboardLayout";
 import {
   ArrowLeft,
   Save,
@@ -42,8 +43,8 @@ export default function NewUser() {
   // Check permissions
   if (!user || !hasPermission("manage_users")) {
     return (
-      <div className="min-h-screen bg-[#E5DDD2] flex items-center justify-center">
-        <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md">
+      <DashboardLayout title="Accès refusé">
+        <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md mx-auto">
           <h2 className="text-2xl font-bold text-amani-primary mb-4">
             Accès refusé
           </h2>
@@ -58,7 +59,7 @@ export default function NewUser() {
             Retour au tableau de bord
           </Link>
         </div>
-      </div>
+      </DashboardLayout>
     );
   }
 
@@ -238,9 +239,12 @@ export default function NewUser() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#E5DDD2]">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
+    <DashboardLayout
+      title="Nouvel utilisateur"
+      subtitle="Créer un nouveau compte utilisateur sur la plateforme Amani"
+    >
+      <div className="max-w-4xl mx-auto space-y-8">
+        {/* Navigation */}
         <div className="mb-8">
           <Link
             to="/dashboard/users"
@@ -249,16 +253,6 @@ export default function NewUser() {
             <ArrowLeft className="w-4 h-4" />
             Retour à la gestion des utilisateurs
           </Link>
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-            <div>
-              <h1 className="text-4xl font-bold text-amani-primary mb-2">
-                Nouvel utilisateur
-              </h1>
-              <p className="text-gray-600">
-                Créer un nouveau compte utilisateur sur la plateforme Amani
-              </p>
-            </div>
-          </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-8">
@@ -727,6 +721,6 @@ export default function NewUser() {
           </div>
         </form>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }
