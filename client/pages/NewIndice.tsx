@@ -186,7 +186,7 @@ export default function NewIndice() {
     );
 
     setIsSaving(false);
-    navigate("/indices");
+    navigate("/dashboard/indices-management");
   };
 
   const categories = [
