@@ -184,19 +184,43 @@ export default function IndicesManagement() {
           </button>
         </div>
 
-        {/* Guide rapide pour débutants */}
+        {/* Guide complet pour débutants */}
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
           <div className="flex items-start gap-3">
             <HelpCircle className="w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" />
             <div>
-              <h3 className="text-lg font-semibold text-blue-900 mb-2">
-                Guide rapide - Comment gérer vos indices
+              <h3 className="text-lg font-semibold text-blue-900 mb-4">
+                💡 Comment fonctionnent les indices économiques - Guide complet
               </h3>
-              <div className="text-blue-800 space-y-2 text-sm">
-                <p><strong>📊 Indices BRVM :</strong> Actions et indices de la bourse ouest-africaine</p>
-                <p><strong>🌍 Matières premières :</strong> Or, pétrole, cacao, coton - prix qui influencent l'économie</p>
-                <p><strong>💰 Indicateurs économiques :</strong> Inflation, taux de change, taux directeur</p>
-                <p><strong>✏️ Modification :</strong> Cliquez sur "Modifier" pour changer les valeurs en temps réel</p>
+
+              <div className="grid md:grid-cols-2 gap-6 text-sm">
+                <div>
+                  <h4 className="font-semibold text-blue-900 mb-2">🎯 Qu'est-ce qu'un indice ?</h4>
+                  <div className="text-blue-800 space-y-2">
+                    <p><strong>📊 BRVM Composite :</strong> Thermomètre de la bourse ouest-africaine. Si il monte = entreprises vont bien, économie forte.</p>
+                    <p><strong>🥇 Or/Argent :</strong> Prix des métaux précieux. Si ils montent = les gens cherchent la sécurité, possible crise.</p>
+                    <p><strong>🛢️ Pétrole :</strong> Plus cher = transport coûteux, inflation sur tout le reste.</p>
+                    <p><strong>🌾 Coton/Cacao :</strong> Important pour l'Afrique de l'Ouest. Prix élevé = plus de revenus pour les agriculteurs.</p>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-blue-900 mb-2">⚙️ Comment ça marche ici ?</h4>
+                  <div className="text-blue-800 space-y-2">
+                    <p><strong>1. Valeur actuelle :</strong> Le prix maintenant (ex: 185.42 points pour BRVM)</p>
+                    <p><strong>2. Variation :</strong> Combien ça a bougé (+4.28 = a monté de 4.28 points)</p>
+                    <p><strong>3. Pourcentage :</strong> Le système calcule automatiquement (+2.3%)</p>
+                    <p><strong>4. Couleur :</strong> Vert = hausse (bon), Rouge = baisse (attention)</p>
+                    <p><strong>✏️ Modification :</strong> Changez juste la valeur et variation, le reste se calcule automatiquement !</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <p className="text-yellow-800 text-sm">
+                  <strong>💡 Astuce :</strong> Vous n'avez qu'à mettre la nouvelle valeur et dire si ça a monté (+) ou baissé (-).
+                  Le pourcentage se calcule tout seul !
+                </p>
               </div>
             </div>
           </div>
