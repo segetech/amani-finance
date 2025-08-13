@@ -75,8 +75,8 @@ export default function Index() {
 
   // Charger les données au démarrage et toutes les 5 minutes
   React.useEffect(() => {
-    loadBRVMData();
-    const interval = setInterval(loadBRVMData, 5 * 60 * 1000); // 5 minutes
+    loadAllData();
+    const interval = setInterval(loadAllData, 5 * 60 * 1000); // 5 minutes
     return () => clearInterval(interval);
   }, []);
 
