@@ -47,7 +47,11 @@ export default function DashboardSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
   const [expandedSections, setExpandedSections] = useState<string[]>([
+    "main",
     "content",
+    "analytics",
+    "moderation",
+    "admin"
   ]);
 
   const handleLogout = () => {
