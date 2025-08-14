@@ -517,72 +517,110 @@ export default function UnifiedContentForm({
       {type === "podcast" && (
         <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-200">
           <div className="flex items-center gap-3 mb-6">
-            <Mic className="w-6 h-6 text-blue-600" />
+            <Mic className="w-6 h-6 text-purple-600" />
             <h3 className="text-xl font-semibold text-gray-900">
-              Liens Podcast
+              Podcast Audio & Vidéo
             </h3>
+            <span className="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+              Liens externes uniquement
+            </span>
           </div>
 
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Lien Audio *
-              </label>
-              <input
-                type="url"
-                value={formData.podcast_data.audio_url || ""}
-                onChange={(e) =>
-                  handleSpecificDataChange("audio_url", e.target.value)
-                }
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="https://anchor.fm/votre-podcast"
-              />
+          <div className="space-y-6">
+            {/* Type de contenu */}
+            <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-4 rounded-lg border border-purple-200">
+              <h4 className="font-medium text-gray-900 mb-2 flex items-center gap-2">
+                <span className="text-purple-600">🎧</span>
+                Choisissez votre format
+              </h4>
+              <p className="text-sm text-gray-600 mb-3">
+                Vous pouvez créer un podcast audio uniquement, vidéo uniquement, ou les deux.
+              </p>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="text-sm">
+                  <span className="font-medium text-purple-700">🎤 Audio :</span> Anchor, Spotify, Apple Podcasts
+                </div>
+                <div className="text-sm">
+                  <span className="font-medium text-blue-700">🎥 Vidéo :</span> YouTube, Vimeo, Dailymotion
+                </div>
+              </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Lien Vidéo (optionnel)
-              </label>
-              <input
-                type="url"
-                value={formData.podcast_data.video_url || ""}
-                onChange={(e) =>
-                  handleSpecificDataChange("video_url", e.target.value)
-                }
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="https://youtube.com/watch?v=..."
-              />
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-4">
+            {/* Liens principaux */}
+            <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Spotify
+                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                  <Mic className="w-4 h-4 text-purple-600" />
+                  Lien Audio Principal
                 </label>
                 <input
                   type="url"
-                  value={formData.podcast_data.spotify_url || ""}
+                  value={formData.podcast_data.audio_url || ""}
                   onChange={(e) =>
-                    handleSpecificDataChange("spotify_url", e.target.value)
+                    handleSpecificDataChange("audio_url", e.target.value)
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="https://open.spotify.com/..."
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  placeholder="https://anchor.fm/votre-podcast"
                 />
+                <p className="text-xs text-gray-500 mt-1">Anchor, SoundCloud, ou autre plateforme audio</p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Apple Podcasts
+                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                  <Video className="w-4 h-4 text-blue-600" />
+                  Lien Vidéo Principal
                 </label>
                 <input
                   type="url"
-                  value={formData.podcast_data.apple_url || ""}
+                  value={formData.podcast_data.video_url || ""}
                   onChange={(e) =>
-                    handleSpecificDataChange("apple_url", e.target.value)
+                    handleSpecificDataChange("video_url", e.target.value)
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="https://podcasts.apple.com/..."
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="https://youtube.com/watch?v=..."
                 />
+                <p className="text-xs text-gray-500 mt-1">YouTube, Vimeo, ou autre plateforme vidéo</p>
+              </div>
+            </div>
+
+            {/* Plateformes supplémentaires */}
+            <div>
+              <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                <span>🔗</span>
+                Plateformes supplémentaires (optionnel)
+              </h4>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                    <span className="text-green-600">🎵</span>
+                    Spotify
+                  </label>
+                  <input
+                    type="url"
+                    value={formData.podcast_data.spotify_url || ""}
+                    onChange={(e) =>
+                      handleSpecificDataChange("spotify_url", e.target.value)
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                    placeholder="https://open.spotify.com/..."
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                    <span className="text-gray-600">🎧</span>
+                    Apple Podcasts
+                  </label>
+                  <input
+                    type="url"
+                    value={formData.podcast_data.apple_url || ""}
+                    onChange={(e) =>
+                      handleSpecificDataChange("apple_url", e.target.value)
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
+                    placeholder="https://podcasts.apple.com/..."
+                  />
+                </div>
               </div>
             </div>
 
