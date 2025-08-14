@@ -231,51 +231,62 @@ export default function Articles() {
       title="Gestion des articles"
       subtitle="Créez, modifiez et gérez vos articles"
       actions={
-        <>
-          <div className="flex items-center gap-2">
-            <Search className="w-4 h-4 text-gray-500" />
+        <div className="flex items-center gap-4">
+          {/* Bouton de création principale */}
+          {hasPermission("create_articles") && (
+            <button
+              onClick={() => navigate("/dashboard/articles/new")}
+              className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg font-medium"
+            >
+              <Plus className="w-5 h-5" />
+              Nouvel article
+            </button>
+          )}
+
+          {/* Barre de recherche améliorée */}
+          <div className="flex items-center gap-2 bg-white border-2 border-gray-200 rounded-lg px-4 py-2.5 min-w-[320px] shadow-sm">
+            <Search className="w-5 h-5 text-gray-400" />
             <input
               type="text"
-              placeholder="Rechercher un article..."
+              placeholder="Rechercher par titre, auteur, contenu..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent w-64"
+              className="flex-1 outline-none text-sm placeholder-gray-500"
             />
           </div>
-          <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-gray-500" />
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
-            >
-              <option value="all">Tous les statuts</option>
-              <option value="published">Publiés</option>
-              <option value="draft">Brouillons</option>
-              <option value="review">En révision</option>
-            </select>
+
+          {/* Filtres stylisés */}
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <Filter className="w-4 h-4 text-gray-500" />
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white"
+              >
+                <option value="all">Tous les statuts</option>
+                <option value="published">📰 Publiés</option>
+                <option value="draft">✏️ Brouillons</option>
+                <option value="review">⏳ En révision</option>
+              </select>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Tag className="w-4 h-4 text-gray-500" />
+              <select
+                value={filterCategory}
+                onChange={(e) => setFilterCategory(e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white"
+              >
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.label}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <select
-              value={filterCategory}
-              onChange={(e) => setFilterCategory(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
-            >
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.label}
-                </option>
-              ))}
-            </select>
-          </div>
-          <Link
-            to="/dashboard/articles/new"
-            className="flex items-center gap-2 px-4 py-2 bg-amani-primary text-white rounded-lg hover:bg-amani-primary/90 transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            Nouvel article
-          </Link>
-        </>
+        </div>
       }
     >
       <div className="space-y-8">
