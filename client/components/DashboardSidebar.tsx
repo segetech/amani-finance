@@ -51,7 +51,7 @@ export default function DashboardSidebar() {
       label: "🏠 Tableau de bord",
       path: "/dashboard",
       icon: LayoutDashboard,
-      description: "Vue d'ensemble"
+      description: "Vue d'ensemble",
     },
 
     // Création de contenu
@@ -60,21 +60,21 @@ export default function DashboardSidebar() {
       path: "/dashboard/articles/new",
       icon: Plus,
       permission: "create_articles",
-      description: "Rédiger un nouvel article"
+      description: "Rédiger un nouvel article",
     },
     {
       label: "🎙️ Créer un Podcast",
-      path: "/dashboard/podcasts/new", 
+      path: "/dashboard/podcasts/new",
       icon: Mic,
       permission: "create_podcasts",
-      description: "Audio ou vidéo"
+      description: "Audio ou vidéo",
     },
     {
       label: "📊 Créer un Indice",
       path: "/dashboard/indices/new",
       icon: Plus,
-      permission: "create_indices", 
-      description: "Nouvel indice économique"
+      permission: "create_indices",
+      description: "Nouvel indice économique",
     },
 
     // Gestion du contenu
@@ -83,28 +83,28 @@ export default function DashboardSidebar() {
       path: "/dashboard/articles",
       icon: FileText,
       permission: "view_analytics",
-      description: "Tous les articles"
+      description: "Tous les articles",
     },
     {
-      label: "🎧 Gérer Podcasts", 
+      label: "🎧 Gérer Podcasts",
       path: "/dashboard/podcasts",
       icon: Headphones,
       permission: "view_analytics",
-      description: "Tous les podcasts"
+      description: "Tous les podcasts",
     },
     {
       label: "📈 Gérer Indices",
       path: "/dashboard/indices-management",
       icon: BarChart3,
       permission: "create_indices",
-      description: "Indices économiques"
+      description: "Indices économiques",
     },
     {
       label: "🗂️ Vue d'ensemble",
       path: "/dashboard/content-management",
       icon: FolderOpen,
       permission: "create_articles",
-      description: "Tout le contenu"
+      description: "Tout le contenu",
     },
 
     // Données dynamiques
@@ -113,21 +113,21 @@ export default function DashboardSidebar() {
       path: "/dashboard/market-data",
       icon: TrendingUp,
       permission: "create_indices",
-      description: "Cotations temps réel"
+      description: "Cotations temps réel",
     },
     {
       label: "💰 Données Économiques",
-      path: "/dashboard/economic-data", 
+      path: "/dashboard/economic-data",
       icon: PieChart,
       permission: "create_economic_reports",
-      description: "Indicateurs économiques"
+      description: "Indicateurs économiques",
     },
     {
       label: "🌾 Matières Premières",
       path: "/dashboard/commodities-management",
       icon: Globe,
       permission: "create_indices",
-      description: "Commodités"
+      description: "Commodités",
     },
 
     // Analytics et rapports
@@ -136,14 +136,14 @@ export default function DashboardSidebar() {
       path: "/dashboard/analytics",
       icon: Activity,
       permission: "view_analytics",
-      description: "Statistiques détaillées"
+      description: "Statistiques détaillées",
     },
     {
       label: "📋 Rapports",
       path: "/dashboard/reports",
       icon: Database,
       permission: "create_economic_reports",
-      description: "Rapports économiques"
+      description: "Rapports économiques",
     },
 
     // Modération (pour modérateurs/admins)
@@ -152,7 +152,7 @@ export default function DashboardSidebar() {
       path: "/dashboard/moderation",
       icon: Shield,
       permission: "moderate_comments",
-      description: "Modérer le contenu"
+      description: "Modérer le contenu",
     },
     {
       label: "⚠️ Signalements",
@@ -160,7 +160,7 @@ export default function DashboardSidebar() {
       icon: AlertTriangle,
       permission: "manage_user_reports",
       badge: "3",
-      description: "Gérer les signalements"
+      description: "Gérer les signalements",
     },
 
     // Administration (pour admins)
@@ -169,21 +169,21 @@ export default function DashboardSidebar() {
       path: "/dashboard/users",
       icon: Users,
       permission: "manage_users",
-      description: "Gérer les utilisateurs"
+      description: "Gérer les utilisateurs",
     },
     {
       label: "🔒 Permissions",
       path: "/dashboard/permissions",
       icon: Shield,
-      permission: "manage_permissions", 
-      description: "Gérer les droits"
+      permission: "manage_permissions",
+      description: "Gérer les droits",
     },
     {
       label: "⚙️ Paramètres",
       path: "/dashboard/settings",
       icon: Settings,
       permission: "system_settings",
-      description: "Configuration système"
+      description: "Configuration système",
     },
 
     // Personnel
@@ -191,7 +191,7 @@ export default function DashboardSidebar() {
       label: "👤 Mon Profil",
       path: "/dashboard/profile",
       icon: User,
-      description: "Mes informations"
+      description: "Mes informations",
     },
   ];
 
@@ -219,27 +219,33 @@ export default function DashboardSidebar() {
         }`}
       >
         <div className="flex items-center gap-3 flex-1">
-          <item.icon className={`w-5 h-5 ${active ? "text-white" : "text-gray-600 group-hover:text-blue-600"}`} />
+          <item.icon
+            className={`w-5 h-5 ${active ? "text-white" : "text-gray-600 group-hover:text-blue-600"}`}
+          />
           <div className="flex-1">
             <span className="font-medium text-sm leading-tight">
               {item.label}
             </span>
             {item.description && (
-              <div className={`text-xs leading-tight ${
-                active ? "text-blue-100" : "text-gray-500 group-hover:text-blue-500"
-              }`}>
+              <div
+                className={`text-xs leading-tight ${
+                  active
+                    ? "text-blue-100"
+                    : "text-gray-500 group-hover:text-blue-500"
+                }`}
+              >
                 {item.description}
               </div>
             )}
           </div>
         </div>
-        
+
         {item.badge && (
-          <span className={`text-xs px-2 py-1 rounded-full font-medium ${
-            active 
-              ? "bg-white/20 text-white" 
-              : "bg-red-500 text-white"
-          }`}>
+          <span
+            className={`text-xs px-2 py-1 rounded-full font-medium ${
+              active ? "bg-white/20 text-white" : "bg-red-500 text-white"
+            }`}
+          >
             {item.badge}
           </span>
         )}
@@ -305,12 +311,12 @@ export default function DashboardSidebar() {
       {/* Navigation simplifiée */}
       <nav className="flex-1 p-4 space-y-6 overflow-y-auto">
         {/* Accueil */}
-        <div>
-          {groupedItems.main.map(renderMenuItem)}
-        </div>
+        <div>{groupedItems.main.map(renderMenuItem)}</div>
 
         {/* Création rapide */}
-        {groupedItems.create.some(item => !item.permission || hasPermission(item.permission)) && (
+        {groupedItems.create.some(
+          (item) => !item.permission || hasPermission(item.permission),
+        ) && (
           <div>
             <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-2">
               ⚡ Création Rapide
@@ -322,7 +328,9 @@ export default function DashboardSidebar() {
         )}
 
         {/* Gestion */}
-        {groupedItems.manage.some(item => !item.permission || hasPermission(item.permission)) && (
+        {groupedItems.manage.some(
+          (item) => !item.permission || hasPermission(item.permission),
+        ) && (
           <div>
             <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-2">
               📋 Gestion
@@ -334,7 +342,9 @@ export default function DashboardSidebar() {
         )}
 
         {/* Données */}
-        {groupedItems.data.some(item => !item.permission || hasPermission(item.permission)) && (
+        {groupedItems.data.some(
+          (item) => !item.permission || hasPermission(item.permission),
+        ) && (
           <div>
             <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-2">
               📊 Données & Sources
@@ -346,7 +356,9 @@ export default function DashboardSidebar() {
         )}
 
         {/* Analytics */}
-        {groupedItems.analytics.some(item => !item.permission || hasPermission(item.permission)) && (
+        {groupedItems.analytics.some(
+          (item) => !item.permission || hasPermission(item.permission),
+        ) && (
           <div>
             <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-2">
               📈 Analytics
@@ -358,7 +370,9 @@ export default function DashboardSidebar() {
         )}
 
         {/* Modération */}
-        {groupedItems.moderation.some(item => !item.permission || hasPermission(item.permission)) && (
+        {groupedItems.moderation.some(
+          (item) => !item.permission || hasPermission(item.permission),
+        ) && (
           <div>
             <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-2">
               🛡️ Modération
@@ -370,7 +384,9 @@ export default function DashboardSidebar() {
         )}
 
         {/* Administration */}
-        {groupedItems.admin.some(item => !item.permission || hasPermission(item.permission)) && (
+        {groupedItems.admin.some(
+          (item) => !item.permission || hasPermission(item.permission),
+        ) && (
           <div>
             <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-2">
               ⚙️ Administration

@@ -51,13 +51,16 @@ export default function NewPodcast() {
 
       success(
         "Podcast créé",
-        `Le podcast "${formData.title}" a été créé avec succès.`
+        `Le podcast "${formData.title}" a été créé avec succès.`,
       );
 
       navigate("/dashboard/podcasts");
     } catch (err) {
       console.error("Erreur lors de la création:", err);
-      error("Erreur", "Une erreur est survenue lors de la création du podcast.");
+      error(
+        "Erreur",
+        "Une erreur est survenue lors de la création du podcast.",
+      );
     } finally {
       setIsSaving(false);
     }
@@ -82,7 +85,6 @@ export default function NewPodcast() {
       }
     >
       <div className="max-w-4xl mx-auto">
-
         {/* Formulaire unifié pour podcasts */}
         <UnifiedContentForm
           type="podcast"

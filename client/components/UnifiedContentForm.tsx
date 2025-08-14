@@ -535,14 +535,19 @@ export default function UnifiedContentForm({
                 Choisissez votre format
               </h4>
               <p className="text-sm text-gray-600 mb-3">
-                Vous pouvez créer un podcast audio uniquement, vidéo uniquement, ou les deux.
+                Vous pouvez créer un podcast audio uniquement, vidéo uniquement,
+                ou les deux.
               </p>
               <div className="grid grid-cols-2 gap-3">
                 <div className="text-sm">
-                  <span className="font-medium text-purple-700">🎤 Audio :</span> Anchor, Spotify, Apple Podcasts
+                  <span className="font-medium text-purple-700">
+                    🎤 Audio :
+                  </span>{" "}
+                  Anchor, Spotify, Apple Podcasts
                 </div>
                 <div className="text-sm">
-                  <span className="font-medium text-blue-700">🎥 Vidéo :</span> YouTube, Vimeo, Dailymotion
+                  <span className="font-medium text-blue-700">🎥 Vidéo :</span>{" "}
+                  YouTube, Vimeo, Dailymotion
                 </div>
               </div>
             </div>
@@ -563,7 +568,9 @@ export default function UnifiedContentForm({
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   placeholder="https://anchor.fm/votre-podcast"
                 />
-                <p className="text-xs text-gray-500 mt-1">Anchor, SoundCloud, ou autre plateforme audio</p>
+                <p className="text-xs text-gray-500 mt-1">
+                  Anchor, SoundCloud, ou autre plateforme audio
+                </p>
               </div>
 
               <div>
@@ -580,7 +587,9 @@ export default function UnifiedContentForm({
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="https://youtube.com/watch?v=..."
                 />
-                <p className="text-xs text-gray-500 mt-1">YouTube, Vimeo, ou autre plateforme vidéo</p>
+                <p className="text-xs text-gray-500 mt-1">
+                  YouTube, Vimeo, ou autre plateforme vidéo
+                </p>
               </div>
             </div>
 

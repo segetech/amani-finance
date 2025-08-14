@@ -51,13 +51,16 @@ export default function NewArticle() {
 
       success(
         "Article cré��",
-        `L'article "${formData.title}" a été créé avec succès.`
+        `L'article "${formData.title}" a été créé avec succès.`,
       );
 
       navigate("/dashboard/articles");
     } catch (err) {
       console.error("Erreur lors de la création:", err);
-      error("Erreur", "Une erreur est survenue lors de la création de l'article.");
+      error(
+        "Erreur",
+        "Une erreur est survenue lors de la création de l'article.",
+      );
     } finally {
       setIsSaving(false);
     }
@@ -82,7 +85,6 @@ export default function NewArticle() {
       }
     >
       <div className="max-w-4xl mx-auto">
-
         {/* Formulaire unifié pour articles */}
         <UnifiedContentForm
           type="article"

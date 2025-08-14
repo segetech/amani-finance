@@ -233,7 +233,7 @@ export default function PodcastsManager() {
               Nouveau podcast
             </button>
           )}
-          
+
           {/* Barre de recherche améliorée */}
           <div className="flex items-center gap-2 bg-white border-2 border-gray-200 rounded-lg px-4 py-2.5 min-w-[320px] shadow-sm">
             <Search className="w-5 h-5 text-gray-400" />
@@ -245,7 +245,7 @@ export default function PodcastsManager() {
               className="flex-1 outline-none text-sm placeholder-gray-500"
             />
           </div>
-          
+
           {/* Filtres stylisés */}
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
@@ -261,7 +261,7 @@ export default function PodcastsManager() {
                 <option value="scheduled">⏰ Programmés</option>
               </select>
             </div>
-            
+
             <div className="flex items-center gap-2">
               <Tag className="w-4 h-4 text-gray-500" />
               <select
@@ -316,9 +316,12 @@ export default function PodcastsManager() {
             {filteredPodcasts.map((podcast) => {
               const TypeIcon = getTypeIcon(podcast.type);
               const isPlaying = playingPodcast === podcast.id;
-              
+
               return (
-                <div key={podcast.id} className="p-6 hover:bg-gray-50 transition-colors">
+                <div
+                  key={podcast.id}
+                  className="p-6 hover:bg-gray-50 transition-colors"
+                >
                   <div className="flex items-start gap-4">
                     {/* Image de couverture */}
                     <div className="relative">
@@ -350,7 +353,9 @@ export default function PodcastsManager() {
                               {podcast.title}
                             </h3>
                             <TypeIcon className="w-4 h-4 text-purple-600" />
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(podcast.status)}`}>
+                            <span
+                              className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(podcast.status)}`}
+                            >
                               {getStatusLabel(podcast.status)}
                             </span>
                           </div>
@@ -364,7 +369,9 @@ export default function PodcastsManager() {
                             </span>
                             <span className="flex items-center gap-1">
                               <Calendar className="w-4 h-4" />
-                              {new Date(podcast.publishDate).toLocaleDateString("fr-FR")}
+                              {new Date(podcast.publishDate).toLocaleDateString(
+                                "fr-FR",
+                              )}
                             </span>
                             <span className="flex items-center gap-1">
                               <Headphones className="w-4 h-4" />
