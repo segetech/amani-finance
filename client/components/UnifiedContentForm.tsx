@@ -286,9 +286,6 @@ export default function UnifiedContentForm({
                 ? `Modifier ${getTypeLabel()}`
                 : `Nouveau ${getTypeLabel()}`}
             </h2>
-            <p className="text-gray-600 mt-1">
-              Créez du contenu de qualité pour votre audience Amani Finance
-            </p>
           </div>
         </div>
       </div>
