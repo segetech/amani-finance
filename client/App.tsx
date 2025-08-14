@@ -355,6 +355,62 @@ const App = () => (
                 }
               />
               <Route
+                path="/dashboard/manage-marche"
+                element={
+                  <ProtectedRoute>
+                    <MarcheManagement />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/manage-economie"
+                element={
+                  <ProtectedRoute>
+                    <EconomieManagement />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/manage-industrie"
+                element={
+                  <ProtectedRoute>
+                    <IndustrieManagement />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/manage-investissement"
+                element={
+                  <ProtectedRoute>
+                    <InvestissementManagement />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/manage-insights"
+                element={
+                  <ProtectedRoute>
+                    <InsightsManagement />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/manage-tech"
+                element={
+                  <ProtectedRoute>
+                    <TechManagement />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/manage-podcast-public"
+                element={
+                  <ProtectedRoute>
+                    <PodcastPublicManagement />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/dashboard/users/edit/:userId"
                 element={
                   <ProtectedRoute>
