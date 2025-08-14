@@ -253,20 +253,99 @@ export default function PodcastsManager() {
     }
   };
 
+  const stats = [
+    {
+      label: "Podcasts publiés",
+      value: podcasts.filter((p) => p.status === "published").length.toString(),
+      icon: CheckCircle,
+      color: "text-green-600",
+      bg: "bg-green-100",
+    },
+    {
+      label: "Brouillons",
+      value: podcasts.filter((p) => p.status === "draft").length.toString(),
+      icon: Edit,
+      color: "text-blue-600",
+      bg: "bg-blue-100",
+    },
+    {
+      label: "Total écoutes",
+      value: podcasts.reduce((sum, p) => sum + p.plays, 0).toLocaleString(),
+      icon: Headphones,
+      color: "text-purple-600",
+      bg: "bg-purple-100",
+    },
+    {
+      label: "Téléchargements",
+      value: podcasts.reduce((sum, p) => sum + p.downloads, 0).toLocaleString(),
+      icon: Download,
+      color: "text-orange-600",
+      bg: "bg-orange-100",
+    },
+  ];
+
   return (
     <DashboardLayout
       title="Gestion des podcasts"
-      subtitle="Créez, gérez et analysez vos épisodes de podcast"
+      subtitle="Créez, modifiez et gérez vos podcasts audio et vidéo"
       actions={
-        hasPermission("create_podcasts") && (
-          <Link
-            to="/dashboard/podcasts/new"
-            className="flex items-center gap-2 px-4 py-2 bg-amani-primary text-white rounded-lg hover:bg-amani-primary/90 transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            Nouveau podcast
-          </Link>
-        )
+        <div className="flex items-center gap-4">
+          {/* Bouton de création principale */}
+          {hasPermission("create_podcasts") && (
+            <button
+              onClick={() => navigate("/dashboard/podcasts/new")}
+              className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg hover:from-purple-700 hover:to-purple-800 transition-all shadow-lg font-medium"
+            >
+              <Plus className="w-5 h-5" />
+              Nouveau podcast
+            </button>
+          )}
+
+          {/* Barre de recherche améliorée */}
+          <div className="flex items-center gap-2 bg-white border-2 border-gray-200 rounded-lg px-4 py-2.5 min-w-[320px] shadow-sm">
+            <Search className="w-5 h-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Rechercher par titre, auteur, contenu..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="flex-1 outline-none text-sm placeholder-gray-500"
+            />
+          </div>
+
+          {/* Filtres stylisés */}
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <Filter className="w-4 h-4 text-gray-500" />
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm bg-white"
+              >
+                <option value="all">Tous les statuts</option>
+                <option value="published">🎙️ Publiés</option>
+                <option value="draft">✏️ Brouillons</option>
+                <option value="scheduled">⏰ Programmés</option>
+              </select>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Tag className="w-4 h-4 text-gray-500" />
+              <select
+                value={filterCategory}
+                onChange={(e) => setFilterCategory(e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm bg-white"
+              >
+                <option value="all">Toutes catégories</option>
+                {categories.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
       }
     >
       <div className="space-y-8">
