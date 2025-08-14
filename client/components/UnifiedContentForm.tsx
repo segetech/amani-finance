@@ -494,9 +494,8 @@ export default function UnifiedContentForm({
         </div>
 
         <ImageUpload
-          onImageSelected={setFeaturedImage}
+          onImageSelect={setFeaturedImage}
           currentImage={initialData?.featured_image}
-          compressionQuality={0.8} // Compression automatique
         />
 
         <div className="mt-4">
