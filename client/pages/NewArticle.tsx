@@ -50,7 +50,7 @@ export default function NewArticle() {
       console.log("Données de l'article:", formData);
 
       success(
-        "Article créé",
+        "Article cré��",
         `L'article "${formData.title}" a été créé avec succès.`
       );
 
@@ -82,31 +82,6 @@ export default function NewArticle() {
       }
     >
       <div className="max-w-4xl mx-auto">
-        {/* En-tête avec informations */}
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 mb-8 border border-blue-100">
-          <div className="flex items-center gap-3 mb-4">
-            <FileText className="w-8 h-8 text-blue-600" />
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900">
-                Nouvel Article
-              </h2>
-              <p className="text-blue-700">
-                Le contenu complet est optionnel
-              </p>
-            </div>
-          </div>
-          <div className="bg-white/70 rounded-lg p-4">
-            <h3 className="font-medium text-gray-900 mb-2">
-              💡 Comment ça marche ?
-            </h3>
-            <ul className="text-sm text-gray-700 space-y-1">
-              <li>• Le <strong>résumé est obligatoire</strong> - il sera affiché sur la page d'accueil</li>
-              <li>• Le <strong>contenu complet est optionnel</strong> - vous pouvez l'ajouter plus tard</li>
-              <li>• Vous pouvez publier avec juste le résumé pour créer un "teaser"</li>
-              <li>• Les métadonnées SEO sont générées automatiquement</li>
-            </ul>
-          </div>
-        </div>
 
         {/* Formulaire unifié pour articles */}
         <UnifiedContentForm
