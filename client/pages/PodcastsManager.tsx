@@ -34,6 +34,7 @@ import {
 export default function PodcastsManager() {
   const { user, hasPermission } = useAuth();
   const { success, error, warning } = useToast();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterCategory, setFilterCategory] = useState("all");
