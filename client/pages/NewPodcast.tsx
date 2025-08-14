@@ -82,31 +82,6 @@ export default function NewPodcast() {
       }
     >
       <div className="max-w-4xl mx-auto">
-        {/* En-tête avec informations */}
-        <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-2xl p-6 mb-8 border border-purple-100">
-          <div className="flex items-center gap-3 mb-4">
-            <Mic className="w-8 h-8 text-purple-600" />
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900">
-                Nouveau Podcast
-              </h2>
-              <p className="text-purple-700">
-                Utilisez des liens externes (Anchor, Spotify, etc.)
-              </p>
-            </div>
-          </div>
-          <div className="bg-white/70 rounded-lg p-4">
-            <h3 className="font-medium text-gray-900 mb-2">
-              💡 Comment ça marche ?
-            </h3>
-            <ul className="text-sm text-gray-700 space-y-1">
-              <li>• Hébergez votre podcast sur Anchor, Spotify, ou une autre plateforme</li>
-              <li>• Copiez les liens de vos épisodes</li>
-              <li>• Ajoutez le résumé obligatoire pour l'extrait</li>
-              <li>• Le contenu complet est optionnel</li>
-            </ul>
-          </div>
-        </div>
 
         {/* Formulaire unifié pour podcasts */}
         <UnifiedContentForm
