@@ -25,6 +25,7 @@ import {
   Link2,
   Image as ImageIcon,
   Sparkles,
+  Video,
 } from "lucide-react";
 
 interface UnifiedContentFormProps {
