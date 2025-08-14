@@ -332,6 +332,22 @@ const App = () => (
                 }
               />
               <Route
+                path="/dashboard/market-data"
+                element={
+                  <ProtectedRoute>
+                    <MarketDataManagement />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/economic-data"
+                element={
+                  <ProtectedRoute>
+                    <EconomicDataManagement />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/dashboard/users/edit/:userId"
                 element={
                   <ProtectedRoute>
