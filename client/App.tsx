@@ -234,6 +234,14 @@ const App = () => (
                 }
               />
               <Route
+                path="/dashboard/reports-moderation"
+                element={
+                  <ProtectedRoute>
+                    <ReportsModeration />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/dashboard/settings"
                 element={
                   <ProtectedRoute>
