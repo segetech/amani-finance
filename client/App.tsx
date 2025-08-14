@@ -63,6 +63,8 @@ import NotFound from "./pages/NotFound";
 import ContentManagement from "./pages/ContentManagement";
 import TasksPermissions from "./pages/TasksPermissions";
 import ReportsModeration from "./pages/ReportsModeration";
+import MarketDataManagement from "./pages/MarketDataManagement";
+import EconomicDataManagement from "./pages/EconomicDataManagement";
 
 const queryClient = new QueryClient();
 
