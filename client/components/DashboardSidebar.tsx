@@ -6,265 +6,192 @@ import {
   Mic,
   BarChart3,
   Users,
-  MessageSquare,
   Settings,
   TrendingUp,
   User,
   Shield,
-  Database,
   Bell,
-  PieChart,
   Activity,
   Globe,
-  Headphones,
-  Edit,
-  UserCheck,
-  FileSpreadsheet,
-  Building,
-  ChevronDown,
-  ChevronRight,
   LogOut,
   FolderOpen,
-  CheckSquare,
-  HelpCircle,
+  AlertTriangle,
   Plus,
   Eye,
-  AlertTriangle,
+  Edit,
+  PieChart,
+  Database,
+  Headphones,
+  Video,
 } from "lucide-react";
-import { useState } from "react";
 
-interface SidebarItem {
+interface MenuItem {
   label: string;
   path: string;
   icon: React.ComponentType<{ className?: string }>;
   permission?: string;
   badge?: string;
-  children?: SidebarItem[];
+  description?: string;
 }
 
 export default function DashboardSidebar() {
   const { user, logout, hasPermission } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const [expandedSections, setExpandedSections] = useState<string[]>([
-    "main",
-    "content",
-    "analytics",
-    "moderation",
-    "admin"
-  ]);
 
   const handleLogout = () => {
     logout();
     navigate("/login");
   };
 
-  const toggleSection = (section: string) => {
-    setExpandedSections((prev) =>
-      prev.includes(section)
-        ? prev.filter((s) => s !== section)
-        : [...prev, section],
-    );
-  };
+  // Menu simplifié et organisé logiquement
+  const menuItems: MenuItem[] = [
+    // Accueil
+    {
+      label: "🏠 Tableau de bord",
+      path: "/dashboard",
+      icon: LayoutDashboard,
+      description: "Vue d'ensemble"
+    },
 
-  const sidebarSections: {
-    title: string;
-    key: string;
-    items: SidebarItem[];
-  }[] = [
+    // Création de contenu
     {
-      title: "Principal",
-      key: "main",
-      items: [
-        {
-          label: "Tableau de bord",
-          path: "/dashboard",
-          icon: LayoutDashboard,
-        },
-        {
-          label: "Gestion de Contenu",
-          path: "/dashboard/content-management",
-          icon: FolderOpen,
-          permission: "create_articles",
-        },
-      ],
+      label: "📝 Créer un Article",
+      path: "/dashboard/articles/new",
+      icon: Plus,
+      permission: "create_articles",
+      description: "Rédiger un nouvel article"
     },
     {
-      title: "Contenu",
-      key: "content",
-      items: [
-        {
-          label: "Articles",
-          path: "/dashboard/articles",
-          icon: FileText,
-          permission: "create_articles",
-          children: [
-            {
-              label: "Tous les articles",
-              path: "/dashboard/articles",
-              icon: Eye,
-              permission: "view_analytics",
-            },
-            {
-              label: "Créer un article",
-              path: "/dashboard/articles/new",
-              icon: Plus,
-              permission: "create_articles",
-            },
-          ],
-        },
-        {
-          label: "Podcasts",
-          path: "/dashboard/podcasts",
-          icon: Mic,
-          permission: "create_podcasts",
-          children: [
-            {
-              label: "Tous les podcasts",
-              path: "/dashboard/podcasts",
-              icon: Headphones,
-              permission: "view_analytics",
-            },
-            {
-              label: "Créer un podcast",
-              path: "/dashboard/podcasts/new",
-              icon: Plus,
-              permission: "create_podcasts",
-            },
-          ],
-        },
-        {
-          label: "Indices économiques",
-          path: "/dashboard/indices-management",
-          icon: BarChart3,
-          permission: "create_indices",
-          children: [
-            {
-              label: "Gestion des indices",
-              path: "/dashboard/indices-management",
-              icon: Settings,
-              permission: "create_indices",
-            },
-            {
-              label: "Créer un indice",
-              path: "/dashboard/indices/new",
-              icon: Plus,
-              permission: "create_indices",
-            },
-            {
-              label: "Matières premières",
-              path: "/dashboard/commodities-management",
-              icon: Globe,
-              permission: "create_indices",
-            },
-          ],
-        },
-      ],
+      label: "🎙️ Créer un Podcast",
+      path: "/dashboard/podcasts/new", 
+      icon: Mic,
+      permission: "create_podcasts",
+      description: "Audio ou vidéo"
     },
     {
-      title: "Données Publiques",
-      key: "public-data",
-      items: [
-        {
-          label: "Données de Marché",
-          path: "/dashboard/market-data",
-          icon: TrendingUp,
-          permission: "create_indices",
-        },
-        {
-          label: "Données Économiques",
-          path: "/dashboard/economic-data",
-          icon: BarChart3,
-          permission: "create_economic_reports",
-        },
-      ],
+      label: "📊 Créer un Indice",
+      path: "/dashboard/indices/new",
+      icon: Plus,
+      permission: "create_indices", 
+      description: "Nouvel indice économique"
+    },
+
+    // Gestion du contenu
+    {
+      label: "📄 Gérer Articles",
+      path: "/dashboard/articles",
+      icon: FileText,
+      permission: "view_analytics",
+      description: "Tous les articles"
     },
     {
-      title: "Analytics",
-      key: "analytics",
-      items: [
-        {
-          label: "Analytics",
-          path: "/dashboard/analytics",
-          icon: BarChart3,
-          permission: "view_analytics",
-        },
-        {
-          label: "Rapports",
-          path: "/dashboard/reports",
-          icon: FileSpreadsheet,
-          permission: "create_economic_reports",
-        },
-        {
-          label: "Activité utilisateurs",
-          path: "/dashboard/user-activity",
-          icon: Activity,
-          permission: "view_user_activity",
-        },
-      ],
+      label: "🎧 Gérer Podcasts", 
+      path: "/dashboard/podcasts",
+      icon: Headphones,
+      permission: "view_analytics",
+      description: "Tous les podcasts"
     },
     {
-      title: "Modération",
-      key: "moderation",
-      items: [
-        {
-          label: "Centre de modération",
-          path: "/dashboard/moderation",
-          icon: Shield,
-          permission: "moderate_comments",
-          badge: "3", // Exemple de signalements en attente
-        },
-        {
-          label: "Signalements",
-          path: "/dashboard/reports-moderation",
-          icon: AlertTriangle,
-          permission: "manage_user_reports",
-        },
-        {
-          label: "Utilisateurs bannis",
-          path: "/dashboard/banned-users",
-          icon: UserCheck,
-          permission: "ban_users",
-        },
-      ],
+      label: "📈 Gérer Indices",
+      path: "/dashboard/indices-management",
+      icon: BarChart3,
+      permission: "create_indices",
+      description: "Indices économiques"
     },
     {
-      title: "Administration",
-      key: "admin",
-      items: [
-        {
-          label: "Utilisateurs",
-          path: "/dashboard/users",
-          icon: Users,
-          permission: "manage_users",
-          children: [
-            {
-              label: "Tous les utilisateurs",
-              path: "/dashboard/users",
-              icon: Users,
-              permission: "manage_users",
-            },
-            {
-              label: "Créer utilisateur",
-              path: "/dashboard/users/new",
-              icon: Plus,
-              permission: "create_users",
-            },
-          ],
-        },
-        {
-          label: "Permissions",
-          path: "/dashboard/permissions",
-          icon: Shield,
-          permission: "manage_permissions",
-        },
-        {
-          label: "Paramètres",
-          path: "/dashboard/settings",
-          icon: Settings,
-          permission: "system_settings",
-        },
-      ],
+      label: "🗂️ Vue d'ensemble",
+      path: "/dashboard/content-management",
+      icon: FolderOpen,
+      permission: "create_articles",
+      description: "Tout le contenu"
+    },
+
+    // Données dynamiques
+    {
+      label: "📊 Données de Marché",
+      path: "/dashboard/market-data",
+      icon: TrendingUp,
+      permission: "create_indices",
+      description: "Cotations temps réel"
+    },
+    {
+      label: "💰 Données Économiques",
+      path: "/dashboard/economic-data", 
+      icon: PieChart,
+      permission: "create_economic_reports",
+      description: "Indicateurs économiques"
+    },
+    {
+      label: "🌾 Matières Premières",
+      path: "/dashboard/commodities-management",
+      icon: Globe,
+      permission: "create_indices",
+      description: "Commodités"
+    },
+
+    // Analytics et rapports
+    {
+      label: "📈 Analytics",
+      path: "/dashboard/analytics",
+      icon: Activity,
+      permission: "view_analytics",
+      description: "Statistiques détaillées"
+    },
+    {
+      label: "📋 Rapports",
+      path: "/dashboard/reports",
+      icon: Database,
+      permission: "create_economic_reports",
+      description: "Rapports économiques"
+    },
+
+    // Modération (pour modérateurs/admins)
+    {
+      label: "🛡️ Modération",
+      path: "/dashboard/moderation",
+      icon: Shield,
+      permission: "moderate_comments",
+      description: "Modérer le contenu"
+    },
+    {
+      label: "⚠️ Signalements",
+      path: "/dashboard/reports-moderation",
+      icon: AlertTriangle,
+      permission: "manage_user_reports",
+      badge: "3",
+      description: "Gérer les signalements"
+    },
+
+    // Administration (pour admins)
+    {
+      label: "👥 Utilisateurs",
+      path: "/dashboard/users",
+      icon: Users,
+      permission: "manage_users",
+      description: "Gérer les utilisateurs"
+    },
+    {
+      label: "🔒 Permissions",
+      path: "/dashboard/permissions",
+      icon: Shield,
+      permission: "manage_permissions", 
+      description: "Gérer les droits"
+    },
+    {
+      label: "⚙️ Paramètres",
+      path: "/dashboard/settings",
+      icon: Settings,
+      permission: "system_settings",
+      description: "Configuration système"
+    },
+
+    // Personnel
+    {
+      label: "👤 Mon Profil",
+      path: "/dashboard/profile",
+      icon: User,
+      description: "Mes informations"
     },
   ];
 
@@ -275,76 +202,44 @@ export default function DashboardSidebar() {
     return location.pathname.startsWith(path);
   };
 
-  const hasAccessToSection = (items: SidebarItem[]): boolean => {
-    return items.some((item) => {
-      if (!item.permission || hasPermission(item.permission)) {
-        return true;
-      }
-      if (item.children) {
-        return hasAccessToSection(item.children);
-      }
-      return false;
-    });
-  };
-
-  const renderMenuItem = (item: SidebarItem, isChild = false) => {
+  const renderMenuItem = (item: MenuItem) => {
     const hasAccess = !item.permission || hasPermission(item.permission);
     if (!hasAccess) return null;
 
     const active = isItemActive(item.path);
-    const hasChildren = item.children && item.children.length > 0;
-
-    if (hasChildren) {
-      return (
-        <div key={item.path}>
-          <button
-            onClick={() => toggleSection(item.path)}
-            className={`w-full flex items-center justify-between px-3 py-2.5 text-sm rounded-lg transition-all duration-200 group ${
-              active
-                ? "bg-blue-600 text-white shadow-md"
-                : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-            } ${isChild ? "ml-4" : ""}`}
-          >
-            <div className="flex items-center gap-3">
-              <item.icon className="w-4 h-4" />
-              <span className="font-medium">{item.label}</span>
-              {item.badge && (
-                <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
-                  {item.badge}
-                </span>
-              )}
-            </div>
-            {expandedSections.includes(item.path) ? (
-              <ChevronDown className="w-4 h-4" />
-            ) : (
-              <ChevronRight className="w-4 h-4" />
-            )}
-          </button>
-          {expandedSections.includes(item.path) && item.children && (
-            <div className="mt-1 space-y-1">
-              {item.children.map((child) => renderMenuItem(child, true))}
-            </div>
-          )}
-        </div>
-      );
-    }
 
     return (
       <Link
         key={item.path}
         to={item.path}
-        className={`flex items-center justify-between px-3 py-2.5 text-sm rounded-lg transition-all duration-200 group ${
+        className={`group flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 ${
           active
-            ? "bg-blue-600 text-white shadow-md"
-            : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-        } ${isChild ? "ml-4" : ""}`}
+            ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg transform scale-[1.02]"
+            : "text-gray-700 hover:bg-blue-50 hover:text-blue-700"
+        }`}
       >
-        <div className="flex items-center gap-3">
-          <item.icon className="w-4 h-4" />
-          <span className="font-medium">{item.label}</span>
+        <div className="flex items-center gap-3 flex-1">
+          <item.icon className={`w-5 h-5 ${active ? "text-white" : "text-gray-600 group-hover:text-blue-600"}`} />
+          <div className="flex-1">
+            <span className="font-medium text-sm leading-tight">
+              {item.label}
+            </span>
+            {item.description && (
+              <div className={`text-xs leading-tight ${
+                active ? "text-blue-100" : "text-gray-500 group-hover:text-blue-500"
+              }`}>
+                {item.description}
+              </div>
+            )}
+          </div>
         </div>
+        
         {item.badge && (
-          <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
+          <span className={`text-xs px-2 py-1 rounded-full font-medium ${
+            active 
+              ? "bg-white/20 text-white" 
+              : "bg-red-500 text-white"
+          }`}>
             {item.badge}
           </span>
         )}
@@ -353,15 +248,27 @@ export default function DashboardSidebar() {
   };
 
   const getUserRole = () => {
-    if (user?.role === "admin") return "Administrateur";
-    if (user?.role === "editeur") return "Éditeur";
-    if (user?.role === "analyste") return "Analyste";
-    if (user?.role === "moderateur") return "Modérateur";
-    return user?.role || "Utilisateur";
+    if (user?.role === "admin") return "👑 Administrateur";
+    if (user?.role === "editeur") return "✏️ Éditeur";
+    if (user?.role === "analyste") return "📊 Analyste";
+    if (user?.role === "moderateur") return "🛡️ Modérateur";
+    return user?.role || "👤 Utilisateur";
+  };
+
+  // Grouper les items par catégorie pour un affichage plus organisé
+  const groupedItems = {
+    main: menuItems.slice(0, 1), // Tableau de bord
+    create: menuItems.slice(1, 4), // Création
+    manage: menuItems.slice(4, 8), // Gestion
+    data: menuItems.slice(8, 11), // Données
+    analytics: menuItems.slice(11, 13), // Analytics
+    moderation: menuItems.slice(13, 15), // Modération
+    admin: menuItems.slice(15, 18), // Administration
+    personal: menuItems.slice(18), // Personnel
   };
 
   return (
-    <div className="w-64 bg-white h-screen sticky top-0 shadow-xl border-r border-gray-200 flex flex-col">
+    <div className="w-72 bg-white h-screen sticky top-0 shadow-2xl border-r border-gray-200 flex flex-col overflow-hidden">
       {/* Header */}
       <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
         <div className="flex items-center gap-3">
@@ -371,7 +278,7 @@ export default function DashboardSidebar() {
             className="h-8 w-auto"
           />
           <div>
-            <div className="font-bold text-blue-700">Dashboard</div>
+            <div className="font-bold text-blue-700 text-lg">Dashboard</div>
             <div className="text-xs text-blue-600">Amani Finance</div>
           </div>
         </div>
@@ -380,12 +287,12 @@ export default function DashboardSidebar() {
       {/* User Info */}
       <div className="p-4 border-b border-gray-200 bg-gray-50">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md">
+          <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg">
             {user?.firstName?.[0]}
             {user?.lastName?.[0]}
           </div>
           <div className="flex-1 min-w-0">
-            <div className="font-semibold text-gray-900 truncate">
+            <div className="font-semibold text-gray-900 truncate text-sm">
               {user?.firstName} {user?.lastName}
             </div>
             <div className="text-xs text-blue-600 font-medium">
@@ -395,46 +302,103 @@ export default function DashboardSidebar() {
         </div>
       </div>
 
-      {/* Navigation */}
+      {/* Navigation simplifiée */}
       <nav className="flex-1 p-4 space-y-6 overflow-y-auto">
-        {sidebarSections.map((section) => {
-          const hasAccess = hasAccessToSection(section.items);
-          if (!hasAccess) return null;
+        {/* Accueil */}
+        <div>
+          {groupedItems.main.map(renderMenuItem)}
+        </div>
 
-          return (
-            <div key={section.key}>
-              <button
-                onClick={() => toggleSection(section.key)}
-                className="w-full flex items-center justify-between mb-3 p-2 rounded-lg hover:bg-blue-50 transition-colors group"
-              >
-                <h3 className="text-xs font-bold text-gray-600 uppercase tracking-wider group-hover:text-blue-700">
-                  {section.title}
-                </h3>
-                <div className="text-gray-400 group-hover:text-blue-600">
-                  {expandedSections.includes(section.key) ? (
-                    <ChevronDown className="w-3 h-3" />
-                  ) : (
-                    <ChevronRight className="w-3 h-3" />
-                  )}
-                </div>
-              </button>
-              {expandedSections.includes(section.key) && (
-                <div className="space-y-1">
-                  {section.items.map((item) => renderMenuItem(item))}
-                </div>
-              )}
+        {/* Création rapide */}
+        {groupedItems.create.some(item => !item.permission || hasPermission(item.permission)) && (
+          <div>
+            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-2">
+              ⚡ Création Rapide
+            </h3>
+            <div className="space-y-1">
+              {groupedItems.create.map(renderMenuItem)}
             </div>
-          );
-        })}
+          </div>
+        )}
+
+        {/* Gestion */}
+        {groupedItems.manage.some(item => !item.permission || hasPermission(item.permission)) && (
+          <div>
+            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-2">
+              📋 Gestion
+            </h3>
+            <div className="space-y-1">
+              {groupedItems.manage.map(renderMenuItem)}
+            </div>
+          </div>
+        )}
+
+        {/* Données */}
+        {groupedItems.data.some(item => !item.permission || hasPermission(item.permission)) && (
+          <div>
+            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-2">
+              📊 Données & Sources
+            </h3>
+            <div className="space-y-1">
+              {groupedItems.data.map(renderMenuItem)}
+            </div>
+          </div>
+        )}
+
+        {/* Analytics */}
+        {groupedItems.analytics.some(item => !item.permission || hasPermission(item.permission)) && (
+          <div>
+            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-2">
+              📈 Analytics
+            </h3>
+            <div className="space-y-1">
+              {groupedItems.analytics.map(renderMenuItem)}
+            </div>
+          </div>
+        )}
+
+        {/* Modération */}
+        {groupedItems.moderation.some(item => !item.permission || hasPermission(item.permission)) && (
+          <div>
+            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-2">
+              🛡️ Modération
+            </h3>
+            <div className="space-y-1">
+              {groupedItems.moderation.map(renderMenuItem)}
+            </div>
+          </div>
+        )}
+
+        {/* Administration */}
+        {groupedItems.admin.some(item => !item.permission || hasPermission(item.permission)) && (
+          <div>
+            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-2">
+              ⚙️ Administration
+            </h3>
+            <div className="space-y-1">
+              {groupedItems.admin.map(renderMenuItem)}
+            </div>
+          </div>
+        )}
+
+        {/* Personnel */}
+        <div>
+          <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-2">
+            👤 Personnel
+          </h3>
+          <div className="space-y-1">
+            {groupedItems.personal.map(renderMenuItem)}
+          </div>
+        </div>
       </nav>
 
       {/* Footer */}
       <div className="p-4 border-t border-gray-200 bg-gray-50">
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors font-medium"
+          className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-600 hover:bg-red-50 rounded-xl transition-colors font-medium"
         >
-          <LogOut className="w-4 h-4" />
+          <LogOut className="w-5 h-5" />
           <span>Déconnexion</span>
         </button>
       </div>
