@@ -162,6 +162,24 @@ export default function DashboardSidebar() {
       ],
     },
     {
+      title: "Données Publiques",
+      key: "public-data",
+      items: [
+        {
+          label: "Données de Marché",
+          path: "/dashboard/market-data",
+          icon: TrendingUp,
+          permission: "create_indices",
+        },
+        {
+          label: "Données Économiques",
+          path: "/dashboard/economic-data",
+          icon: BarChart3,
+          permission: "create_economic_reports",
+        },
+      ],
+    },
+    {
       title: "Analytics",
       key: "analytics",
       items: [
