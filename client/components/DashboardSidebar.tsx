@@ -44,9 +44,9 @@ export default function DashboardSidebar() {
           label: "Tableau de bord",
           path: "/dashboard",
           icon: LayoutDashboard,
-          description: "Vue d'ensemble"
-        }
-      ]
+          description: "Vue d'ensemble",
+        },
+      ],
     },
     {
       title: "✏️ CRÉER DU CONTENU",
@@ -55,21 +55,21 @@ export default function DashboardSidebar() {
           label: "Nouvel Article",
           path: "/dashboard/articles/new",
           icon: FileText,
-          permission: "create_articles"
+          permission: "create_articles",
         },
         {
           label: "Nouveau Podcast",
           path: "/dashboard/podcasts/new",
           icon: Mic,
-          permission: "create_podcasts"
+          permission: "create_podcasts",
         },
         {
           label: "Nouvel Indice",
           path: "/dashboard/indices/new",
           icon: BarChart3,
-          permission: "create_indices"
-        }
-      ]
+          permission: "create_indices",
+        },
+      ],
     },
     {
       title: "📋 GÉRER LE CONTENU",
@@ -79,27 +79,27 @@ export default function DashboardSidebar() {
           path: "/dashboard/content-management",
           icon: FolderOpen,
           permission: "create_articles",
-          description: "Vue unifiée"
+          description: "Vue unifiée",
         },
         {
           label: "Articles",
           path: "/dashboard/articles",
           icon: FileText,
-          permission: "view_analytics"
+          permission: "view_analytics",
         },
         {
           label: "Podcasts",
           path: "/dashboard/podcasts",
           icon: Headphones,
-          permission: "view_analytics"
+          permission: "view_analytics",
         },
         {
           label: "Indices Économiques",
           path: "/dashboard/indices-management",
           icon: BarChart3,
-          permission: "create_indices"
-        }
-      ]
+          permission: "create_indices",
+        },
+      ],
     },
     {
       title: "🌐 GÉRER LES PAGES PUBLIQUES",
@@ -109,51 +109,51 @@ export default function DashboardSidebar() {
           path: "/dashboard/manage-marche",
           icon: TrendingUp,
           permission: "create_indices",
-          description: "Cotations & données"
+          description: "Cotations & données",
         },
         {
           label: "Page Économie",
           path: "/dashboard/manage-economie",
           icon: PieChart,
           permission: "create_economic_reports",
-          description: "Indicateurs économiques"
+          description: "Indicateurs économiques",
         },
         {
           label: "Page Industrie",
           path: "/dashboard/manage-industrie",
           icon: Building,
           permission: "create_articles",
-          description: "Secteur industriel"
+          description: "Secteur industriel",
         },
         {
           label: "Page Investissement",
           path: "/dashboard/manage-investissement",
           icon: DollarSign,
           permission: "create_articles",
-          description: "Opportunités & conseils"
+          description: "Opportunités & conseils",
         },
         {
           label: "Page Insights",
           path: "/dashboard/manage-insights",
           icon: Lightbulb,
           permission: "create_articles",
-          description: "Analyses approfondies"
+          description: "Analyses approfondies",
         },
         {
           label: "Page Tech",
           path: "/dashboard/manage-tech",
           icon: Cpu,
           permission: "create_articles",
-          description: "Technologie & innovation"
+          description: "Technologie & innovation",
         },
         {
           label: "Page Podcast Public",
           path: "/dashboard/manage-podcast-public",
           icon: Mic,
           permission: "create_podcasts",
-          description: "Vitrine podcasts"
-        }
-      ]
+          description: "Vitrine podcasts",
+        },
+      ],
     },
     {
       title: "📊 DONNÉES & SOURCES",
@@ -163,23 +163,23 @@ export default function DashboardSidebar() {
           path: "/dashboard/market-data",
           icon: TrendingUp,
           permission: "create_indices",
-          description: "Cotations temps réel"
+          description: "Cotations temps réel",
         },
         {
           label: "Données Économiques",
           path: "/dashboard/economic-data",
           icon: PieChart,
           permission: "create_economic_reports",
-          description: "Indicateurs macro"
+          description: "Indicateurs macro",
         },
         {
           label: "Matières Premières",
           path: "/dashboard/commodities-management",
           icon: Globe,
           permission: "create_indices",
-          description: "Commodités"
-        }
-      ]
+          description: "Commodités",
+        },
+      ],
     },
     {
       title: "📈 ANALYTICS",
@@ -189,59 +189,62 @@ export default function DashboardSidebar() {
           path: "/dashboard/analytics",
           icon: Activity,
           permission: "view_analytics",
-          description: "Statistiques détaillées"
+          description: "Statistiques détaillées",
         },
         {
           label: "Rapports",
           path: "/dashboard/reports",
           icon: FileText,
           permission: "create_economic_reports",
-          description: "Rapports économiques"
-        }
-      ]
+          description: "Rapports économiques",
+        },
+      ],
     },
     {
       title: "🛡️ MODÉRATION",
-      condition: () => hasPermission("moderate_comments") || hasPermission("manage_user_reports"),
+      condition: () =>
+        hasPermission("moderate_comments") ||
+        hasPermission("manage_user_reports"),
       items: [
         {
           label: "Centre de Modération",
           path: "/dashboard/moderation",
           icon: Shield,
-          permission: "moderate_comments"
+          permission: "moderate_comments",
         },
         {
           label: "Signalements",
           path: "/dashboard/reports-moderation",
           icon: AlertTriangle,
           permission: "manage_user_reports",
-          badge: "3"
-        }
-      ]
+          badge: "3",
+        },
+      ],
     },
     {
       title: "⚙️ ADMINISTRATION",
-      condition: () => hasPermission("manage_users") || hasPermission("system_settings"),
+      condition: () =>
+        hasPermission("manage_users") || hasPermission("system_settings"),
       items: [
         {
           label: "Utilisateurs",
           path: "/dashboard/users",
           icon: Users,
-          permission: "manage_users"
+          permission: "manage_users",
         },
         {
           label: "Permissions",
           path: "/dashboard/permissions",
           icon: Shield,
-          permission: "manage_permissions"
+          permission: "manage_permissions",
         },
         {
           label: "Paramètres",
           path: "/dashboard/settings",
           icon: Settings,
-          permission: "system_settings"
-        }
-      ]
+          permission: "system_settings",
+        },
+      ],
     },
     {
       title: "👤 PERSONNEL",
@@ -250,10 +253,10 @@ export default function DashboardSidebar() {
           label: "Mon Profil",
           path: "/dashboard/profile",
           icon: User,
-          description: "Mes informations"
-        }
-      ]
-    }
+          description: "Mes informations",
+        },
+      ],
+    },
   ];
 
   const isItemActive = (path: string) => {
@@ -280,27 +283,31 @@ export default function DashboardSidebar() {
         }`}
       >
         <div className="flex items-center gap-3 flex-1">
-          <item.icon className={`w-4 h-4 ${active ? "text-white" : "text-gray-600 group-hover:text-blue-600"}`} />
+          <item.icon
+            className={`w-4 h-4 ${active ? "text-white" : "text-gray-600 group-hover:text-blue-600"}`}
+          />
           <div className="flex-1">
-            <span className="font-medium text-sm">
-              {item.label}
-            </span>
+            <span className="font-medium text-sm">{item.label}</span>
             {item.description && (
-              <div className={`text-xs ${
-                active ? "text-blue-100" : "text-gray-500 group-hover:text-blue-500"
-              }`}>
+              <div
+                className={`text-xs ${
+                  active
+                    ? "text-blue-100"
+                    : "text-gray-500 group-hover:text-blue-500"
+                }`}
+              >
                 {item.description}
               </div>
             )}
           </div>
         </div>
-        
+
         {item.badge && (
-          <span className={`text-xs px-2 py-1 rounded-full font-medium ${
-            active 
-              ? "bg-white/20 text-white" 
-              : "bg-red-500 text-white"
-          }`}>
+          <span
+            className={`text-xs px-2 py-1 rounded-full font-medium ${
+              active ? "bg-white/20 text-white" : "bg-red-500 text-white"
+            }`}
+          >
             {item.badge}
           </span>
         )}
@@ -360,8 +367,8 @@ export default function DashboardSidebar() {
           }
 
           // Vérifier si l'utilisateur a accès à au moins un item de la section
-          const hasAccessToSection = section.items.some(item => 
-            !item.permission || hasPermission(item.permission)
+          const hasAccessToSection = section.items.some(
+            (item) => !item.permission || hasPermission(item.permission),
           );
 
           if (!hasAccessToSection) {
