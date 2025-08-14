@@ -65,6 +65,13 @@ import TasksPermissions from "./pages/TasksPermissions";
 import ReportsModeration from "./pages/ReportsModeration";
 import MarketDataManagement from "./pages/MarketDataManagement";
 import EconomicDataManagement from "./pages/EconomicDataManagement";
+import MarcheManagement from "./pages/MarcheManagement";
+import EconomieManagement from "./pages/EconomieManagement";
+import IndustrieManagement from "./pages/IndustrieManagement";
+import InvestissementManagement from "./pages/InvestissementManagement";
+import InsightsManagement from "./pages/InsightsManagement";
+import TechManagement from "./pages/TechManagement";
+import PodcastPublicManagement from "./pages/PodcastPublicManagement";
 
 const queryClient = new QueryClient();
 
