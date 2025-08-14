@@ -10,29 +10,20 @@ import {
   TrendingUp,
   User,
   Shield,
-  Bell,
-  Activity,
-  Globe,
   LogOut,
   FolderOpen,
   AlertTriangle,
   Plus,
   Eye,
-  Edit,
-  PieChart,
-  Database,
+  Globe,
+  Building,
+  DollarSign,
+  Lightbulb,
+  Cpu,
   Headphones,
-  Video,
+  PieChart,
+  Activity,
 } from "lucide-react";
-
-interface MenuItem {
-  label: string;
-  path: string;
-  icon: React.ComponentType<{ className?: string }>;
-  permission?: string;
-  badge?: string;
-  description?: string;
-}
 
 export default function DashboardSidebar() {
   const { user, logout, hasPermission } = useAuth();
@@ -44,155 +35,225 @@ export default function DashboardSidebar() {
     navigate("/login");
   };
 
-  // Menu simplifié et organisé logiquement
-  const menuItems: MenuItem[] = [
-    // Accueil
+  // Structure simplifiée avec sections claires
+  const menuSections = [
     {
-      label: "🏠 Tableau de bord",
-      path: "/dashboard",
-      icon: LayoutDashboard,
-      description: "Vue d'ensemble",
-    },
-
-    // Création de contenu
-    {
-      label: "📝 Créer un Article",
-      path: "/dashboard/articles/new",
-      icon: Plus,
-      permission: "create_articles",
-      description: "Rédiger un nouvel article",
+      title: "🏠 ACCUEIL",
+      items: [
+        {
+          label: "Tableau de bord",
+          path: "/dashboard",
+          icon: LayoutDashboard,
+          description: "Vue d'ensemble"
+        }
+      ]
     },
     {
-      label: "🎙️ Créer un Podcast",
-      path: "/dashboard/podcasts/new",
-      icon: Mic,
-      permission: "create_podcasts",
-      description: "Audio ou vidéo",
+      title: "✏️ CRÉER DU CONTENU",
+      items: [
+        {
+          label: "Nouvel Article",
+          path: "/dashboard/articles/new",
+          icon: FileText,
+          permission: "create_articles"
+        },
+        {
+          label: "Nouveau Podcast",
+          path: "/dashboard/podcasts/new",
+          icon: Mic,
+          permission: "create_podcasts"
+        },
+        {
+          label: "Nouvel Indice",
+          path: "/dashboard/indices/new",
+          icon: BarChart3,
+          permission: "create_indices"
+        }
+      ]
     },
     {
-      label: "📊 Créer un Indice",
-      path: "/dashboard/indices/new",
-      icon: Plus,
-      permission: "create_indices",
-      description: "Nouvel indice économique",
-    },
-
-    // Gestion du contenu
-    {
-      label: "📄 Gérer Articles",
-      path: "/dashboard/articles",
-      icon: FileText,
-      permission: "view_analytics",
-      description: "Tous les articles",
-    },
-    {
-      label: "🎧 Gérer Podcasts",
-      path: "/dashboard/podcasts",
-      icon: Headphones,
-      permission: "view_analytics",
-      description: "Tous les podcasts",
-    },
-    {
-      label: "📈 Gérer Indices",
-      path: "/dashboard/indices-management",
-      icon: BarChart3,
-      permission: "create_indices",
-      description: "Indices économiques",
-    },
-    {
-      label: "🗂️ Vue d'ensemble",
-      path: "/dashboard/content-management",
-      icon: FolderOpen,
-      permission: "create_articles",
-      description: "Tout le contenu",
-    },
-
-    // Données dynamiques
-    {
-      label: "📊 Données de Marché",
-      path: "/dashboard/market-data",
-      icon: TrendingUp,
-      permission: "create_indices",
-      description: "Cotations temps réel",
+      title: "📋 GÉRER LE CONTENU",
+      items: [
+        {
+          label: "Tous les Contenus",
+          path: "/dashboard/content-management",
+          icon: FolderOpen,
+          permission: "create_articles",
+          description: "Vue unifiée"
+        },
+        {
+          label: "Articles",
+          path: "/dashboard/articles",
+          icon: FileText,
+          permission: "view_analytics"
+        },
+        {
+          label: "Podcasts",
+          path: "/dashboard/podcasts",
+          icon: Headphones,
+          permission: "view_analytics"
+        },
+        {
+          label: "Indices Économiques",
+          path: "/dashboard/indices-management",
+          icon: BarChart3,
+          permission: "create_indices"
+        }
+      ]
     },
     {
-      label: "💰 Données Économiques",
-      path: "/dashboard/economic-data",
-      icon: PieChart,
-      permission: "create_economic_reports",
-      description: "Indicateurs économiques",
+      title: "🌐 GÉRER LES PAGES PUBLIQUES",
+      items: [
+        {
+          label: "Page Marché",
+          path: "/dashboard/manage-marche",
+          icon: TrendingUp,
+          permission: "create_indices",
+          description: "Cotations & données"
+        },
+        {
+          label: "Page Économie",
+          path: "/dashboard/manage-economie",
+          icon: PieChart,
+          permission: "create_economic_reports",
+          description: "Indicateurs économiques"
+        },
+        {
+          label: "Page Industrie",
+          path: "/dashboard/manage-industrie",
+          icon: Building,
+          permission: "create_articles",
+          description: "Secteur industriel"
+        },
+        {
+          label: "Page Investissement",
+          path: "/dashboard/manage-investissement",
+          icon: DollarSign,
+          permission: "create_articles",
+          description: "Opportunités & conseils"
+        },
+        {
+          label: "Page Insights",
+          path: "/dashboard/manage-insights",
+          icon: Lightbulb,
+          permission: "create_articles",
+          description: "Analyses approfondies"
+        },
+        {
+          label: "Page Tech",
+          path: "/dashboard/manage-tech",
+          icon: Cpu,
+          permission: "create_articles",
+          description: "Technologie & innovation"
+        },
+        {
+          label: "Page Podcast Public",
+          path: "/dashboard/manage-podcast-public",
+          icon: Mic,
+          permission: "create_podcasts",
+          description: "Vitrine podcasts"
+        }
+      ]
     },
     {
-      label: "🌾 Matières Premières",
-      path: "/dashboard/commodities-management",
-      icon: Globe,
-      permission: "create_indices",
-      description: "Commodités",
-    },
-
-    // Analytics et rapports
-    {
-      label: "📈 Analytics",
-      path: "/dashboard/analytics",
-      icon: Activity,
-      permission: "view_analytics",
-      description: "Statistiques détaillées",
-    },
-    {
-      label: "📋 Rapports",
-      path: "/dashboard/reports",
-      icon: Database,
-      permission: "create_economic_reports",
-      description: "Rapports économiques",
-    },
-
-    // Modération (pour modérateurs/admins)
-    {
-      label: "🛡️ Modération",
-      path: "/dashboard/moderation",
-      icon: Shield,
-      permission: "moderate_comments",
-      description: "Modérer le contenu",
+      title: "📊 DONNÉES & SOURCES",
+      items: [
+        {
+          label: "Données de Marché",
+          path: "/dashboard/market-data",
+          icon: TrendingUp,
+          permission: "create_indices",
+          description: "Cotations temps réel"
+        },
+        {
+          label: "Données Économiques",
+          path: "/dashboard/economic-data",
+          icon: PieChart,
+          permission: "create_economic_reports",
+          description: "Indicateurs macro"
+        },
+        {
+          label: "Matières Premières",
+          path: "/dashboard/commodities-management",
+          icon: Globe,
+          permission: "create_indices",
+          description: "Commodités"
+        }
+      ]
     },
     {
-      label: "⚠️ Signalements",
-      path: "/dashboard/reports-moderation",
-      icon: AlertTriangle,
-      permission: "manage_user_reports",
-      badge: "3",
-      description: "Gérer les signalements",
-    },
-
-    // Administration (pour admins)
-    {
-      label: "👥 Utilisateurs",
-      path: "/dashboard/users",
-      icon: Users,
-      permission: "manage_users",
-      description: "Gérer les utilisateurs",
-    },
-    {
-      label: "🔒 Permissions",
-      path: "/dashboard/permissions",
-      icon: Shield,
-      permission: "manage_permissions",
-      description: "Gérer les droits",
+      title: "📈 ANALYTICS",
+      items: [
+        {
+          label: "Analytics",
+          path: "/dashboard/analytics",
+          icon: Activity,
+          permission: "view_analytics",
+          description: "Statistiques détaillées"
+        },
+        {
+          label: "Rapports",
+          path: "/dashboard/reports",
+          icon: FileText,
+          permission: "create_economic_reports",
+          description: "Rapports économiques"
+        }
+      ]
     },
     {
-      label: "⚙️ Paramètres",
-      path: "/dashboard/settings",
-      icon: Settings,
-      permission: "system_settings",
-      description: "Configuration système",
+      title: "🛡️ MODÉRATION",
+      condition: () => hasPermission("moderate_comments") || hasPermission("manage_user_reports"),
+      items: [
+        {
+          label: "Centre de Modération",
+          path: "/dashboard/moderation",
+          icon: Shield,
+          permission: "moderate_comments"
+        },
+        {
+          label: "Signalements",
+          path: "/dashboard/reports-moderation",
+          icon: AlertTriangle,
+          permission: "manage_user_reports",
+          badge: "3"
+        }
+      ]
     },
-
-    // Personnel
     {
-      label: "👤 Mon Profil",
-      path: "/dashboard/profile",
-      icon: User,
-      description: "Mes informations",
+      title: "⚙️ ADMINISTRATION",
+      condition: () => hasPermission("manage_users") || hasPermission("system_settings"),
+      items: [
+        {
+          label: "Utilisateurs",
+          path: "/dashboard/users",
+          icon: Users,
+          permission: "manage_users"
+        },
+        {
+          label: "Permissions",
+          path: "/dashboard/permissions",
+          icon: Shield,
+          permission: "manage_permissions"
+        },
+        {
+          label: "Paramètres",
+          path: "/dashboard/settings",
+          icon: Settings,
+          permission: "system_settings"
+        }
+      ]
     },
+    {
+      title: "👤 PERSONNEL",
+      items: [
+        {
+          label: "Mon Profil",
+          path: "/dashboard/profile",
+          icon: User,
+          description: "Mes informations"
+        }
+      ]
+    }
   ];
 
   const isItemActive = (path: string) => {
@@ -202,7 +263,7 @@ export default function DashboardSidebar() {
     return location.pathname.startsWith(path);
   };
 
-  const renderMenuItem = (item: MenuItem) => {
+  const renderMenuItem = (item: any) => {
     const hasAccess = !item.permission || hasPermission(item.permission);
     if (!hasAccess) return null;
 
@@ -212,40 +273,34 @@ export default function DashboardSidebar() {
       <Link
         key={item.path}
         to={item.path}
-        className={`group flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 ${
+        className={`group flex items-center justify-between px-3 py-2.5 rounded-lg transition-all duration-200 ${
           active
-            ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg transform scale-[1.02]"
+            ? "bg-blue-600 text-white shadow-lg"
             : "text-gray-700 hover:bg-blue-50 hover:text-blue-700"
         }`}
       >
         <div className="flex items-center gap-3 flex-1">
-          <item.icon
-            className={`w-5 h-5 ${active ? "text-white" : "text-gray-600 group-hover:text-blue-600"}`}
-          />
+          <item.icon className={`w-4 h-4 ${active ? "text-white" : "text-gray-600 group-hover:text-blue-600"}`} />
           <div className="flex-1">
-            <span className="font-medium text-sm leading-tight">
+            <span className="font-medium text-sm">
               {item.label}
             </span>
             {item.description && (
-              <div
-                className={`text-xs leading-tight ${
-                  active
-                    ? "text-blue-100"
-                    : "text-gray-500 group-hover:text-blue-500"
-                }`}
-              >
+              <div className={`text-xs ${
+                active ? "text-blue-100" : "text-gray-500 group-hover:text-blue-500"
+              }`}>
                 {item.description}
               </div>
             )}
           </div>
         </div>
-
+        
         {item.badge && (
-          <span
-            className={`text-xs px-2 py-1 rounded-full font-medium ${
-              active ? "bg-white/20 text-white" : "bg-red-500 text-white"
-            }`}
-          >
+          <span className={`text-xs px-2 py-1 rounded-full font-medium ${
+            active 
+              ? "bg-white/20 text-white" 
+              : "bg-red-500 text-white"
+          }`}>
             {item.badge}
           </span>
         )}
@@ -254,27 +309,15 @@ export default function DashboardSidebar() {
   };
 
   const getUserRole = () => {
-    if (user?.role === "admin") return "👑 Administrateur";
+    if (user?.role === "admin") return "👑 Admin";
     if (user?.role === "editeur") return "✏️ Éditeur";
     if (user?.role === "analyste") return "📊 Analyste";
     if (user?.role === "moderateur") return "🛡️ Modérateur";
     return user?.role || "👤 Utilisateur";
   };
 
-  // Grouper les items par catégorie pour un affichage plus organisé
-  const groupedItems = {
-    main: menuItems.slice(0, 1), // Tableau de bord
-    create: menuItems.slice(1, 4), // Création
-    manage: menuItems.slice(4, 8), // Gestion
-    data: menuItems.slice(8, 11), // Données
-    analytics: menuItems.slice(11, 13), // Analytics
-    moderation: menuItems.slice(13, 15), // Modération
-    admin: menuItems.slice(15, 18), // Administration
-    personal: menuItems.slice(18), // Personnel
-  };
-
   return (
-    <div className="w-72 bg-white h-screen sticky top-0 shadow-2xl border-r border-gray-200 flex flex-col overflow-hidden">
+    <div className="w-80 bg-white h-screen sticky top-0 shadow-2xl border-r border-gray-200 flex flex-col overflow-hidden">
       {/* Header */}
       <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
         <div className="flex items-center gap-3">
@@ -308,104 +351,34 @@ export default function DashboardSidebar() {
         </div>
       </div>
 
-      {/* Navigation simplifiée */}
+      {/* Navigation */}
       <nav className="flex-1 p-4 space-y-6 overflow-y-auto">
-        {/* Accueil */}
-        <div>{groupedItems.main.map(renderMenuItem)}</div>
+        {menuSections.map((section) => {
+          // Vérifier si la section a une condition et si elle est remplie
+          if (section.condition && !section.condition()) {
+            return null;
+          }
 
-        {/* Création rapide */}
-        {groupedItems.create.some(
-          (item) => !item.permission || hasPermission(item.permission),
-        ) && (
-          <div>
-            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-2">
-              ⚡ Création Rapide
-            </h3>
-            <div className="space-y-1">
-              {groupedItems.create.map(renderMenuItem)}
+          // Vérifier si l'utilisateur a accès à au moins un item de la section
+          const hasAccessToSection = section.items.some(item => 
+            !item.permission || hasPermission(item.permission)
+          );
+
+          if (!hasAccessToSection) {
+            return null;
+          }
+
+          return (
+            <div key={section.title}>
+              <h3 className="text-xs font-bold text-gray-600 uppercase tracking-wider mb-3 px-2">
+                {section.title}
+              </h3>
+              <div className="space-y-1">
+                {section.items.map(renderMenuItem)}
+              </div>
             </div>
-          </div>
-        )}
-
-        {/* Gestion */}
-        {groupedItems.manage.some(
-          (item) => !item.permission || hasPermission(item.permission),
-        ) && (
-          <div>
-            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-2">
-              📋 Gestion
-            </h3>
-            <div className="space-y-1">
-              {groupedItems.manage.map(renderMenuItem)}
-            </div>
-          </div>
-        )}
-
-        {/* Données */}
-        {groupedItems.data.some(
-          (item) => !item.permission || hasPermission(item.permission),
-        ) && (
-          <div>
-            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-2">
-              📊 Données & Sources
-            </h3>
-            <div className="space-y-1">
-              {groupedItems.data.map(renderMenuItem)}
-            </div>
-          </div>
-        )}
-
-        {/* Analytics */}
-        {groupedItems.analytics.some(
-          (item) => !item.permission || hasPermission(item.permission),
-        ) && (
-          <div>
-            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-2">
-              📈 Analytics
-            </h3>
-            <div className="space-y-1">
-              {groupedItems.analytics.map(renderMenuItem)}
-            </div>
-          </div>
-        )}
-
-        {/* Modération */}
-        {groupedItems.moderation.some(
-          (item) => !item.permission || hasPermission(item.permission),
-        ) && (
-          <div>
-            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-2">
-              🛡️ Modération
-            </h3>
-            <div className="space-y-1">
-              {groupedItems.moderation.map(renderMenuItem)}
-            </div>
-          </div>
-        )}
-
-        {/* Administration */}
-        {groupedItems.admin.some(
-          (item) => !item.permission || hasPermission(item.permission),
-        ) && (
-          <div>
-            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-2">
-              ⚙️ Administration
-            </h3>
-            <div className="space-y-1">
-              {groupedItems.admin.map(renderMenuItem)}
-            </div>
-          </div>
-        )}
-
-        {/* Personnel */}
-        <div>
-          <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-2">
-            👤 Personnel
-          </h3>
-          <div className="space-y-1">
-            {groupedItems.personal.map(renderMenuItem)}
-          </div>
-        </div>
+          );
+        })}
       </nav>
 
       {/* Footer */}
