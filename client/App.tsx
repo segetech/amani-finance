@@ -62,6 +62,7 @@ import IndicesHelp from "./pages/IndicesHelp";
 import NotFound from "./pages/NotFound";
 import ContentManagement from "./pages/ContentManagement";
 import TasksPermissions from "./pages/TasksPermissions";
+import ReportsModeration from "./pages/ReportsModeration";
 
 const queryClient = new QueryClient();
 
