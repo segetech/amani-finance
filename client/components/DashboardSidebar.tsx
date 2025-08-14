@@ -366,13 +366,16 @@ export default function DashboardSidebar() {
             return null;
           }
 
-          // Vérifier si l'utilisateur a accès à au moins un item de la section
-          const hasAccessToSection = section.items.some(
-            (item) => !item.permission || hasPermission(item.permission),
-          );
+                  // Toujours afficher pour l'admin, sinon vérifier les permissions
+          if (user?.role !== 'admin') {
+            const hasAccessToSection = section.items.some(
+              (item) => !item.permission || hasPermission(item.permission) || !user?.permissions
+            );
 
-          if (!hasAccessToSection) {
-            return null;
+            if (!hasAccessToSection) {
+              console.log(`Section non affichée: ${section.title} - Aucune permission valide`);
+              return null;
+            }
           }
 
           return (

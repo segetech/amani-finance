@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useRef, ChangeEvent } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import DashboardLayout from "../components/DashboardLayout";
+import { uploadAvatar, getAvatarUrl } from "../lib/avatar";
 import {
   Save,
   User,
@@ -44,7 +45,42 @@ export default function Profile() {
     website: "",
     linkedIn: "",
     twitter: "",
+    avatarUrl: user?.avatarUrl || "",
   });
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user?.id) return;
+
+    try {
+      setIsSaving(true);
+      const avatarUrl = await uploadAvatar(user.id, file);
+      
+      // Mettre à jour l'état local
+      setProfileData(prev => ({
+        ...prev,
+        avatarUrl
+      }));
+      
+      // Mettre à jour le contexte d'authentification
+      if (user) {
+        user.avatarUrl = avatarUrl;
+      }
+      
+      success("Avatar mis à jour", "Votre photo de profil a été mise à jour avec succès.");
+    } catch (err) {
+      console.error("Erreur lors du téléchargement de l'avatar:", err);
+      error("Erreur", "Une erreur est survenue lors du téléchargement de l'avatar.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const [preferences, setPreferences] = useState({
     emailNotifications: true,
@@ -155,13 +191,32 @@ export default function Profile() {
         <div className="bg-white rounded-2xl shadow-lg p-6 border border-white/50">
           <div className="flex items-center gap-6">
             <div className="relative">
-              <div className="w-24 h-24 bg-amani-primary rounded-full flex items-center justify-center text-white text-2xl font-bold">
-                {user?.firstName?.[0]}
-                {user?.lastName?.[0]}
-              </div>
-              <button className="absolute -bottom-2 -right-2 w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center text-gray-600 hover:text-amani-primary transition-colors">
+              {profileData.avatarUrl ? (
+                <img
+                  src={profileData.avatarUrl}
+                  alt={`${user?.firstName} ${user?.lastName}`}
+                  className="w-24 h-24 rounded-full object-cover border-2 border-white shadow-md"
+                />
+              ) : (
+                <div className="w-24 h-24 bg-amani-primary rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                  {user?.firstName?.[0]}
+                  {user?.lastName?.[0]}
+                </div>
+              )}
+              <button 
+                type="button"
+                onClick={handleAvatarClick}
+                className="absolute -bottom-2 -right-2 w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center text-gray-600 hover:text-amani-primary transition-colors"
+              >
                 <Camera className="w-4 h-4" />
               </button>
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                accept="image/*"
+                className="hidden"
+              />
             </div>
             <div className="flex-1">
               <h2 className="text-2xl font-bold text-amani-primary mb-1">

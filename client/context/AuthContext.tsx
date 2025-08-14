@@ -1,10 +1,29 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { demoAccounts, DemoUser } from "../lib/demoAccounts";
+import { supabase, getCurrentUser } from "../lib/supabase";
+
+interface User {
+  id: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  organization?: string;
+  avatarUrl?: string;
+  user_metadata?: {
+    full_name?: string;
+    first_name?: string;
+    last_name?: string;
+    avatar_url?: string;
+    role?: string;
+  };
+  role?: string;
+  roles?: string[];
+  permissions?: string[];
+}
 
 interface AuthContextType {
-  user: DemoUser | null;
+  user: User | null;
   login: (email: string, password: string) => Promise<boolean>;
-  logout: () => void;
+  logout: () => Promise<void>;
   isAuthenticated: boolean;
   hasPermission: (permission: string) => boolean;
 }
@@ -12,42 +31,219 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<DemoUser | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user was previously logged in
-    const savedUser = localStorage.getItem("amani-demo-user");
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
+    // Vérifier la session au chargement
+    const checkUser = async () => {
+      try {
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          console.error('Erreur lors de la récupération de la session:', sessionError);
+          setIsLoading(false);
+          return;
+        }
+
+        if (session?.user) {
+          // Récupérer les informations du profil
+          const { data: profileData, error: profileError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
+
+          if (profileError) {
+            console.error('Erreur lors de la récupération du profil:', profileError);
+          }
+
+          const isAdmin = profileData?.roles?.includes('admin') || session.user.role === 'admin';
+          const userData = {
+            id: session.user.id,
+            email: session.user.email || '',
+            firstName: profileData?.first_name || session.user.user_metadata?.first_name || session.user.user_metadata?.full_name?.split(' ')[0] || 'Utilisateur',
+            lastName: profileData?.last_name || session.user.user_metadata?.last_name || session.user.user_metadata?.full_name?.split(' ').slice(1).join(' ') || '',
+            organization: profileData?.organization || '',
+            avatarUrl: profileData?.avatar_url || session.user.user_metadata?.avatar_url || '',
+            user_metadata: session.user.user_metadata,
+            role: isAdmin ? 'admin' : (session.user.role || 'user'),
+            roles: profileData?.roles || [session.user.role || 'user'],
+            permissions: isAdmin ? [
+              'view_dashboard', 'create_articles', 'edit_articles', 'delete_articles',
+              'publish_articles', 'create_podcasts', 'edit_podcasts', 'delete_podcasts',
+              'publish_podcasts', 'create_economic_reports', 'create_indices',
+              'manage_users', 'view_analytics', 'manage_settings'
+            ] : (session.user.user_metadata?.permissions || [])
+          };
+
+          setUser(userData);
+        }
+      } catch (error) {
+        console.error('Erreur lors de la vérification de la session:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkUser();
+
+    // Écouter les changements d'authentification
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Changement d\'état d\'authentification:', event);
+      
+      if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
+        if (session?.user) {
+          // Recharger les données utilisateur
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
+
+          const isAdmin = profileData?.roles?.includes('admin') || session.user.role === 'admin';
+          
+          const userData = {
+            id: session.user.id,
+            email: session.user.email || '',
+            firstName: profileData?.first_name || session.user.user_metadata?.first_name || session.user.user_metadata?.full_name?.split(' ')[0] || 'Utilisateur',
+            lastName: profileData?.last_name || session.user.user_metadata?.last_name || session.user.user_metadata?.full_name?.split(' ').slice(1).join(' ') || '',
+            organization: profileData?.organization || '',
+            avatarUrl: profileData?.avatar_url || session.user.user_metadata?.avatar_url || '',
+            user_metadata: session.user.user_metadata,
+            role: isAdmin ? 'admin' : (session.user.role || 'user'),
+            roles: profileData?.roles || [session.user.role || 'user'],
+            permissions: isAdmin ? [
+              'view_dashboard', 'create_articles', 'edit_articles', 'delete_articles',
+              'publish_articles', 'create_podcasts', 'edit_podcasts', 'delete_podcasts',
+              'publish_podcasts', 'create_economic_reports', 'create_indices',
+              'manage_users', 'view_analytics', 'manage_settings'
+            ] : (session.user.user_metadata?.permissions || [])
+          };
+
+          setUser(userData);
+        }
+      } else if (event === 'SIGNED_OUT') {
+        setUser(null);
+      }
+    });
+
+    return () => {
+      subscription?.unsubscribe();
+    };
   }, []);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
-    const foundUser = demoAccounts.find(
-      (account) => account.email === email && account.password === password,
-    );
+  const login = async (email: string, password: string) => {
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    if (foundUser) {
-      // Update last login time
-      const updatedUser = {
-        ...foundUser,
-        lastLogin: new Date().toLocaleString("fr-FR"),
-      };
-      setUser(updatedUser);
-      localStorage.setItem("amani-demo-user", JSON.stringify(updatedUser));
-      return true;
+      if (error) {
+        console.error('Erreur de connexion:', error);
+        return false;
+      }
+
+      if (data?.user) {
+        // Récupérer les informations supplémentaires du profil
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', data.user.id)
+          .single();
+
+        if (profileError) {
+          console.error('Erreur lors de la récupération du profil:', profileError);
+        }
+
+        // Vérifier si l'utilisateur est admin
+        const isAdmin = profileData?.roles?.includes('admin') || data.user.role === 'admin';
+        
+        // Définir les permissions en fonction du rôle
+        let userPermissions = [];
+        if (isAdmin) {
+          userPermissions = [
+            'view_dashboard',
+            'create_articles',
+            'edit_articles',
+            'delete_articles',
+            'publish_articles',
+            'create_podcasts',
+            'edit_podcasts',
+            'delete_podcasts',
+            'publish_podcasts',
+            'create_economic_reports',
+            'create_indices',
+            'manage_users',
+            'view_analytics',
+            'manage_settings'
+          ];
+        } else {
+          // Permissions par défaut pour les utilisateurs non-admins
+          userPermissions = [
+            'view_dashboard',
+            'create_articles',
+            'edit_own_articles',
+            'view_analytics'
+          ];
+        }
+
+        const userData = {
+          id: data.user.id,
+          email: data.user.email || '',
+          firstName: profileData?.first_name || data.user.user_metadata?.first_name || data.user.user_metadata?.full_name?.split(' ')[0] || 'Utilisateur',
+          lastName: profileData?.last_name || data.user.user_metadata?.last_name || data.user.user_metadata?.full_name?.split(' ').slice(1).join(' ') || '',
+          organization: profileData?.organization || '',
+          avatarUrl: profileData?.avatar_url || data.user.user_metadata?.avatar_url || '',
+          user_metadata: data.user.user_metadata,
+          role: isAdmin ? 'admin' : (data.user.role || 'user'),
+          roles: profileData?.roles || [data.user.role || 'user'],
+          permissions: userPermissions
+        };
+
+        console.log('Utilisateur connecté avec les données:', userData);
+        setUser(userData);
+        return true;
+      }
+
+      return false;
+    } catch (err) {
+      console.error('Erreur inattendue lors de la connexion:', err);
+      return false;
     }
-    return false;
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem("amani-demo-user");
+  const logout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      setUser(null);
+    } catch (error) {
+      console.error('Erreur lors de la déconnexion:', error);
+    }
   };
 
   const hasPermission = (permission: string): boolean => {
-    if (!user) return false;
-    return user.permissions.includes(permission);
+    if (!user) {
+      console.log('Aucun utilisateur connecté');
+      return false;
+    }
+    
+    console.log('Rôle de l\'utilisateur:', user.role);
+    console.log('Permissions de l\'utilisateur:', user.permissions);
+    console.log('Permission demandée:', permission);
+    
+    // Si l'utilisateur est admin, il a toutes les permissions
+    if (user.role === 'admin') {
+      console.log('Accès accordé: utilisateur admin');
+      return true;
+    }
+    
+    // Vérifier si l'utilisateur a la permission spécifique
+    const hasPerm = user.permissions?.includes(permission) || false;
+    console.log('Permission accordée?', hasPerm);
+    return hasPerm;
   };
 
   const value = {
