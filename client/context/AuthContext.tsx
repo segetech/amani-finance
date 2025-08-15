@@ -134,23 +134,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = async (email: string, password: string) => {
-    console.log('Tentative de connexion pour:', email);
+    console.log('🔐 Tentative de connexion pour:', email);
 
     try {
-      console.log('Appel supabase.auth.signInWithPassword...');
+      console.log('📡 Appel supabase.auth.signInWithPassword...');
+      const startTime = Date.now();
+
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      console.log('Réponse Supabase:', { data, error });
+      console.log(`⏱️ Temps de réponse Supabase: ${Date.now() - startTime}ms`);
+      console.log('📦 Réponse Supabase:', { data, error });
 
       if (error) {
-        console.error('Erreur de connexion:', error);
+        console.error('❌ Erreur de connexion:', error);
+        console.error('❌ Code d\'erreur:', error.status);
+        console.error('❌ Message:', error.message);
         return false;
       }
 
       if (data?.user) {
+        console.log('👤 Utilisateur trouvé, récupération du profil...');
+
         // Récupérer les informations supplémentaires du profil
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
@@ -158,13 +165,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           .eq('id', data.user.id)
           .single();
 
+        console.log('📋 Profil data:', profileData);
         if (profileError) {
-          console.error('Erreur lors de la récupération du profil:', profileError);
+          console.error('⚠️ Erreur lors de la récupération du profil:', profileError);
+          console.log('🔄 Continuons sans profil...');
         }
 
         // Vérifier si l'utilisateur est admin
-        const isAdmin = profileData?.roles?.includes('admin') || data.user.role === 'admin';
-        
+        const isAdmin = profileData?.role === 'admin' || data.user.user_metadata?.role === 'admin';
+        console.log('🛡️ Est admin?', isAdmin);
+
         // Définir les permissions en fonction du rôle
         let userPermissions = [];
         if (isAdmin) {
@@ -202,19 +212,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           organization: profileData?.organization || '',
           avatarUrl: profileData?.avatar_url || data.user.user_metadata?.avatar_url || '',
           user_metadata: data.user.user_metadata,
-          role: isAdmin ? 'admin' : (data.user.role || 'user'),
-          roles: profileData?.roles || [data.user.role || 'user'],
+          role: isAdmin ? 'admin' : (profileData?.role || data.user.user_metadata?.role || 'user'),
+          roles: [profileData?.role || data.user.user_metadata?.role || 'user'],
           permissions: userPermissions
         };
 
-        console.log('Utilisateur connecté avec les données:', userData);
+        console.log('✅ Utilisateur connecté avec les données:', userData);
         setUser(userData);
         return true;
       }
 
+      console.log('❌ Aucun utilisateur retourné');
       return false;
     } catch (err) {
-      console.error('Erreur inattendue lors de la connexion:', err);
+      console.error('💥 Erreur inattendue lors de la connexion:', err);
+      console.error('💥 Stack trace:', err.stack);
       return false;
     }
   };
