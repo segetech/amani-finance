@@ -110,19 +110,15 @@ export default function Profile() {
     try {
       setIsSaving(true);
 
-      // Mettre à jour le profil dans Supabase
+      // Mettre à jour le profil dans Supabase (seulement les colonnes existantes)
       const { data, error: updateError } = await supabase
         .from('profiles')
         .update({
           first_name: profileData.firstName,
           last_name: profileData.lastName,
           organization: profileData.organization,
-          phone: profileData.phone,
-          location: profileData.location,
           bio: profileData.bio,
           website: profileData.website,
-          linkedin: profileData.linkedIn,
-          twitter: profileData.twitter,
           updated_at: new Date().toISOString()
         })
         .eq('id', user.id)
