@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, LogIn, Mail, Lock, Users } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { demoAccounts, getRoleDisplayName } from "../lib/demoAccounts";
+import { supabase } from "../lib/supabase";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -17,21 +18,52 @@ export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
+  // Test de connexion Supabase au chargement
+  useEffect(() => {
+    const testSupabaseConnection = async () => {
+      console.log("🧪 Test de connexion Supabase...");
+      try {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("count")
+          .limit(1);
+        if (error) {
+          console.error("❌ Test Supabase échoué:", error);
+        } else {
+          console.log("✅ Connexion Supabase OK");
+        }
+      } catch (err) {
+        console.error("💥 Erreur de test Supabase:", err);
+      }
+    };
+
+    testSupabaseConnection();
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("🚀 Début du handleSubmit");
     setIsLoading(true);
     setError("");
 
     try {
+      console.log("🔑 Appel de la fonction login...");
       const success = await login(formData.email, formData.password);
+      console.log("✅ Résultat login:", success);
+
       if (success) {
+        console.log("🎯 Navigation vers /dashboard...");
         navigate("/dashboard");
+        console.log("🎯 Navigation terminée");
       } else {
+        console.log("❌ Login a échoué");
         setError("Email ou mot de passe incorrect");
       }
     } catch (err) {
+      console.log("💥 Erreur dans handleSubmit:", err);
       setError("Erreur de connexion");
     } finally {
+      console.log("🏁 Finally - setIsLoading(false)");
       setIsLoading(false);
     }
   };

@@ -1,8 +1,9 @@
-import { useState, useRef, ChangeEvent } from "react";
+import { useState, useRef, ChangeEvent, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import DashboardLayout from "../components/DashboardLayout";
 import { uploadAvatar, getAvatarUrl } from "../lib/avatar";
+import { supabase } from "../lib/supabase";
 import {
   Save,
   User,
@@ -50,6 +51,23 @@ export default function Profile() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Charger les préférences utilisateur depuis localStorage
+  useEffect(() => {
+    if (user?.id) {
+      const savedPreferences = localStorage.getItem(
+        `user_preferences_${user.id}`,
+      );
+      if (savedPreferences) {
+        try {
+          const parsedPreferences = JSON.parse(savedPreferences);
+          setPreferences(parsedPreferences);
+        } catch (err) {
+          console.error("Erreur lors du parsing des préférences:", err);
+        }
+      }
+    }
+  }, [user?.id]);
+
   const handleAvatarClick = () => {
     fileInputRef.current?.click();
   };
@@ -61,22 +79,28 @@ export default function Profile() {
     try {
       setIsSaving(true);
       const avatarUrl = await uploadAvatar(user.id, file);
-      
+
       // Mettre à jour l'état local
-      setProfileData(prev => ({
+      setProfileData((prev) => ({
         ...prev,
-        avatarUrl
+        avatarUrl,
       }));
-      
+
       // Mettre à jour le contexte d'authentification
       if (user) {
         user.avatarUrl = avatarUrl;
       }
-      
-      success("Avatar mis à jour", "Votre photo de profil a été mise à jour avec succès.");
+
+      success(
+        "Avatar mis à jour",
+        "Votre photo de profil a été mise à jour avec succès.",
+      );
     } catch (err) {
       console.error("Erreur lors du téléchargement de l'avatar:", err);
-      error("Erreur", "Une erreur est survenue lors du téléchargement de l'avatar.");
+      error(
+        "Erreur",
+        "Une erreur est survenue lors du téléchargement de l'avatar.",
+      );
     } finally {
       setIsSaving(false);
     }
@@ -101,23 +125,92 @@ export default function Profile() {
   });
 
   const handleSaveProfile = async () => {
-    setIsSaving(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    success(
-      "Profil mis à jour",
-      "Vos informations ont été sauvegardées avec succès.",
-    );
-    setIsSaving(false);
+    if (!user?.id) {
+      error("Erreur", "Utilisateur non connecté.");
+      return;
+    }
+
+    try {
+      setIsSaving(true);
+
+      // Mettre à jour le profil dans Supabase (seulement les colonnes existantes)
+      const { data, error: updateError } = await supabase
+        .from("profiles")
+        .update({
+          first_name: profileData.firstName,
+          last_name: profileData.lastName,
+          organization: profileData.organization,
+          bio: profileData.bio,
+          website: profileData.website,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", user.id)
+        .select()
+        .single();
+
+      if (updateError) {
+        console.error("Erreur lors de la mise à jour du profil:", updateError);
+        error("Erreur", "Une erreur est survenue lors de la sauvegarde.");
+        return;
+      }
+
+      // Mettre à jour l'email si nécessaire
+      if (profileData.email !== user.email) {
+        const { error: emailError } = await supabase.auth.updateUser({
+          email: profileData.email,
+        });
+
+        if (emailError) {
+          console.error(
+            "Erreur lors de la mise à jour de l'email:",
+            emailError,
+          );
+          error(
+            "Erreur",
+            "Une erreur est survenue lors de la mise à jour de l'email.",
+          );
+          return;
+        }
+      }
+
+      success(
+        "Profil mis à jour",
+        "Vos informations ont été sauvegardées avec succès.",
+      );
+    } catch (err) {
+      console.error("Erreur lors de la sauvegarde:", err);
+      error("Erreur", "Une erreur inattendue est survenue.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleSavePreferences = async () => {
-    setIsSaving(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    success(
-      "Préférences mises à jour",
-      "Vos préférences ont été sauvegardées avec succès.",
-    );
-    setIsSaving(false);
+    if (!user?.id) {
+      error("Erreur", "Utilisateur non connecté.");
+      return;
+    }
+
+    try {
+      setIsSaving(true);
+
+      // Sauvegarder les préférences en localStorage pour l'instant
+      // TODO: Ajouter une colonne preferences JSONB à la table profiles ou créer une table user_preferences
+      localStorage.setItem(
+        `user_preferences_${user.id}`,
+        JSON.stringify(preferences),
+      );
+
+      success(
+        "Préférences mises à jour",
+        "Vos préférences ont été sauvegardées avec succès.",
+      );
+    } catch (err) {
+      console.error("Erreur lors de la sauvegarde des préférences:", err);
+      error("Erreur", "Une erreur inattendue est survenue.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleChangePassword = async () => {
@@ -129,18 +222,43 @@ export default function Profile() {
       error("Erreur", "Le mot de passe doit contenir au moins 8 caractères.");
       return;
     }
-    setIsSaving(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    success(
-      "Mot de passe mis à jour",
-      "Votre mot de passe a été changé avec succès.",
-    );
-    setPasswordData({
-      currentPassword: "",
-      newPassword: "",
-      confirmPassword: "",
-    });
-    setIsSaving(false);
+
+    try {
+      setIsSaving(true);
+
+      // Changer le mot de passe via Supabase Auth
+      const { error: passwordError } = await supabase.auth.updateUser({
+        password: passwordData.newPassword,
+      });
+
+      if (passwordError) {
+        console.error(
+          "Erreur lors du changement de mot de passe:",
+          passwordError,
+        );
+        error(
+          "Erreur",
+          "Une erreur est survenue lors du changement de mot de passe.",
+        );
+        return;
+      }
+
+      success(
+        "Mot de passe mis à jour",
+        "Votre mot de passe a été changé avec succès.",
+      );
+
+      setPasswordData({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+    } catch (err) {
+      console.error("Erreur lors du changement de mot de passe:", err);
+      error("Erreur", "Une erreur inattendue est survenue.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const stats = [
@@ -203,7 +321,7 @@ export default function Profile() {
                   {user?.lastName?.[0]}
                 </div>
               )}
-              <button 
+              <button
                 type="button"
                 onClick={handleAvatarClick}
                 className="absolute -bottom-2 -right-2 w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center text-gray-600 hover:text-amani-primary transition-colors"
