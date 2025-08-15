@@ -208,18 +208,38 @@ export default function Profile() {
       error("Erreur", "Le mot de passe doit contenir au moins 8 caractères.");
       return;
     }
-    setIsSaving(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    success(
-      "Mot de passe mis à jour",
-      "Votre mot de passe a été changé avec succès.",
-    );
-    setPasswordData({
-      currentPassword: "",
-      newPassword: "",
-      confirmPassword: "",
-    });
-    setIsSaving(false);
+
+    try {
+      setIsSaving(true);
+
+      // Changer le mot de passe via Supabase Auth
+      const { error: passwordError } = await supabase.auth.updateUser({
+        password: passwordData.newPassword
+      });
+
+      if (passwordError) {
+        console.error('Erreur lors du changement de mot de passe:', passwordError);
+        error("Erreur", "Une erreur est survenue lors du changement de mot de passe.");
+        return;
+      }
+
+      success(
+        "Mot de passe mis à jour",
+        "Votre mot de passe a été changé avec succès.",
+      );
+
+      setPasswordData({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+
+    } catch (err) {
+      console.error('Erreur lors du changement de mot de passe:', err);
+      error("Erreur", "Une erreur inattendue est survenue.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const stats = [
