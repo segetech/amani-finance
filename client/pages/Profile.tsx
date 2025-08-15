@@ -166,22 +166,9 @@ export default function Profile() {
     try {
       setIsSaving(true);
 
-      // Mettre à jour les préférences dans Supabase
-      const { data, error: updateError } = await supabase
-        .from('profiles')
-        .update({
-          preferences: preferences,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', user.id)
-        .select()
-        .single();
-
-      if (updateError) {
-        console.error('Erreur lors de la mise à jour des préférences:', updateError);
-        error("Erreur", "Une erreur est survenue lors de la sauvegarde des préférences.");
-        return;
-      }
+      // Sauvegarder les préférences en localStorage pour l'instant
+      // TODO: Ajouter une colonne preferences JSONB à la table profiles ou créer une table user_preferences
+      localStorage.setItem(`user_preferences_${user.id}`, JSON.stringify(preferences));
 
       success(
         "Préférences mises à jour",
