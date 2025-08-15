@@ -39,7 +39,7 @@ export default function Profile() {
     firstName: user?.firstName || "",
     lastName: user?.lastName || "",
     email: user?.email || "",
-    organization: user?.organization || "",
+    organization: "",
     phone: "",
     location: "",
     bio: "",
@@ -51,8 +51,39 @@ export default function Profile() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Charger les préférences utilisateur depuis localStorage
   useEffect(() => {
+    if (!user?.id) return;
+
+    const fetchProfile = async () => {
+      if (user.id) {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", user.id)
+          .single();
+
+        if (error) {
+          console.error("Erreur lors de la récupération du profil:", error);
+        } else if (data) {
+          setProfileData({
+            firstName: data.first_name || "",
+            lastName: data.last_name || "",
+            email: user.email || "",
+            organization: data.organization || "",
+            phone: data.phone || "",
+            location: data.location || "",
+            bio: data.bio || "",
+            website: data.website || "",
+            linkedIn: data.linkedin || "",
+            twitter: data.twitter || "",
+            avatarUrl: data.avatar_url || "",
+          });
+        }
+      }
+    };
+
+    fetchProfile();
+
     if (user?.id) {
       const savedPreferences = localStorage.getItem(
         `user_preferences_${user.id}`,
@@ -66,7 +97,7 @@ export default function Profile() {
         }
       }
     }
-  }, [user?.id]);
+  }, [user?.id, user?.email, supabase]);
 
   const handleAvatarClick = () => {
     fileInputRef.current?.click();
@@ -133,25 +164,51 @@ export default function Profile() {
     try {
       setIsSaving(true);
 
+      const profileUpdates = {
+        first_name: profileData.firstName,
+        last_name: profileData.lastName,
+        organization: profileData.organization,
+        phone: profileData.phone,
+        country: profileData.location, // 'location' in form, 'country' in DB
+        bio: profileData.bio,
+        website: profileData.website,
+        twitter_url: profileData.twitter, // 'twitter' in form, 'twitter_url' in DB
+        linkedin_url: profileData.linkedIn, // 'linkedIn' in form, 'linkedin_url' in DB
+        updated_at: new Date().toISOString(),
+      };
+
+      console.log("Envoi des données de profil à Supabase:", profileUpdates);
+
       // Mettre à jour le profil dans Supabase (seulement les colonnes existantes)
       const { data, error: updateError } = await supabase
         .from("profiles")
-        .update({
-          first_name: profileData.firstName,
-          last_name: profileData.lastName,
-          organization: profileData.organization,
-          bio: profileData.bio,
-          website: profileData.website,
-          updated_at: new Date().toISOString(),
-        })
+        .update(profileUpdates)
         .eq("id", user.id)
         .select()
         .single();
 
       if (updateError) {
-        console.error("Erreur lors de la mise à jour du profil:", updateError);
-        error("Erreur", "Une erreur est survenue lors de la sauvegarde.");
+        console.error("Erreur Supabase lors de la mise à jour du profil:", updateError);
+        error("Erreur", `Erreur de sauvegarde: ${updateError.message}`);
         return;
+      }
+
+      console.log("Profil mis à jour avec succès dans Supabase:", data);
+
+      if (data) {
+        setProfileData({
+          firstName: data.first_name || "",
+          lastName: data.last_name || "",
+          email: user.email || "",
+          organization: data.organization || "",
+          phone: data.phone || "",
+          location: data.location || "",
+          bio: data.bio || "",
+          website: data.website || "",
+          linkedIn: data.linkedin || "",
+          twitter: data.twitter || "",
+          avatarUrl: data.avatar_url || "",
+        });
       }
 
       // Mettre à jour l'email si nécessaire
@@ -177,9 +234,9 @@ export default function Profile() {
         "Profil mis à jour",
         "Vos informations ont été sauvegardées avec succès.",
       );
-    } catch (err) {
-      console.error("Erreur lors de la sauvegarde:", err);
-      error("Erreur", "Une erreur inattendue est survenue.");
+    } catch (error) {
+      console.error("Erreur inattendue:", error);
+      // Gérer les erreurs inattendues
     } finally {
       setIsSaving(false);
     }
