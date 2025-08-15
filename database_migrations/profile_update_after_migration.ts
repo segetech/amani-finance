@@ -9,10 +9,10 @@ const handleSaveProfile = async () => {
 
   try {
     setIsSaving(true);
-    
+
     // Mettre à jour le profil dans Supabase (toutes les colonnes après migration)
     const { data, error: updateError } = await supabase
-      .from('profiles')
+      .from("profiles")
       .update({
         first_name: profileData.firstName,
         last_name: profileData.lastName,
@@ -23,14 +23,14 @@ const handleSaveProfile = async () => {
         website: profileData.website,
         linkedin: profileData.linkedIn,
         twitter: profileData.twitter,
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       })
-      .eq('id', user.id)
+      .eq("id", user.id)
       .select()
       .single();
 
     if (updateError) {
-      console.error('Erreur lors de la mise à jour du profil:', updateError);
+      console.error("Erreur lors de la mise à jour du profil:", updateError);
       error("Erreur", "Une erreur est survenue lors de la sauvegarde.");
       return;
     }
@@ -38,12 +38,15 @@ const handleSaveProfile = async () => {
     // Mettre à jour l'email si nécessaire
     if (profileData.email !== user.email) {
       const { error: emailError } = await supabase.auth.updateUser({
-        email: profileData.email
+        email: profileData.email,
       });
 
       if (emailError) {
-        console.error('Erreur lors de la mise à jour de l\'email:', emailError);
-        error("Erreur", "Une erreur est survenue lors de la mise à jour de l'email.");
+        console.error("Erreur lors de la mise à jour de l'email:", emailError);
+        error(
+          "Erreur",
+          "Une erreur est survenue lors de la mise à jour de l'email.",
+        );
         return;
       }
     }
@@ -52,9 +55,8 @@ const handleSaveProfile = async () => {
       "Profil mis à jour",
       "Vos informations ont été sauvegardées avec succès.",
     );
-    
   } catch (err) {
-    console.error('Erreur lors de la sauvegarde:', err);
+    console.error("Erreur lors de la sauvegarde:", err);
     error("Erreur", "Une erreur inattendue est survenue.");
   } finally {
     setIsSaving(false);
@@ -70,21 +72,27 @@ const handleSavePreferences = async () => {
 
   try {
     setIsSaving(true);
-    
+
     // Mettre à jour les préférences dans Supabase (après migration)
     const { data, error: updateError } = await supabase
-      .from('profiles')
+      .from("profiles")
       .update({
         preferences: preferences,
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       })
-      .eq('id', user.id)
+      .eq("id", user.id)
       .select()
       .single();
 
     if (updateError) {
-      console.error('Erreur lors de la mise à jour des préférences:', updateError);
-      error("Erreur", "Une erreur est survenue lors de la sauvegarde des préférences.");
+      console.error(
+        "Erreur lors de la mise à jour des préférences:",
+        updateError,
+      );
+      error(
+        "Erreur",
+        "Une erreur est survenue lors de la sauvegarde des préférences.",
+      );
       return;
     }
 
@@ -92,9 +100,8 @@ const handleSavePreferences = async () => {
       "Préférences mises à jour",
       "Vos préférences ont été sauvegardées avec succès.",
     );
-    
   } catch (err) {
-    console.error('Erreur lors de la sauvegarde des préférences:', err);
+    console.error("Erreur lors de la sauvegarde des préférences:", err);
     error("Erreur", "Une erreur inattendue est survenue.");
   } finally {
     setIsSaving(false);
