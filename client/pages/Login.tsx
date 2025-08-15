@@ -18,6 +18,25 @@ export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
+  // Test de connexion Supabase au chargement
+  useEffect(() => {
+    const testSupabaseConnection = async () => {
+      console.log('🧪 Test de connexion Supabase...');
+      try {
+        const { data, error } = await supabase.from('profiles').select('count').limit(1);
+        if (error) {
+          console.error('❌ Test Supabase échoué:', error);
+        } else {
+          console.log('✅ Connexion Supabase OK');
+        }
+      } catch (err) {
+        console.error('💥 Erreur de test Supabase:', err);
+      }
+    };
+
+    testSupabaseConnection();
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
