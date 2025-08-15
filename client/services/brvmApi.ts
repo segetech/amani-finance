@@ -1,5 +1,5 @@
 // Service pour récupérer les données BRVM
-import React from 'react';
+import React from "react";
 
 export interface BRVMIndex {
   name: string;

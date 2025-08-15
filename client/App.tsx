@@ -1,74 +1,74 @@
-import React from 'react';
-import { createRoot } from 'react-dom/client';
-import './global.css';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { TooltipProvider } from '@/components/ui/tooltip';
-import { Toaster } from '@/components/ui/toaster';
-import { Toaster as Sonner } from '@/components/ui/sonner';
+import React from "react";
+import { createRoot } from "react-dom/client";
+import "./global.css";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
 
 // Context Providers
-import { AuthProvider, useAuth } from './context/AuthContext';
-import { ToastProvider } from './context/ToastContext';
+import { AuthProvider, useAuth } from "./context/AuthContext";
+import { ToastProvider } from "./context/ToastContext";
 
 // Components
-import ProtectedRoute from './components/ProtectedRoute';
-import LoadingSpinner from './components/LoadingSpinner';
-import ScrollToTop from './components/ScrollToTop';
-import { Navigation } from './components/Navigation';
+import ProtectedRoute from "./components/ProtectedRoute";
+import LoadingSpinner from "./components/LoadingSpinner";
+import ScrollToTop from "./components/ScrollToTop";
+import { Navigation } from "./components/Navigation";
 
 // Public Pages
-import Index from './pages/Index';
-import Article from './pages/Article';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import About from './pages/About';
-import Contact from './pages/Contact';
-import Podcast from './pages/Podcast';
-import Indices from './pages/Indices';
-import Calculateur from './pages/Calculateur';
-import GuideDebutant from './pages/GuideDebutant';
-import Actualites from './pages/Actualites';
-import Newsletter from './pages/Newsletter';
-import Marche from './pages/Marche';
-import Economie from './pages/Economie';
-import EconomieNews from './pages/EconomieNews';
-import Industrie from './pages/Industrie';
-import Investissement from './pages/Investissement';
-import Insights from './pages/Insights';
-import Tech from './pages/Tech';
+import Index from "./pages/Index";
+import Article from "./pages/Article";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
+import Podcast from "./pages/Podcast";
+import Indices from "./pages/Indices";
+import Calculateur from "./pages/Calculateur";
+import GuideDebutant from "./pages/GuideDebutant";
+import Actualites from "./pages/Actualites";
+import Newsletter from "./pages/Newsletter";
+import Marche from "./pages/Marche";
+import Economie from "./pages/Economie";
+import EconomieNews from "./pages/EconomieNews";
+import Industrie from "./pages/Industrie";
+import Investissement from "./pages/Investissement";
+import Insights from "./pages/Insights";
+import Tech from "./pages/Tech";
 
 // Dashboard Pages
-import DashboardMain from './pages/DashboardMain';
-import ContentManagement from './pages/ContentManagement';
-import Articles from './pages/Articles';
-import NewArticle from './pages/NewArticle';
-import EditArticle from './pages/EditArticle';
-import PodcastsManager from './pages/PodcastsManager';
-import NewPodcast from './pages/NewPodcast';
-import EditPodcast from './pages/EditPodcast';
-import IndicesManager from './pages/IndicesManager';
-import NewIndice from './pages/NewIndice';
-import EditIndice from './pages/EditIndice';
-import IndicesManagement from './pages/IndicesManagement';
-import CommoditiesManagement from './pages/CommoditiesManagement';
-import IndicesHelp from './pages/IndicesHelp';
-import Analytics from './pages/Analytics';
-import Moderation from './pages/Moderation';
-import ReportsModeration from './pages/ReportsModeration';
-import Settings from './pages/Settings';
-import Profile from './pages/Profile';
-import PermissionsManager from './pages/PermissionsManager';
-import Users from './pages/Users';
-import NewUser from './pages/NewUser';
-import EditUser from './pages/EditUser';
-import BannedUsers from './pages/BannedUsers';
-import Notifications from './pages/Notifications';
-import Logs from './pages/Logs';
-import UserActivity from './pages/UserActivity';
-import ReportsManager from './pages/ReportsManager';
-import NewUserAdvanced from './pages/NewUserAdvanced';
-import Integrations from './pages/Integrations';
+import DashboardMain from "./pages/DashboardMain";
+import ContentManagement from "./pages/ContentManagement";
+import Articles from "./pages/Articles";
+import NewArticle from "./pages/NewArticle";
+import EditArticle from "./pages/EditArticle";
+import PodcastsManager from "./pages/PodcastsManager";
+import NewPodcast from "./pages/NewPodcast";
+import EditPodcast from "./pages/EditPodcast";
+import IndicesManager from "./pages/IndicesManager";
+import NewIndice from "./pages/NewIndice";
+import EditIndice from "./pages/EditIndice";
+import IndicesManagement from "./pages/IndicesManagement";
+import CommoditiesManagement from "./pages/CommoditiesManagement";
+import IndicesHelp from "./pages/IndicesHelp";
+import Analytics from "./pages/Analytics";
+import Moderation from "./pages/Moderation";
+import ReportsModeration from "./pages/ReportsModeration";
+import Settings from "./pages/Settings";
+import Profile from "./pages/Profile";
+import PermissionsManager from "./pages/PermissionsManager";
+import Users from "./pages/Users";
+import NewUser from "./pages/NewUser";
+import EditUser from "./pages/EditUser";
+import BannedUsers from "./pages/BannedUsers";
+import Notifications from "./pages/Notifications";
+import Logs from "./pages/Logs";
+import UserActivity from "./pages/UserActivity";
+import ReportsManager from "./pages/ReportsManager";
+import NewUserAdvanced from "./pages/NewUserAdvanced";
+import Integrations from "./pages/Integrations";
 
 // Create a single instance of QueryClient
 const queryClient = new QueryClient({
@@ -395,14 +395,14 @@ const App = () => {
 };
 
 // Initialize React root
-const container = document.getElementById('root');
-if (!container) throw new Error('Failed to find the root element');
+const container = document.getElementById("root");
+if (!container) throw new Error("Failed to find the root element");
 
 const root = createRoot(container);
 root.render(
   <React.StrictMode>
     <App />
-  </React.StrictMode>
+  </React.StrictMode>,
 );
 
 export default App;
