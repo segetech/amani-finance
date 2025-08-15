@@ -8,13 +8,16 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 // Configuration de l'instance Supabase avec des options de persistance de session
+// IMPORTANT: protéger l'accès à window pour les builds SSR
+const safeStorage = typeof window !== 'undefined' ? window.localStorage : undefined;
+
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: true,
-    storageKey: 'amani_finance_session',
-    storage: window.localStorage
+    // ne pas forcer un storageKey personnalisé: utiliser la convention par défaut de Supabase
+    storage: safeStorage,
   },
   global: {
     headers: {

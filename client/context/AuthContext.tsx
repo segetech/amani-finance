@@ -53,16 +53,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
 
         if (session?.user) {
-          // Récupérer les informations du profil
+          // Récupérer les informations du profil (ne jette pas d'exception si aucune ligne)
           const { data: profileData, error: profileError } = await supabase
             .from("profiles")
             .select("*")
             .eq("id", session.user.id)
-            .single();
+            .maybeSingle();
 
           if (profileError) {
-            console.error(
-              "Erreur lors de la récupération du profil:",
+            console.warn(
+              "[Auth] Profil non récupéré (continuons avec les métadonnées de session):",
               profileError,
             );
           }
@@ -131,14 +131,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Changement d'état d'authentification:", event);
 
-      if (event === "SIGNED_IN" || event === "INITIAL_SESSION") {
+      if (
+        event === "SIGNED_IN" ||
+        event === "INITIAL_SESSION" ||
+        event === "TOKEN_REFRESHED" ||
+        event === "USER_UPDATED"
+      ) {
         if (session?.user) {
-          // Recharger les données utilisateur
+          // Recharger les données utilisateur (sans jeter en cas d'absence)
           const { data: profileData } = await supabase
             .from("profiles")
             .select("*")
             .eq("id", session.user.id)
-            .single();
+            .maybeSingle();
 
           const isAdmin =
             profileData?.roles?.includes("admin") ||
@@ -201,7 +206,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = async (email: string, password: string) => {
-    console.log("🔐 Tentative de connexion pour:", email);
+    const requestId = Math.random().toString(36).substr(2, 9);
+    console.group(`🔐 [${requestId}] Tentative de connexion`);
+    console.log("📧 Email:", email);
+    console.log("🔄 Appel à signInWithPassword...");
 
     try {
       console.log("📡 Appel supabase.auth.signInWithPassword...");
@@ -217,20 +225,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (error) {
         console.error("❌ Erreur de connexion:", error);
-        console.error("❌ Code d'erreur:", error.status);
+        console.error("❌ Code d'erreur:", (error as any).status);
         console.error("❌ Message:", error.message);
+        console.log("🔑 Réponse de signInWithPassword:", {
+          user: data?.user ? "✅ Utilisateur présent" : "❌ Aucun utilisateur",
+          session: data?.session ? "✅ Session présente" : "❌ Aucune session",
+          error: error ? `❌ Erreur: ${error.message}` : "✅ Aucune erreur",
+        });
+        console.groupEnd();
         return false;
       }
 
       if (data?.user) {
-        console.log("👤 Utilisateur trouvé, récupération du profil...");
+        console.log("✅ Connexion réussie, récupération du profil...");
+        console.log("🔄 Mise à jour de l'état utilisateur avec les informations de base...");
+        // On ne met pas à jour l'état ici, on attend d'avoir toutes les données
 
-        // Récupérer les informations supplémentaires du profil
+        console.log("🔄 Récupération des informations du profil...");
         const { data: profileData, error: profileError } = await supabase
           .from("profiles")
           .select("*")
           .eq("id", data.user.id)
-          .single();
+          .maybeSingle();
 
         console.log("📋 Profil data:", profileData);
         if (profileError) {
@@ -287,7 +303,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           lastName:
             profileData?.last_name ||
             data.user.user_metadata?.last_name ||
-            data.user.user_metadata?.full_name?.split(" ").slice(1).join(" ") ||
+            data.user.user_metadata?.full_name
+              ?.split(" ")
+              .slice(1)
+              .join(" ") ||
             "",
           organization: profileData?.organization || "",
           avatarUrl:

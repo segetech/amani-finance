@@ -43,9 +43,6 @@ export default function Profile() {
     phone: "",
     location: "",
     bio: "",
-    website: "",
-    linkedIn: "",
-    twitter: "",
     avatarUrl: user?.avatarUrl || "",
   });
 
@@ -56,15 +53,29 @@ export default function Profile() {
 
     const fetchProfile = async () => {
       if (user.id) {
+        console.group("[Profile] Fetch profile");
+        console.log("user.id:", user.id);
         const { data, error } = await supabase
           .from("profiles")
           .select("*")
           .eq("id", user.id)
-          .single();
+          .maybeSingle();
 
         if (error) {
-          console.error("Erreur lors de la récupération du profil:", error);
+          console.error("[Profile] Fetch error:", {
+            message: error.message,
+            details: (error as any).details,
+            hint: (error as any).hint,
+            code: (error as any).code,
+          });
         } else if (data) {
+          console.log("[Profile] Fetch success. Received:", {
+            id: data.id,
+            first_name: data.first_name,
+            last_name: data.last_name,
+            country: (data as any).country,
+            // website/twitter/linkedin intentionally ignored
+          });
           setProfileData({
             firstName: data.first_name || "",
             lastName: data.last_name || "",
@@ -73,12 +84,10 @@ export default function Profile() {
             phone: data.phone || "",
             location: data.location || "",
             bio: data.bio || "",
-            website: data.website || "",
-            linkedIn: data.linkedin || "",
-            twitter: data.twitter || "",
             avatarUrl: data.avatar_url || "",
           });
         }
+        console.groupEnd();
       }
     };
 
@@ -108,6 +117,9 @@ export default function Profile() {
     if (!file || !user?.id) return;
 
     try {
+      console.group("[Profile] Update avatar");
+      const t0 = performance.now();
+      console.log("user.id:", user.id, "file:", { name: file.name, size: file.size, type: file.type });
       setIsSaving(true);
       const avatarUrl = await uploadAvatar(user.id, file);
 
@@ -122,16 +134,42 @@ export default function Profile() {
         user.avatarUrl = avatarUrl;
       }
 
+      // Persister dans Supabase (création si la ligne n'existe pas)
+      const { error: avatarUpdateError } = await supabase
+        .from("profiles")
+        .upsert(
+          {
+            id: user.id,
+            avatar_url: avatarUrl,
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: "id" },
+        );
+
+      if (avatarUpdateError) {
+        console.error("[Profile] Avatar upsert error:", {
+          message: avatarUpdateError.message,
+          details: (avatarUpdateError as any).details,
+          hint: (avatarUpdateError as any).hint,
+          code: (avatarUpdateError as any).code,
+        });
+      } else {
+        console.log("[Profile] Avatar upsert success. avatar_url:", avatarUrl);
+      }
+
       success(
         "Avatar mis à jour",
         "Votre photo de profil a été mise à jour avec succès.",
       );
+      console.log(`[Profile] Update avatar done in ${(performance.now() - t0).toFixed(1)}ms`);
+      console.groupEnd();
     } catch (err) {
       console.error("Erreur lors du téléchargement de l'avatar:", err);
       error(
         "Erreur",
         "Une erreur est survenue lors du téléchargement de l'avatar.",
       );
+      console.groupEnd();
     } finally {
       setIsSaving(false);
     }
@@ -162,57 +200,82 @@ export default function Profile() {
     }
 
     try {
+      console.group("[Profile] Save profile");
+      const t0 = performance.now();
+      console.log("user.id:", user.id);
       setIsSaving(true);
 
       const profileUpdates = {
+        email: profileData.email || user.email || "",
         first_name: profileData.firstName,
         last_name: profileData.lastName,
         organization: profileData.organization,
         phone: profileData.phone,
-        country: profileData.location, // 'location' in form, 'country' in DB
+        location: profileData.location, // use 'location' column in DB
         bio: profileData.bio,
-        website: profileData.website,
-        twitter_url: profileData.twitter, // 'twitter' in form, 'twitter_url' in DB
-        linkedin_url: profileData.linkedIn, // 'linkedIn' in form, 'linkedin_url' in DB
         updated_at: new Date().toISOString(),
       };
 
-      console.log("Envoi des données de profil à Supabase:", profileUpdates);
+      const requestId = Math.random().toString(36).slice(2, 8);
+      console.log(`[Profile] Upserting payload (req:${requestId}):`, profileUpdates);
 
-      // Mettre à jour le profil dans Supabase (seulement les colonnes existantes)
-      const { data, error: updateError } = await supabase
-        .from("profiles")
-        .update(profileUpdates)
-        .eq("id", user.id)
-        .select()
-        .single();
+      // Mettre à jour le profil dans Supabase (ne demande PAS de représentation pour éviter un blocage si SELECT est refusé par RLS)
+      // Ajout d'un timeout pour éviter les blocages réseau
+      console.log(`[Profile] Before upsert await (req:${requestId})`);
+      const ac = new AbortController();
+      const timeout = setTimeout(() => {
+        console.warn(`[Profile] Upsert timed out after 10s (req:${requestId})`);
+        ac.abort();
+      }, 10_000);
+      let updateError: any | null = null;
+      try {
+        const { error } = await supabase
+          .from("profiles")
+          .upsert({ id: user.id, ...profileUpdates }, { onConflict: "id" })
+          .abortSignal(ac.signal);
+        updateError = error;
+      } catch (e: any) {
+        if (e?.name === "AbortError") {
+          console.error(`[Profile] Upsert aborted (req:${requestId})`);
+          updateError = e;
+        } else {
+          console.error(`[Profile] Upsert threw unexpected error (req:${requestId}):`, e);
+          updateError = e;
+        }
+      } finally {
+        clearTimeout(timeout);
+      }
+      console.log(`[Profile] After upsert await (req:${requestId})`);
 
       if (updateError) {
-        console.error("Erreur Supabase lors de la mise à jour du profil:", updateError);
+        console.error("[Profile] Upsert error:", {
+          message: updateError.message,
+          details: (updateError as any).details,
+          hint: (updateError as any).hint,
+          code: (updateError as any).code,
+        });
         error("Erreur", `Erreur de sauvegarde: ${updateError.message}`);
+        console.groupEnd();
         return;
       }
 
-      console.log("Profil mis à jour avec succès dans Supabase:", data);
+      console.log("[Profile] Upsert success.");
 
-      if (data) {
-        setProfileData({
-          firstName: data.first_name || "",
-          lastName: data.last_name || "",
-          email: user.email || "",
-          organization: data.organization || "",
-          phone: data.phone || "",
-          location: data.location || "",
-          bio: data.bio || "",
-          website: data.website || "",
-          linkedIn: data.linkedin || "",
-          twitter: data.twitter || "",
-          avatarUrl: data.avatar_url || "",
-        });
-      }
+      // Mettre à jour l'état local à partir du payload envoyé
+      setProfileData((prev) => ({
+        ...prev,
+        email: profileUpdates.email || prev.email,
+        firstName: profileUpdates.first_name || "",
+        lastName: profileUpdates.last_name || "",
+        organization: profileUpdates.organization || "",
+        phone: profileUpdates.phone || "",
+        location: profileUpdates.location || "",
+        bio: profileUpdates.bio || "",
+      }));
 
       // Mettre à jour l'email si nécessaire
       if (profileData.email !== user.email) {
+        console.log("[Profile] Updating auth email from", user.email, "to", profileData.email);
         const { error: emailError } = await supabase.auth.updateUser({
           email: profileData.email,
         });
@@ -234,9 +297,12 @@ export default function Profile() {
         "Profil mis à jour",
         "Vos informations ont été sauvegardées avec succès.",
       );
+      console.log(`[Profile] Save done in ${(performance.now() - t0).toFixed(1)}ms`);
+      console.groupEnd();
     } catch (error) {
       console.error("Erreur inattendue:", error);
       // Gérer les erreurs inattendues
+      console.groupEnd();
     } finally {
       setIsSaving(false);
     }

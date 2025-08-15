@@ -101,12 +101,9 @@ function ToastContainer() {
       {toasts.map((toast) => (
         <div
           key={toast.id}
-          className={`max-w-sm w-full border rounded-lg shadow-lg p-4 transition-all duration-300 transform ${getColors(
+          className={`max-w-sm w-full border rounded-lg shadow-lg p-4 transition-all duration-300 transform animate-slide-in-right ${getColors(
             toast.type,
           )}`}
-          style={{
-            animation: "slideInRight 0.3s ease-out",
-          }}
         >
           <div className="flex items-start gap-3">
             {getIcon(toast.type)}
@@ -125,18 +122,6 @@ function ToastContainer() {
           </div>
         </div>
       ))}
-      <style jsx>{`
-        @keyframes slideInRight {
-          from {
-            transform: translateX(100%);
-            opacity: 0;
-          }
-          to {
-            transform: translateX(0);
-            opacity: 1;
-          }
-        }
-      `}</style>
     </div>
   );
 }
