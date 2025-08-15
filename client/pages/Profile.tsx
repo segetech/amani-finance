@@ -161,13 +161,42 @@ export default function Profile() {
   };
 
   const handleSavePreferences = async () => {
-    setIsSaving(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    success(
-      "Préférences mises à jour",
-      "Vos préférences ont été sauvegardées avec succès.",
-    );
-    setIsSaving(false);
+    if (!user?.id) {
+      error("Erreur", "Utilisateur non connecté.");
+      return;
+    }
+
+    try {
+      setIsSaving(true);
+
+      // Mettre à jour les préférences dans Supabase
+      const { data, error: updateError } = await supabase
+        .from('profiles')
+        .update({
+          preferences: preferences,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user.id)
+        .select()
+        .single();
+
+      if (updateError) {
+        console.error('Erreur lors de la mise à jour des préférences:', updateError);
+        error("Erreur", "Une erreur est survenue lors de la sauvegarde des préférences.");
+        return;
+      }
+
+      success(
+        "Préférences mises à jour",
+        "Vos préférences ont été sauvegardées avec succès.",
+      );
+
+    } catch (err) {
+      console.error('Erreur lors de la sauvegarde des préférences:', err);
+      error("Erreur", "Une erreur inattendue est survenue.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleChangePassword = async () => {
