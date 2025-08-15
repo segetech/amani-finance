@@ -39,19 +39,28 @@ export default function Login() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('🚀 Début du handleSubmit');
     setIsLoading(true);
     setError("");
 
     try {
+      console.log('🔑 Appel de la fonction login...');
       const success = await login(formData.email, formData.password);
+      console.log('✅ Résultat login:', success);
+
       if (success) {
+        console.log('🎯 Navigation vers /dashboard...');
         navigate("/dashboard");
+        console.log('🎯 Navigation terminée');
       } else {
+        console.log('❌ Login a échoué');
         setError("Email ou mot de passe incorrect");
       }
     } catch (err) {
+      console.log('💥 Erreur dans handleSubmit:', err);
       setError("Erreur de connexion");
     } finally {
+      console.log('🏁 Finally - setIsLoading(false)');
       setIsLoading(false);
     }
   };
