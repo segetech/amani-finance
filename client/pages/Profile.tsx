@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import DashboardLayout from "../components/DashboardLayout";
 import { uploadAvatar, getAvatarUrl } from "../lib/avatar";
+import { supabase } from "../lib/supabase";
 import {
   Save,
   User,
