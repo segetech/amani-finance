@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, LogIn, Mail, Lock, Users } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { demoAccounts, getRoleDisplayName } from "../lib/demoAccounts";
+import { supabase } from "../lib/supabase";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
