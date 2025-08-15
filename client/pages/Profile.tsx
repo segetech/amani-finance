@@ -51,6 +51,21 @@ export default function Profile() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Charger les préférences utilisateur depuis localStorage
+  useEffect(() => {
+    if (user?.id) {
+      const savedPreferences = localStorage.getItem(`user_preferences_${user.id}`);
+      if (savedPreferences) {
+        try {
+          const parsedPreferences = JSON.parse(savedPreferences);
+          setPreferences(parsedPreferences);
+        } catch (err) {
+          console.error('Erreur lors du parsing des préférences:', err);
+        }
+      }
+    }
+  }, [user?.id]);
+
   const handleAvatarClick = () => {
     fileInputRef.current?.click();
   };
