@@ -4,6 +4,7 @@ import { Eye, EyeOff, LogIn, Mail, Lock, Users } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { demoAccounts, getRoleDisplayName } from "../lib/demoAccounts";
 import { supabase } from "../lib/supabase";
+import EnvTest from "@/components/EnvTest";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -99,6 +100,9 @@ export default function Login() {
           <h2 className="mt-8 text-3xl font-bold text-amani-primary">
             Connexion
           </h2>
+          <div className="mt-4">
+            <EnvTest />
+          </div>
           <p className="mt-2 text-gray-600">
             Accédez à votre compte pour suivre l'économie du Sahel
           </p>
