@@ -16,6 +16,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import LoadingSpinner from "./components/LoadingSpinner";
 import ScrollToTop from "./components/ScrollToTop";
 import { Navigation } from "./components/Navigation";
+import DashboardShell from "./components/DashboardShell";
 
 // Public Pages
 import Index from "./pages/Index";
@@ -114,247 +115,46 @@ const AppContent = () => {
         <Route path="/insights" element={<Insights />} />
         <Route path="/tech" element={<Tech />} />
 
-        {/* Protected Dashboard Routes */}
+        {/* Protected Dashboard Routes (persistent layout with nested routes) */}
         <Route
           path="/dashboard"
           element={
             <ProtectedRoute>
-              <DashboardMain />
+              <DashboardShell />
             </ProtectedRoute>
           }
-        />
-        <Route
-          path="/dashboard/content"
-          element={
-            <ProtectedRoute>
-              <ContentManagement />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/dashboard/articles"
-          element={
-            <ProtectedRoute>
-              <Articles />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/dashboard/articles/new"
-          element={
-            <ProtectedRoute>
-              <NewArticle />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/dashboard/articles/edit/:id"
-          element={
-            <ProtectedRoute>
-              <EditArticle />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/dashboard/podcasts"
-          element={
-            <ProtectedRoute>
-              <PodcastsManager />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/dashboard/podcasts/new"
-          element={
-            <ProtectedRoute>
-              <NewPodcast />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/dashboard/podcasts/edit/:id"
-          element={
-            <ProtectedRoute>
-              <EditPodcast />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/dashboard/indices"
-          element={
-            <ProtectedRoute>
-              <IndicesManager />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/dashboard/indices/new"
-          element={
-            <ProtectedRoute>
-              <NewIndice />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/dashboard/indices/edit/:id"
-          element={
-            <ProtectedRoute>
-              <EditIndice />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/dashboard/indices-management"
-          element={
-            <ProtectedRoute>
-              <IndicesManagement />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/dashboard/commodities-management"
-          element={
-            <ProtectedRoute>
-              <CommoditiesManagement />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/dashboard/indices-help"
-          element={
-            <ProtectedRoute>
-              <IndicesHelp />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/dashboard/analytics"
-          element={
-            <ProtectedRoute>
-              <Analytics />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/dashboard/moderation"
-          element={
-            <ProtectedRoute>
-              <Moderation />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/dashboard/reports-moderation"
-          element={
-            <ProtectedRoute>
-              <ReportsModeration />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/dashboard/settings"
-          element={
-            <ProtectedRoute>
-              <Settings />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/dashboard/profile"
-          element={
-            <ProtectedRoute>
-              <Profile />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/dashboard/permissions"
-          element={
-            <ProtectedRoute>
-              <PermissionsManager />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/dashboard/users"
-          element={
-            <ProtectedRoute>
-              <Users />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/dashboard/users/new"
-          element={
-            <ProtectedRoute>
-              <NewUser />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/dashboard/users/new-advanced"
-          element={
-            <ProtectedRoute>
-              <NewUserAdvanced />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/dashboard/users/edit/:userId"
-          element={
-            <ProtectedRoute>
-              <EditUser />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/dashboard/user-activity"
-          element={
-            <ProtectedRoute>
-              <UserActivity />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/dashboard/reports"
-          element={
-            <ProtectedRoute>
-              <ReportsManager />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/dashboard/banned-users"
-          element={
-            <ProtectedRoute>
-              <BannedUsers />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/dashboard/notifications"
-          element={
-            <ProtectedRoute>
-              <Notifications />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/dashboard/logs"
-          element={
-            <ProtectedRoute>
-              <Logs />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/dashboard/integrations"
-          element={
-            <ProtectedRoute>
-              <Integrations />
-            </ProtectedRoute>
-          }
-        />
+        >
+          <Route index element={<DashboardMain />} />
+          <Route path="content" element={<ContentManagement />} />
+          <Route path="articles" element={<Articles />} />
+          <Route path="articles/new" element={<NewArticle />} />
+          <Route path="articles/edit/:id" element={<EditArticle />} />
+          <Route path="podcasts" element={<PodcastsManager />} />
+          <Route path="podcasts/new" element={<NewPodcast />} />
+          <Route path="podcasts/edit/:id" element={<EditPodcast />} />
+          <Route path="indices" element={<IndicesManager />} />
+          <Route path="indices/new" element={<NewIndice />} />
+          <Route path="indices/edit/:id" element={<EditIndice />} />
+          <Route path="indices-management" element={<IndicesManagement />} />
+          <Route path="commodities-management" element={<CommoditiesManagement />} />
+          <Route path="indices-help" element={<IndicesHelp />} />
+          <Route path="analytics" element={<Analytics />} />
+          <Route path="moderation" element={<Moderation />} />
+          <Route path="reports-moderation" element={<ReportsModeration />} />
+          <Route path="settings" element={<Settings />} />
+          <Route path="profile" element={<Profile />} />
+          <Route path="permissions" element={<PermissionsManager />} />
+          <Route path="users" element={<Users />} />
+          <Route path="users/new" element={<NewUser />} />
+          <Route path="users/new-advanced" element={<NewUserAdvanced />} />
+          <Route path="users/edit/:userId" element={<EditUser />} />
+          <Route path="user-activity" element={<UserActivity />} />
+          <Route path="reports" element={<ReportsManager />} />
+          <Route path="banned-users" element={<BannedUsers />} />
+          <Route path="notifications" element={<Notifications />} />
+          <Route path="logs" element={<Logs />} />
+          <Route path="integrations" element={<Integrations />} />
+        </Route>
 
         {/* 404 route */}
         <Route

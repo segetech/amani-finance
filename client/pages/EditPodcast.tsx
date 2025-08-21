@@ -2,9 +2,10 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
-import DashboardLayout from "../components/DashboardLayout";
+import { usePodcasts, Podcast } from "../hooks/usePodcasts";
+import { supabase } from "../lib/supabase";
+// DashboardLayout removed: page now renders inside persistent DashboardShell
 import UnifiedContentForm from "../components/UnifiedContentForm";
-import { UnifiedContent } from "../types/database";
 import { ArrowLeft, Mic, AlertCircle, Loader } from "lucide-react";
 
 export default function EditPodcast() {
@@ -12,34 +13,30 @@ export default function EditPodcast() {
   const navigate = useNavigate();
   const { user, hasPermission } = useAuth();
   const { success, error } = useToast();
+  const { fetchPodcastBySlug, updatePodcast } = usePodcasts();
 
-  const [podcast, setPodcast] = useState<Partial<UnifiedContent> | null>(null);
+  const [podcast, setPodcast] = useState<Podcast | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
 
   // Vérification des permissions
   if (!user || !hasPermission("manage_podcasts")) {
     return (
-      <DashboardLayout title="Accès refusé">
-        <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md mx-auto">
-          <div className="text-center">
-            <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              Accès refusé
-            </h2>
-            <p className="text-gray-600 mb-6">
-              Vous n'avez pas les permissions nécessaires pour modifier des
-              podcasts.
-            </p>
-            <button
-              onClick={() => navigate("/dashboard")}
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Retour au tableau de bord
-            </button>
-          </div>
+      <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md mx-auto">
+        <div className="text-center">
+          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Accès refusé</h2>
+          <p className="text-gray-600 mb-6">
+            Vous n'avez pas les permissions nécessaires pour modifier des podcasts.
+          </p>
+          <button
+            onClick={() => navigate("/dashboard")}
+            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Retour au tableau de bord
+          </button>
         </div>
-      </DashboardLayout>
+      </div>
     );
   }
 
@@ -54,64 +51,55 @@ export default function EditPodcast() {
 
       try {
         setLoading(true);
+        console.log("🔍 Chargement du podcast avec ID:", id);
 
-        // Simuler le chargement des données - à remplacer par un appel API Supabase
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        // Récupérer le podcast par ID avec les données de catégorie
+        const { data, error: fetchError } = await supabase
+          .from('contents')
+          .select(`
+            *,
+            content_categories!inner(id, name, slug, color)
+          `)
+          .eq('id', id)
+          .eq('type', 'podcast')
+          .single();
 
-        // Données de demo - remplacer par ContentService.getContentBySlug(id)
-        const mockPodcast: Partial<UnifiedContent> = {
-          id: id,
-          type: "podcast",
-          title: "Analyse économique hebdomadaire",
-          slug: "analyse-economique-hebdomadaire",
-          summary:
-            "Notre analyse des tendances économiques de la semaine en Afrique de l'Ouest.",
-          description:
-            "Un podcast hebdomadaire qui décortique les principales actualités économiques de la région.",
-          status: "published",
-          category: "economie",
-          country: "mali",
-          tags: ["économie", "analyse", "afrique"],
-          meta_title: "Analyse économique hebdomadaire | Amani Finance",
-          meta_description:
-            "Notre analyse des tendances économiques de la semaine en Afrique de l'Ouest.",
-          featured_image: undefined,
-          featured_image_alt: "",
-          published_at: "2024-01-15",
-          podcast_data: {
-            audio_url: "https://anchor.fm/amani-finance/episodes/episode-1",
-            video_url: "",
-            spotify_url: "https://open.spotify.com/episode/123",
-            apple_url: "https://podcasts.apple.com/episode/123",
-            duration: 1800, // 30 minutes en secondes
-            episode_number: 1,
-            season: 1,
-            transcript: "",
-            guests: ["Expert Économique", "Analyste BCEAO"],
-            topics: ["Politique monétaire", "Inflation", "Croissance"],
-            platforms: [
-              {
-                name: "Spotify",
-                url: "https://open.spotify.com/episode/123",
-                icon: "spotify",
-              },
-              {
-                name: "Apple Podcasts",
-                url: "https://podcasts.apple.com/episode/123",
-                icon: "apple",
-              },
-              {
-                name: "Anchor",
-                url: "https://anchor.fm/amani-finance/episodes/episode-1",
-                icon: "anchor",
-              },
-            ],
+        if (fetchError) {
+          throw fetchError;
+        }
+
+        if (!data) {
+          throw new Error('Podcast non trouvé');
+        }
+
+        // Formater les données pour correspondre au type Podcast
+        // Typage explicite du résultat Supabase pour éviter "unknown"
+        const row = data as any;
+        const podcastData: Podcast = {
+          ...(row as Podcast),
+          author: {
+            id: row.author_id as string,
+            first_name: 'Animateur',
+            last_name: 'Podcast',
+            avatar_url: null
           },
+          categories: row.content_categories ? {
+            id: row.content_categories.id as string,
+            name: row.content_categories.name as string,
+            slug: row.content_categories.slug as string,
+            color: row.content_categories.color as string
+          } : {
+            id: row.category_id as string,
+            name: 'Catégorie Podcast',
+            slug: 'podcast',
+            color: '#8B5CF6'
+          }
         };
 
-        setPodcast(mockPodcast);
+        console.log("✅ Podcast récupéré:", podcastData);
+        setPodcast(podcastData);
       } catch (err) {
-        console.error("Erreur lors du chargement du podcast:", err);
+        console.error("❌ Erreur lors du chargement du podcast:", err);
         error("Erreur", "Impossible de charger les données du podcast.");
         setNotFound(true);
       } finally {
@@ -120,28 +108,28 @@ export default function EditPodcast() {
     };
 
     loadPodcast();
-  }, [id, error]);
+  }, [id]);
 
   // Gestion de la sauvegarde
   const handleSave = async (formData: any) => {
+    if (!id) {
+      error("Erreur", "ID du podcast manquant");
+      return;
+    }
+
     try {
-      // Simuler l'API call - remplacer par ContentService.updateContent(id, formData)
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      console.log("Données du podcast mises à jour:", formData);
-
-      success(
-        "Podcast mis à jour",
-        `Le podcast "${formData.title}" a été mis à jour avec succès.`,
-      );
-
-      navigate("/dashboard/podcasts");
+      console.log("🚀 Mise à jour du podcast:", formData);
+      await updatePodcast(id, formData);
+      success("Succès", "Podcast mis à jour avec succès !");
+      
+      // Recharger les données du podcast après la sauvegarde
+      const updatedPodcast = await fetchPodcastBySlug(podcast?.slug || '');
+      console.log("🔄 Podcast rechargé après sauvegarde:", updatedPodcast);
+      setPodcast(updatedPodcast);
+      
     } catch (err) {
-      console.error("Erreur lors de la mise à jour:", err);
-      error(
-        "Erreur",
-        "Une erreur est survenue lors de la mise à jour du podcast.",
-      );
+      console.error("❌ Erreur lors de la mise à jour:", err);
+      error("Erreur", "Une erreur est survenue lors de la mise à jour du podcast.");
     }
   };
 
@@ -153,59 +141,52 @@ export default function EditPodcast() {
   // État de chargement
   if (loading) {
     return (
-      <DashboardLayout title="Chargement...">
-        <div className="flex items-center justify-center py-12">
-          <div className="text-center">
-            <Loader className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-4" />
-            <p className="text-gray-600">
-              Chargement des données du podcast...
-            </p>
-          </div>
+      <div className="flex items-center justify-center py-12">
+        <div className="text-center">
+          <Loader className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-4" />
+          <p className="text-gray-600">Chargement des données du podcast...</p>
         </div>
-      </DashboardLayout>
+      </div>
     );
   }
 
   // Podcast non trouvé
   if (notFound || !podcast) {
     return (
-      <DashboardLayout title="Podcast introuvable">
-        <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md mx-auto">
-          <div className="text-center">
-            <Mic className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              Podcast introuvable
-            </h2>
-            <p className="text-gray-600 mb-6">
-              Le podcast avec l'ID "{id}" n'a pas été trouvé.
-            </p>
-            <div className="flex gap-3 justify-center">
-              <button
-                onClick={() => navigate("/dashboard/podcasts")}
-                className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                Retour aux podcasts
-              </button>
-              <button
-                onClick={() => navigate("/dashboard/podcasts/new")}
-                className="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors"
-              >
-                Créer un podcast
-              </button>
-            </div>
+      <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md mx-auto">
+        <div className="text-center">
+          <Mic className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Podcast introuvable</h2>
+          <p className="text-gray-600 mb-6">Le podcast avec l'ID "{id}" n'a pas été trouvé.</p>
+          <div className="flex gap-3 justify-center">
+            <button
+              onClick={() => navigate("/dashboard/podcasts")}
+              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Retour aux podcasts
+            </button>
+            <button
+              onClick={() => navigate("/dashboard/podcasts/new")}
+              className="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors"
+            >
+              Créer un podcast
+            </button>
           </div>
         </div>
-      </DashboardLayout>
+      </div>
     );
   }
 
   return (
-    <DashboardLayout
-      title="Modifier le podcast"
-      subtitle={`Modification de "${podcast.title}"`}
-    >
-      <div className="max-w-4xl mx-auto space-y-8">
-        {/* Navigation */}
+    <>
+    <div className="max-w-4xl mx-auto space-y-8">
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-amani-primary">Modifier le podcast</h1>
+          <p className="text-gray-600">Modification de "{podcast.title}"</p>
+        </div>
+      </div>
+        
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate("/dashboard/podcasts")}
@@ -258,22 +239,18 @@ export default function EditPodcast() {
             </div>
           </div>
 
-          {podcast.podcast_data?.platforms &&
-            podcast.podcast_data.platforms.length > 0 && (
+          {podcast.podcast_data?.audio_url && (
               <div className="mt-4">
                 <p className="text-sm text-gray-700 mb-2">Disponible sur :</p>
                 <div className="flex flex-wrap gap-2">
-                  {podcast.podcast_data.platforms.map((platform, index) => (
-                    <a
-                      key={index}
-                      href={platform.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-1 px-3 py-1 bg-white text-purple-700 text-xs rounded-full border border-purple-200 hover:bg-purple-50 transition-colors"
-                    >
-                      <span>{platform.name}</span>
-                    </a>
-                  ))}
+                  <a
+                    href={podcast.podcast_data.audio_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 px-3 py-1 bg-white text-purple-700 text-xs rounded-full border border-purple-200 hover:bg-purple-50 transition-colors"
+                  >
+                    <span>Écouter le podcast</span>
+                  </a>
                 </div>
               </div>
             )}
@@ -282,11 +259,15 @@ export default function EditPodcast() {
         {/* Formulaire unifié */}
         <UnifiedContentForm
           type="podcast"
-          initialData={podcast}
+          initialData={{
+            ...podcast,
+            category: podcast?.categories?.slug || podcast?.category_id, // Utiliser le slug de la catégorie
+            published_at: podcast?.published_at ? podcast.published_at.split('T')[0] : undefined, // Format yyyy-MM-dd pour input date
+          } as any}
           onSave={handleSave}
           onCancel={handleCancel}
         />
       </div>
-    </DashboardLayout>
+    </>
   );
 }

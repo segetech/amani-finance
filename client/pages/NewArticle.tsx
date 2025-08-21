@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
+import { useArticles } from "../hooks/useArticles";
 import DashboardLayout from "../components/DashboardLayout";
 import UnifiedContentForm from "../components/UnifiedContentForm";
 import { ArrowLeft, FileText, AlertCircle } from "lucide-react";
@@ -11,6 +12,7 @@ export default function NewArticle() {
   const { success, error } = useToast();
   const navigate = useNavigate();
   const [isSaving, setIsSaving] = useState(false);
+  const { createArticle } = useArticles();
 
   // Check permissions
   if (!user || !hasPermission("create_articles")) {
@@ -44,19 +46,37 @@ export default function NewArticle() {
   const handleSave = async (formData: any) => {
     setIsSaving(true);
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      console.log(" Création d'un nouvel article:", formData);
 
-      console.log("Données de l'article:", formData);
+      const articleData = {
+        type: 'article' as const,
+        title: formData.title,
+        slug: formData.slug,
+        summary: formData.summary,
+        description: formData.description,
+        content: formData.content,
+        status: formData.status,
+        category_id: formData.category,
+        author_id: user?.id || '',
+        country: formData.country,
+        tags: formData.tags,
+        meta_title: formData.meta_title,
+        meta_description: formData.meta_description,
+        featured_image_alt: formData.featured_image_alt,
+        published_at: formData.published_at,
+        article_data: formData.article_data || {}
+      };
+
+      const newArticle = await createArticle(articleData);
 
       success(
-        "Article cré��",
+        "Article créé",
         `L'article "${formData.title}" a été créé avec succès.`,
       );
 
       navigate("/dashboard/articles");
     } catch (err) {
-      console.error("Erreur lors de la création:", err);
+      console.error(" Erreur lors de la création:", err);
       error(
         "Erreur",
         "Une erreur est survenue lors de la création de l'article.",

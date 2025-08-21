@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
+import { useArticles } from "../hooks/useArticles";
 import DashboardLayout from "../components/DashboardLayout";
 import {
   FileText,
@@ -31,8 +32,31 @@ export default function Articles() {
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterCategory, setFilterCategory] = useState("all");
 
+  // Utiliser le hook useArticles pour récupérer les données depuis Supabase
+  const { 
+    articles: supabaseArticles, 
+    loading, 
+    error: articlesError, 
+    count,
+    deleteArticle,
+    updateArticle
+  } = useArticles({
+    status: filterStatus === "all" ? "all" : filterStatus as any,
+    limit: 50,
+    offset: 0
+  });
+
+  // Debug logs
+  console.log('🔍 Articles Page Debug:', {
+    loading,
+    articlesError,
+    articlesCount: supabaseArticles?.length || 0,
+    filterStatus,
+    filterCategory
+  });
+
   // Check permissions after all hooks
-  if (!user || !hasPermission("view_analytics")) {
+  if (!user || !hasPermission("create_articles")) {
     return (
       <DashboardLayout
         title="Accès refusé"
@@ -59,82 +83,22 @@ export default function Articles() {
     );
   }
 
-  const articles = [
-    {
-      id: "1",
-      title: "Évolution du FCFA face à l'Euro en 2024",
-      excerpt:
-        "Analyse détaillée des fluctuations monétaires et leur impact sur l'économie sahélienne.",
-      author: "Fatou Diallo",
-      category: "Marché",
-      status: "published",
-      views: 8342,
-      comments: 23,
-      shares: 156,
-      publishedAt: "2024-01-15",
-      lastModified: "2024-01-15 14:30",
-      featured: true,
-    },
-    {
-      id: "2",
-      title: "Perspectives économiques du Mali pour 2024",
-      excerpt:
-        "Les prévisions de croissance et les défis économiques à relever cette année.",
-      author: "Amadou Traoré",
-      category: "Économie",
-      status: "published",
-      views: 6891,
-      comments: 34,
-      shares: 89,
-      publishedAt: "2024-01-14",
-      lastModified: "2024-01-14 16:20",
-      featured: false,
-    },
-    {
-      id: "3",
-      title: "Investissements miniers au Burkina Faso",
-      excerpt:
-        "Nouvelles opportunités d'investissement dans le secteur minier burkinabé.",
-      author: "Adjoa Kone",
-      category: "Industrie",
-      status: "draft",
-      views: 0,
-      comments: 0,
-      shares: 0,
-      publishedAt: null,
-      lastModified: "2024-01-15 10:45",
-      featured: false,
-    },
-    {
-      id: "4",
-      title: "BCEAO : Nouvelles directives bancaires",
-      excerpt:
-        "Les dernières régulations de la Banque Centrale et leur impact sur le secteur bancaire.",
-      author: "Mariama Sy",
-      category: "Marché",
-      status: "review",
-      views: 0,
-      comments: 0,
-      shares: 0,
-      publishedAt: null,
-      lastModified: "2024-01-15 09:30",
-      featured: false,
-    },
-    {
-      id: "5",
-      title: "Tech startup au Sahel : opportunités et défis",
-      excerpt: "L'écosystème technologique sahélien en pleine expansion.",
-      author: "Ibrahim Diarra",
-      category: "Tech",
-      status: "published",
-      views: 4234,
-      comments: 12,
-      shares: 67,
-      publishedAt: "2024-01-13",
-      lastModified: "2024-01-13 18:15",
-      featured: false,
-    },
-  ];
+  // Transformer les données Supabase pour correspondre à la structure attendue
+  const articles = supabaseArticles.map(article => ({
+    id: article.id,
+    slug: article.slug,
+    title: article.title,
+    excerpt: article.summary,
+    author: article.author ? `${article.author.first_name} ${article.author.last_name}` : 'Auteur inconnu',
+    category: article.category_info?.name || 'Non catégorisé',
+    status: article.status,
+    views: article.views,
+    comments: 0, // À implémenter plus tard avec les commentaires
+    shares: article.shares,
+    publishedAt: article.published_at ? new Date(article.published_at).toISOString().split('T')[0] : null,
+    lastModified: new Date(article.updated_at).toLocaleString('fr-FR'),
+    featured: false // À implémenter plus tard
+  }));
 
   const categories = [
     { id: "all", label: "Toutes catégories" },
@@ -214,16 +178,27 @@ export default function Articles() {
     return matchesSearch && matchesStatus && matchesCategory;
   });
 
-  const handleEditArticle = (id: string) => {
-    navigate(`/dashboard/articles/${id}/edit`);
+  const handleEditArticle = (slug: string) => {
+    // Route définie dans App.tsx: /dashboard/articles/edit/:id
+    navigate(`/dashboard/articles/edit/${slug}`);
   };
 
-  const handleDeleteArticle = (id: string) => {
-    warning("Suppression", `Article ${id} supprimé`);
+  const handleDeleteArticle = async (id: string) => {
+    try {
+      await deleteArticle(id);
+      success("Suppression", "Article supprimé avec succès");
+    } catch (err) {
+      error("Erreur", "Impossible de supprimer l'article");
+    }
   };
 
-  const handlePublishArticle = (id: string) => {
-    success("Publication", `Article ${id} publié`);
+  const handlePublishArticle = async (id: string) => {
+    try {
+      await updateArticle(id, { status: 'published' as any });
+      success("Publication", "Article publié avec succès");
+    } catch (err) {
+      error("Erreur", "Impossible de publier l'article");
+    }
   };
 
   return (
@@ -290,27 +265,50 @@ export default function Articles() {
       }
     >
       <div className="space-y-8">
+        {/* Loading State */}
+        {loading && (
+          <div className="flex flex-col items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amani-primary mb-4"></div>
+            <span className="text-gray-600">Chargement des articles...</span>
+            <div className="mt-4 text-sm text-gray-500">
+              Vérifiez la console (F12) pour plus de détails
+            </div>
+          </div>
+        )}
+
+        {/* Error State */}
+        {articlesError && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <div className="flex items-center">
+              <AlertCircle className="w-5 h-5 text-red-600 mr-2" />
+              <span className="text-red-800">Erreur lors du chargement des articles</span>
+            </div>
+          </div>
+        )}
+
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {stats.map((stat, index) => (
-            <div
-              key={index}
-              className="bg-white rounded-2xl shadow-lg p-6 border border-white/50"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-2xl font-bold text-amani-primary mb-1">
-                    {stat.value}
+        {!loading && !articlesError && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {stats.map((stat, index) => (
+              <div
+                key={index}
+                className="bg-white rounded-2xl shadow-lg p-6 border border-white/50"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-2xl font-bold text-amani-primary mb-1">
+                      {stat.value}
+                    </div>
+                    <div className="text-sm text-gray-600">{stat.label}</div>
                   </div>
-                  <div className="text-sm text-gray-600">{stat.label}</div>
-                </div>
-                <div className={`p-3 rounded-lg ${stat.bg}`}>
-                  <stat.icon className={`w-6 h-6 ${stat.color}`} />
+                  <div className={`p-3 rounded-lg ${stat.bg}`}>
+                    <stat.icon className={`w-6 h-6 ${stat.color}`} />
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         {/* Articles List */}
         <div className="bg-white rounded-2xl shadow-lg border border-white/50">
@@ -422,7 +420,7 @@ export default function Articles() {
                             </button>
                           )}
                           <button
-                            onClick={() => handleEditArticle(article.id)}
+                            onClick={() => handleEditArticle(article.slug)}
                             className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
                             title="Modifier"
                           >

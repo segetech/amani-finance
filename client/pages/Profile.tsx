@@ -1,8 +1,7 @@
 import { useState, useRef, ChangeEvent, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
-import DashboardLayout from "../components/DashboardLayout";
-import { uploadAvatar, getAvatarUrl } from "../lib/avatar";
+import { uploadAvatar } from "../lib/avatar";
 import { supabase } from "../lib/supabase";
 import {
   Save,
@@ -77,14 +76,14 @@ export default function Profile() {
             // website/twitter/linkedin intentionally ignored
           });
           setProfileData({
-            firstName: data.first_name || "",
-            lastName: data.last_name || "",
-            email: user.email || "",
-            organization: data.organization || "",
-            phone: data.phone || "",
-            location: data.location || "",
-            bio: data.bio || "",
-            avatarUrl: data.avatar_url || "",
+            firstName: String((data as any).first_name ?? ""),
+            lastName: String((data as any).last_name ?? ""),
+            email: String(user.email ?? ""),
+            organization: String((data as any).organization ?? ""),
+            phone: String((data as any).phone ?? ""),
+            location: String((data as any).location ?? ""),
+            bio: String((data as any).bio ?? ""),
+            avatarUrl: String((data as any).avatar_url ?? ""),
           });
         }
         console.groupEnd();
@@ -423,11 +422,11 @@ export default function Profile() {
   ];
 
   return (
-    <DashboardLayout
-      title="Mon profil"
-      subtitle="Gérez vos informations personnelles et préférences"
-    >
-      <div className="space-y-8">
+    <div className="space-y-8">
+      <div className="bg-white rounded-2xl shadow-lg p-6 border border-white/50">
+        <h1 className="text-2xl font-bold text-amani-primary">Mon profil</h1>
+        <p className="text-gray-600 mt-1">Gérez vos informations personnelles et préférences</p>
+      </div>
         {/* Profile Header */}
         <div className="bg-white rounded-2xl shadow-lg p-6 border border-white/50">
           <div className="flex items-center gap-6">
@@ -950,7 +949,6 @@ export default function Profile() {
             </div>
           </div>
         </div>
-      </div>
-    </DashboardLayout>
+    </div>
   );
 }

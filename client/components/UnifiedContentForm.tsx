@@ -1,4 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { Textarea } from "./ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { Badge } from "./ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import { FileText, Mic, BarChart3, Plus, X, AlertCircle } from "lucide-react";
+import { supabase } from "../lib/supabase";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
@@ -16,10 +25,6 @@ import {
   Calendar,
   Tag,
   Globe,
-  FileText,
-  Mic,
-  BarChart3,
-  AlertCircle,
   CheckCircle,
   Share2,
   Link2,
@@ -48,35 +53,95 @@ export default function UnifiedContentForm({
   const [isSaving, setIsSaving] = useState(false);
   const [isPreview, setIsPreview] = useState(false);
   const [featuredImage, setFeaturedImage] = useState<File | null>(null);
+  const [currentImageUrl, setCurrentImageUrl] = useState<string>(
+    (initialData as any)?.featured_image || ""
+  );
 
   // FORMULAIRE UNIFIÉ
-  const [formData, setFormData] = useState({
-    // CHAMPS COMMUNS
-    title: "",
-    slug: "",
-    summary: "", // RÉSUMÉ OBLIGATOIRE
-    description: "",
-    content: "", // Contenu complet optionnel
-    status: "draft" as const,
-    category: "",
-    country: "mali",
-    tags: [] as string[],
+  const [formData, setFormData] = useState(() => {
+    const baseData = {
+      // CHAMPS COMMUNS
+      title: "",
+      slug: "",
+      summary: "", // RÉSUMÉ OBLIGATOIRE
+      description: "",
+      content: "", // Contenu complet optionnel
+      status: "draft" as "draft" | "published",
+      category: "",
+      country: "mali",
+      tags: [] as string[],
 
-    // SEO
-    meta_title: "",
-    meta_description: "",
-    featured_image_alt: "",
+      // SEO
+      meta_title: "",
+      meta_description: "",
+      featured_image: "",
+      featured_image_alt: "",
 
-    // DATES
-    published_at: new Date().toISOString().split("T")[0],
+      // DATES
+      published_at: new Date().toISOString().split("T")[0],
 
-    // DONNÉES SPÉCIFIQUES
-    article_data: {} as ArticleData,
-    podcast_data: {} as PodcastData,
-    indice_data: {} as IndiceData,
+      // DONNÉES SPÉCIFIQUES
+      article_data: {} as ArticleData,
+      podcast_data: {} as PodcastData,
+      indice_data: {} as IndiceData,
+    };
 
-    ...initialData,
+    // Fusionner initialData en convertissant null vers string vide
+    if (initialData) {
+      const mergedData: any = { ...baseData };
+      Object.entries(initialData).forEach(([key, value]) => {
+        if (value !== null && value !== undefined) {
+          (mergedData as any)[key] = value as any;
+        }
+      });
+      // Pré-remplir la catégorie à partir du slug si disponible
+      const initialCategory = (initialData as any).category
+        || (initialData as any)?.category_info?.slug
+        || "";
+      mergedData.category = initialCategory;
+      // Garder category_id tel quel pour la DB si fourni
+      if ((initialData as any).category_id) {
+        mergedData.category_id = (initialData as any).category_id;
+      }
+      console.log('🔍 FormData initialisé avec:', mergedData);
+      return mergedData;
+    }
+
+    return baseData;
   });
+
+  // Effet pour synchroniser avec initialData (approche simplifiée)
+  useEffect(() => {
+    if (initialData) {
+      console.log('🔄 initialData reçu:', initialData);
+      const derivedCategory = (initialData as any).category
+        || (initialData as any)?.category_info?.slug
+        || "";
+
+      setFormData(prev => {
+        const currentCategory = prev.category;
+        const needsUpdate = derivedCategory !== currentCategory;
+        if (needsUpdate) {
+          console.log('📝 Mise à jour catégorie (sync):', derivedCategory);
+        }
+        return {
+          ...prev,
+          ...(needsUpdate ? { category: derivedCategory, category_id: (initialData as any).category_id || prev.category_id } : {}),
+          ...Object.fromEntries(
+            Object.entries(initialData).map(([key, value]) => [
+              key,
+              value === null ? "" : value
+            ])
+          )
+        } as any;
+      });
+
+      // Mettre à jour l'image actuelle si elle existe
+      if ((initialData as any)?.featured_image) {
+        setCurrentImageUrl((initialData as any).featured_image);
+      }
+    }
+  }, [initialData]);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [newTag, setNewTag] = useState("");
@@ -119,10 +184,13 @@ export default function UnifiedContentForm({
     >,
   ) => {
     const { name, value, type } = e.target;
+    const newValue = type === "checkbox" ? (e.target as HTMLInputElement).checked : value;
+    
     setFormData((prev) => ({
       ...prev,
-      [name]:
-        type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
+      [name]: newValue,
+      // Si on change la catégorie, synchroniser category_id pour la DB
+      ...(name === "category" && { category_id: newValue as string }),
     }));
 
     // Clear error
@@ -133,13 +201,18 @@ export default function UnifiedContentForm({
 
   const handleSpecificDataChange = (field: string, value: any) => {
     const dataKey = `${type}_data` as keyof typeof formData;
-    setFormData((prev) => ({
-      ...prev,
-      [dataKey]: {
-        ...prev[dataKey],
-        [field]: value,
-      },
-    }));
+    setFormData((prev) => {
+      const currentData = prev[dataKey];
+      const existingData = currentData && typeof currentData === 'object' ? currentData : {};
+      
+      return {
+        ...prev,
+        [dataKey]: {
+          ...existingData,
+          [field]: value,
+        },
+      };
+    });
   };
 
   const addTag = () => {
@@ -209,12 +282,25 @@ export default function UnifiedContentForm({
     setIsSaving(true);
 
     try {
+      // Upload de l'image si nécessaire
+      let imageUrl = formData.featured_image;
+      if (featuredImage) {
+        try {
+          const { StorageService } = await import("../services/supabase");
+          imageUrl = await StorageService.uploadImage(featuredImage, "images", "content");
+        } catch (imgError) {
+          console.error("Erreur upload image:", imgError);
+          error("Erreur", "Impossible d'uploader l'image. Veuillez réessayer.");
+          return;
+        }
+      }
+
       // Préparer les données finales
       const finalData = {
         ...formData,
         type,
         author_id: user?.id,
-        featured_image: featuredImage ? "will-be-uploaded" : undefined,
+        featured_image: imageUrl,
       };
 
       await onSave(finalData);
@@ -253,15 +339,53 @@ export default function UnifiedContentForm({
     }
   };
 
-  const categories = [
+  // Charger les catégories dynamiquement depuis la base de données
+  const [categories, setCategories] = useState([
     { value: "economie", label: "Économie" },
-    { value: "marche", label: "Marchés Financiers" },
-    { value: "politique", label: "Politique" },
-    { value: "industrie", label: "Industrie" },
+    { value: "marches-financiers", label: "Marchés Financiers" },
+    { value: "politique-monetaire", label: "Politique Monétaire" },
+    { value: "industrie-miniere", label: "Industrie Minière" },
     { value: "agriculture", label: "Agriculture" },
     { value: "technologie", label: "Technologie" },
     { value: "investissement", label: "Investissement" },
-  ];
+  ]);
+
+  // Charger les catégories depuis la base de données
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        console.log('🔍 Chargement des catégories...');
+        const { data, error } = await supabase
+          .from('content_categories')
+          .select('id, name, slug')
+          .eq('is_active', true)
+          .order('sort_order');
+        
+        if (error) throw error;
+        
+        console.log('📊 Catégories récupérées:', data);
+        
+        if (data && data.length > 0) {
+          // Assurer le typage des champs retournés par Supabase
+          type CategoryRow = { id: string; name: string; slug: string };
+          const rows = data as unknown as CategoryRow[];
+          const mappedCategories = rows.map((cat) => ({
+            value: cat.slug,
+            label: cat.name,
+          }));
+          console.log('🏷️ Catégories mappées:', mappedCategories);
+          setCategories(mappedCategories);
+        } else {
+          console.log('⚠️ Aucune catégorie trouvée, utilisation des catégories par défaut');
+        }
+      } catch (error) {
+        console.error('Erreur chargement catégories:', error);
+      }
+    };
+    
+    console.log('🚀 Démarrage du chargement des catégories...');
+    loadCategories();
+  }, []);
 
   const countries = [
     { value: "mali", label: "Mali" },
@@ -309,7 +433,7 @@ export default function UnifiedContentForm({
             <input
               type="text"
               name="title"
-              value={formData.title}
+              value={formData.title || ""}
               onChange={handleInputChange}
               className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                 errors.title ? "border-red-300" : "border-gray-300"
@@ -334,7 +458,7 @@ export default function UnifiedContentForm({
               <input
                 type="text"
                 name="slug"
-                value={formData.slug}
+                value={formData.slug || ""}
                 onChange={handleInputChange}
                 className="flex-1 ml-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="url-de-votre-contenu"
@@ -352,7 +476,7 @@ export default function UnifiedContentForm({
             </label>
             <textarea
               name="summary"
-              value={formData.summary}
+              value={formData.summary || ""}
               onChange={handleInputChange}
               rows={4}
               className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
@@ -379,7 +503,7 @@ export default function UnifiedContentForm({
             </label>
             <textarea
               name="content"
-              value={formData.content}
+              value={formData.content || ""}
               onChange={handleInputChange}
               rows={8}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -399,8 +523,13 @@ export default function UnifiedContentForm({
               </label>
               <select
                 name="category"
-                value={formData.category}
-                onChange={handleInputChange}
+                value={formData.category || ""}
+                onChange={(e) => {
+                  console.log('🏷️ Catégorie sélectionnée:', e.target.value);
+                  console.log('📋 FormData actuel:', formData);
+                  console.log('🎯 Catégories disponibles:', categories);
+                  handleInputChange(e);
+                }}
                 className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                   errors.category ? "border-red-300" : "border-gray-300"
                 }`}
@@ -427,7 +556,7 @@ export default function UnifiedContentForm({
               </label>
               <select
                 name="country"
-                value={formData.country}
+                value={formData.country || "mali"}
                 onChange={handleInputChange}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
@@ -495,8 +624,15 @@ export default function UnifiedContentForm({
         </div>
 
         <ImageUpload
-          onImageSelect={setFeaturedImage}
-          currentImage={initialData?.featured_image}
+          onImageSelect={(file) => {
+            setFeaturedImage(file);
+            if (file) {
+              // Créer une URL temporaire pour l'aperçu
+              const tempUrl = URL.createObjectURL(file);
+              setCurrentImageUrl(tempUrl);
+            }
+          }}
+          currentImage={currentImageUrl}
         />
 
         <div className="mt-4">
@@ -506,7 +642,7 @@ export default function UnifiedContentForm({
           <input
             type="text"
             name="featured_image_alt"
-            value={formData.featured_image_alt}
+            value={formData.featured_image_alt || ""}
             onChange={handleInputChange}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Description de l'image pour l'accessibilité"
@@ -757,7 +893,7 @@ export default function UnifiedContentForm({
             <input
               type="text"
               name="meta_title"
-              value={formData.meta_title}
+              value={formData.meta_title || ""}
               onChange={handleInputChange}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Auto-généré depuis le titre"
@@ -773,7 +909,7 @@ export default function UnifiedContentForm({
             </label>
             <textarea
               name="meta_description"
-              value={formData.meta_description}
+              value={formData.meta_description || ""}
               onChange={handleInputChange}
               rows={3}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -864,7 +1000,7 @@ export default function UnifiedContentForm({
             <input
               type="date"
               name="published_at"
-              value={formData.published_at}
+              value={formData.published_at || ""}
               onChange={handleInputChange}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />

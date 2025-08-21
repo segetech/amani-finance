@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
-import DashboardLayout from "../components/DashboardLayout";
+import { usePodcasts } from "../hooks/usePodcasts";
 import {
   Mic,
   Play,
@@ -40,85 +40,48 @@ export default function PodcastsManager() {
   const [selectedPodcasts, setSelectedPodcasts] = useState<string[]>([]);
   const [playingPodcast, setPlayingPodcast] = useState<string | null>(null);
 
+  // Utiliser le hook usePodcasts
+  const { podcasts: podcastsData, loading, error: podcastsError } = usePodcasts({
+    status: filterStatus === 'all' ? 'all' : filterStatus as any,
+    limit: 50
+  });
+
   // Check permissions
   if (
     !user ||
     (!hasPermission("create_podcasts") && !hasPermission("view_analytics"))
   ) {
     return (
-      <DashboardLayout title="Accès refusé">
+      <div className="max-w-7xl mx-auto p-4">
         <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md mx-auto">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            Accès refusé
-          </h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Accès refusé</h2>
           <p className="text-gray-600 mb-6">
             Vous n'avez pas les permissions nécessaires pour gérer les podcasts.
           </p>
         </div>
-      </DashboardLayout>
+      </div>
     );
   }
 
-  // Mock data - in real app would come from API
-  const podcasts = [
-    {
-      id: "1",
-      title: "L'avenir de l'économie sahélienne",
-      description:
-        "Discussion avec des experts sur les perspectives économiques de la région du Sahel",
-      duration: "45:32",
-      category: "Économie",
-      status: "published",
-      publishDate: "2024-01-15",
-      author: "Fatou Diallo",
-      plays: 2840,
-      downloads: 1230,
-      likes: 156,
-      type: "audio",
-      coverImage: "/placeholder.svg",
-      audioFile: "episode-001.mp3",
-      guests: ["Dr. Amadou Touré", "Prof. Aïcha Koné"],
-      tags: ["économie", "sahel", "développement"],
-    },
-    {
-      id: "2",
-      title: "Investir dans les startups africaines",
-      description:
-        "Analyse des opportunités d'investissement dans la tech africaine avec des entrepreneurs locaux",
-      duration: "38:15",
-      category: "Tech",
-      status: "published",
-      publishDate: "2024-01-12",
-      author: "Ibrahim Touré",
-      plays: 1950,
-      downloads: 890,
-      likes: 89,
-      type: "video",
-      coverImage: "/placeholder.svg",
-      audioFile: "episode-002.mp3",
-      guests: ["Salif Keita", "Mariam Ba"],
-      tags: ["tech", "startup", "investissement"],
-    },
-    {
-      id: "3",
-      title: "BCEAO : Nouvelles politiques monétaires",
-      description:
-        "Entretien exclusif avec un responsable de la BCEAO sur les dernières décisions",
-      duration: "52:18",
-      category: "Économie",
-      status: "draft",
-      publishDate: "2024-01-10",
-      author: "Amadou Sanogo",
-      plays: 0,
-      downloads: 0,
-      likes: 0,
-      type: "audio",
-      coverImage: "/placeholder.svg",
-      audioFile: "episode-003.mp3",
-      guests: ["Directeur BCEAO"],
-      tags: ["BCEAO", "politique monétaire", "banque centrale"],
-    },
-  ];
+  // Transformer les données de la base pour correspondre au format attendu
+  const podcasts = podcastsData.map(podcast => ({
+    id: podcast.id,
+    title: podcast.title,
+    description: podcast.summary || podcast.description || '',
+    duration: podcast.podcast_data?.duration || '00:00',
+    category: podcast.categories?.name || 'Non catégorisé',
+    status: podcast.status,
+    publishDate: podcast.published_at || podcast.created_at,
+    author: `${podcast.author?.first_name} ${podcast.author?.last_name}`,
+    plays: podcast.podcast_data?.plays || podcast.views || 0,
+    downloads: podcast.podcast_data?.downloads || 0,
+    likes: podcast.likes || 0,
+    type: podcast.podcast_data?.video_url ? "video" : "audio",
+    coverImage: podcast.podcast_data?.cover_image || podcast.featured_image || "/placeholder.svg",
+    audioFile: podcast.podcast_data?.audio_file || '',
+    guests: podcast.podcast_data?.guests || [],
+    tags: podcast.tags || [],
+  }));
 
   const categories = [
     "Économie",
@@ -165,7 +128,7 @@ export default function PodcastsManager() {
   };
 
   const handleEditPodcast = (id: string) => {
-    navigate(`/dashboard/podcasts/${id}/edit`);
+    navigate(`/dashboard/podcasts/edit/${id}`);
   };
 
   const handleDeletePodcast = async (podcastId: string) => {
@@ -218,12 +181,13 @@ export default function PodcastsManager() {
   };
 
   return (
-    <DashboardLayout
-      title="Gestion des podcasts"
-      subtitle="Créez, modifiez et gérez vos podcasts audio et vidéo"
-      actions={
+    <div className="max-w-7xl mx-auto space-y-8 p-4">
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-amani-primary">Gestion des podcasts</h1>
+          <p className="text-gray-600">Créez, modifiez et gérez vos podcasts audio et vidéo</p>
+        </div>
         <div className="flex items-center gap-4">
-          {/* Bouton de création principale */}
           {hasPermission("create_podcasts") && (
             <button
               onClick={() => navigate("/dashboard/podcasts/new")}
@@ -233,8 +197,6 @@ export default function PodcastsManager() {
               Nouveau podcast
             </button>
           )}
-
-          {/* Barre de recherche améliorée */}
           <div className="flex items-center gap-2 bg-white border-2 border-gray-200 rounded-lg px-4 py-2.5 min-w-[320px] shadow-sm">
             <Search className="w-5 h-5 text-gray-400" />
             <input
@@ -245,8 +207,6 @@ export default function PodcastsManager() {
               className="flex-1 outline-none text-sm placeholder-gray-500"
             />
           </div>
-
-          {/* Filtres stylisés */}
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
               <Filter className="w-4 h-4 text-gray-500" />
@@ -261,7 +221,6 @@ export default function PodcastsManager() {
                 <option value="scheduled">⏰ Programmés</option>
               </select>
             </div>
-
             <div className="flex items-center gap-2">
               <Tag className="w-4 h-4 text-gray-500" />
               <select
@@ -279,8 +238,7 @@ export default function PodcastsManager() {
             </div>
           </div>
         </div>
-      }
-    >
+      </div>
       <div className="space-y-8">
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -310,10 +268,21 @@ export default function PodcastsManager() {
             <h2 className="text-xl font-semibold text-gray-900">
               Podcasts ({filteredPodcasts.length})
             </h2>
+            {podcastsError && (
+              <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-red-700">Erreur: {podcastsError.message}</p>
+              </div>
+            )}
           </div>
 
-          <div className="divide-y divide-gray-200">
-            {filteredPodcasts.map((podcast) => {
+          {loading ? (
+            <div className="p-12 text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-4"></div>
+              <p className="text-gray-600">Chargement des podcasts...</p>
+            </div>
+          ) : (
+            <div className="divide-y divide-gray-200">
+              {filteredPodcasts.map((podcast) => {
               const TypeIcon = getTypeIcon(podcast.type);
               const isPlaying = playingPodcast === podcast.id;
 
@@ -409,29 +378,30 @@ export default function PodcastsManager() {
               );
             })}
 
-            {filteredPodcasts.length === 0 && (
-              <div className="p-12 text-center">
-                <Mic className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  Aucun podcast trouvé
-                </h3>
-                <p className="text-gray-600 mb-4">
-                  Aucun podcast ne correspond à vos critères de recherche.
-                </p>
-                {hasPermission("create_podcasts") && (
-                  <button
-                    onClick={() => navigate("/dashboard/podcasts/new")}
-                    className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors mx-auto"
-                  >
-                    <Plus className="w-4 h-4" />
-                    Créer votre premier podcast
-                  </button>
-                )}
-              </div>
-            )}
-          </div>
+              {filteredPodcasts.length === 0 && (
+                <div className="p-12 text-center">
+                  <Mic className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    Aucun podcast trouvé
+                  </h3>
+                  <p className="text-gray-600 mb-4">
+                    Aucun podcast ne correspond à vos critères de recherche.
+                  </p>
+                  {hasPermission("create_podcasts") && (
+                    <button
+                      onClick={() => navigate("/dashboard/podcasts/new")}
+                      className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors mx-auto"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Créer votre premier podcast
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
-    </DashboardLayout>
+    </div>
   );
 }

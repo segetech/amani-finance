@@ -2,9 +2,10 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
+import { useArticles } from "../hooks/useArticles";
 import DashboardLayout from "../components/DashboardLayout";
 import UnifiedContentForm from "../components/UnifiedContentForm";
-import { UnifiedContent } from "../types/database";
+import { Article } from "../hooks/useArticles";
 import {
   ArrowLeft,
   FileText,
@@ -19,8 +20,9 @@ export default function EditArticle() {
   const navigate = useNavigate();
   const { user, hasPermission } = useAuth();
   const { success, error } = useToast();
+  const { fetchArticleBySlug, updateArticle } = useArticles();
 
-  const [article, setArticle] = useState<Partial<UnifiedContent> | null>(null);
+  const [article, setArticle] = useState<Article | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
 
@@ -61,73 +63,17 @@ export default function EditArticle() {
 
       try {
         setLoading(true);
+        console.log("📖 Chargement de l'article:", id);
 
-        // Simuler le chargement des données - à remplacer par un appel API Supabase
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        // Données de demo - remplacer par ContentService.getContentBySlug(id)
-        const mockArticle: Partial<UnifiedContent> = {
-          id: id,
-          type: "article",
-          title:
-            "L'impact de la politique monétaire de la BCEAO sur l'économie malienne",
-          slug: "impact-politique-monetaire-bceao-economie-mali",
-          summary:
-            "Analyse approfondie des récentes décisions de la Banque Centrale des États de l'Afrique de l'Ouest et leur influence sur l'économie du Mali en 2024.",
-          content: `<p>La Banque Centrale des États de l'Afrique de l'Ouest (BCEAO) a récemment annoncé plusieurs mesures importantes qui auront un impact significatif sur l'économie malienne.</p>
-
-<h2>Les nouvelles mesures annoncées</h2>
-
-<p>Parmi les principales décisions prises par la BCEAO, nous retrouvons :</p>
-
-<ul>
-<li>Maintien du taux directeur à 2,5%</li>
-<li>Renforcement des réserves obligatoires</li>
-<li>Nouvelles directives sur les crédits immobiliers</li>
-</ul>
-
-<h2>Impact sur l'économie malienne</h2>
-
-<p>Ces mesures auront plusieurs conséquences directes sur l'économie du Mali, notamment sur les secteurs bancaire, immobilier et agricole.</p>
-
-<p>Le maintien du taux directeur à un niveau relativement bas devrait favoriser l'investissement et la consommation, tout en maintenant une inflation maîtrisée.</p>`,
-          status: "published",
-          category: "economie",
-          country: "mali",
-          tags: [
-            "BCEAO",
-            "politique monétaire",
-            "économie",
-            "Mali",
-            "taux directeur",
-          ],
-          meta_title:
-            "Impact de la politique monétaire BCEAO sur l'économie malienne | Amani Finance",
-          meta_description:
-            "Analyse approfondie des récentes décisions de la BCEAO et leur influence sur l'économie du Mali en 2024.",
-          featured_image: "/images/bceao-mali-economie.jpg",
-          featured_image_alt: "Siège de la BCEAO et drapeau du Mali",
-          published_at: "2024-01-20",
-          views: 1247,
-          likes: 89,
-          shares: 23,
-          read_time: 8,
-          article_data: {
-            excerpt:
-              "Les récentes décisions de la BCEAO concernant la politique monétaire auront un impact majeur sur l'économie malienne. Découvrez notre analyse complète.",
-            content_type: "full",
-            reading_time: 8,
-            is_featured: true,
-            related_articles: [],
-            sources: ["BCEAO", "Ministère de l'Économie du Mali", "FMI"],
-            author_note:
-              "Article rédigé en collaboration avec des experts de la BCEAO et du secteur bancaire malien.",
-          },
-        };
-
-        setArticle(mockArticle);
+        const articleData = await fetchArticleBySlug(id);
+        
+        if (articleData) {
+          setArticle(articleData);
+        } else {
+          setNotFound(true);
+        }
       } catch (err) {
-        console.error("Erreur lors du chargement de l'article:", err);
+        console.error("❌ Erreur lors du chargement de l'article:", err);
         error("Erreur", "Impossible de charger les données de l'article.");
         setNotFound(true);
       } finally {
@@ -136,15 +82,35 @@ export default function EditArticle() {
     };
 
     loadArticle();
-  }, [id, error]);
+  }, [id, error, fetchArticleBySlug]);
 
   // Gestion de la sauvegarde
   const handleSave = async (formData: any) => {
     try {
-      // Simuler l'API call - remplacer par ContentService.updateContent(id, formData)
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      console.log("📝 Mise à jour de l'article:", formData);
 
-      console.log("Données de l'article mises à jour:", formData);
+      const articleData = {
+        type: 'article' as const,
+        title: formData.title,
+        slug: formData.slug,
+        summary: formData.summary,
+        description: formData.description,
+        content: formData.content,
+        status: formData.status,
+        category_id: formData.category,
+        author_id: user?.id || '',
+        country: formData.country,
+        tags: formData.tags,
+        meta_title: formData.meta_title,
+        meta_description: formData.meta_description,
+        featured_image_alt: formData.featured_image_alt,
+        published_at: formData.published_at,
+        article_data: formData.article_data || {}
+      };
+
+      await updateArticle(article!.id, articleData);
+
+      console.log("✅ Article mis à jour avec succès");
 
       success(
         "Article mis à jour",

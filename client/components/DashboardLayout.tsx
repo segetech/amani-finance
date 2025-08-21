@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import DashboardSidebar from "./DashboardSidebar";
+import DashboardSidebar from "./sidebar/DashboardSidebar";
 import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
 import { Bell, Search, Settings, ChevronDown } from "lucide-react";

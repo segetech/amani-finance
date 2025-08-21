@@ -350,24 +350,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const hasPermission = (permission: string): boolean => {
     if (!user) {
-      console.log("Aucun utilisateur connecté");
       return false;
     }
 
-    console.log("Rôle de l'utilisateur:", user.role);
-    console.log("Permissions de l'utilisateur:", user.permissions);
-    console.log("Permission demandée:", permission);
-
     // Si l'utilisateur est admin, il a toutes les permissions
     if (user.role === "admin") {
-      console.log("Accès accordé: utilisateur admin");
       return true;
     }
 
     // Vérifier si l'utilisateur a la permission spécifique
-    const hasPerm = user.permissions?.includes(permission) || false;
-    console.log("Permission accordée?", hasPerm);
-    return hasPerm;
+    return user.permissions?.includes(permission) || false;
   };
 
   const value = {

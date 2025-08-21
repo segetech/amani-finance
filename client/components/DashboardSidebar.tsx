@@ -35,8 +35,9 @@ export default function DashboardSidebar() {
     navigate("/login");
   };
 
-  // Structure simplifiée avec sections claires
+  // Structure réorganisée de la sidebar
   const menuSections = [
+    // Section Accueil
     {
       title: "🏠 ACCUEIL",
       items: [
@@ -48,8 +49,10 @@ export default function DashboardSidebar() {
         },
       ],
     },
+
+    // Section Création de contenu
     {
-      title: "✏️ CRÉER DU CONTENU",
+      title: "✏️ CRÉATION",
       items: [
         {
           label: "Nouvel Article",
@@ -71,8 +74,10 @@ export default function DashboardSidebar() {
         },
       ],
     },
+
+    // Section Gestion du contenu
     {
-      title: "📋 GÉRER LE CONTENU",
+      title: "📚 GESTION",
       items: [
         {
           label: "Tous les Contenus",
@@ -94,117 +99,106 @@ export default function DashboardSidebar() {
           permission: "view_analytics",
         },
         {
-          label: "Indices Économiques",
+          label: "Indices",
           path: "/dashboard/indices-management",
           icon: BarChart3,
           permission: "create_indices",
         },
       ],
     },
+
+    // Section Pages publiques
     {
-      title: "🌐 GÉRER LES PAGES PUBLIQUES",
+      title: "🌐 PAGES PUBLIQUES",
       items: [
         {
-          label: "Page Marché",
+          label: "Marché",
           path: "/dashboard/manage-marche",
           icon: TrendingUp,
           permission: "create_indices",
-          description: "Cotations & données",
         },
         {
-          label: "Page Économie",
+          label: "Économie",
           path: "/dashboard/manage-economie",
           icon: PieChart,
           permission: "create_economic_reports",
-          description: "Indicateurs économiques",
         },
         {
-          label: "Page Industrie",
+          label: "Industrie",
           path: "/dashboard/manage-industrie",
           icon: Building,
           permission: "create_articles",
-          description: "Secteur industriel",
         },
         {
-          label: "Page Investissement",
+          label: "Investissement",
           path: "/dashboard/manage-investissement",
           icon: DollarSign,
           permission: "create_articles",
-          description: "Opportunités & conseils",
         },
         {
-          label: "Page Insights",
+          label: "Insights",
           path: "/dashboard/manage-insights",
           icon: Lightbulb,
           permission: "create_articles",
-          description: "Analyses approfondies",
         },
         {
-          label: "Page Tech",
+          label: "Tech",
           path: "/dashboard/manage-tech",
           icon: Cpu,
           permission: "create_articles",
-          description: "Technologie & innovation",
-        },
-        {
-          label: "Page Podcast Public",
-          path: "/dashboard/manage-podcast-public",
-          icon: Mic,
-          permission: "create_podcasts",
-          description: "Vitrine podcasts",
         },
       ],
     },
+
+    // Section Données
     {
-      title: "📊 DONNÉES & SOURCES",
+      title: "📊 DONNÉES",
       items: [
         {
-          label: "Données de Marché",
+          label: "Marché",
           path: "/dashboard/market-data",
-          icon: TrendingUp,
+          icon: Activity,
           permission: "create_indices",
-          description: "Cotations temps réel",
         },
         {
-          label: "Données Économiques",
+          label: "Économie",
           path: "/dashboard/economic-data",
           icon: PieChart,
           permission: "create_economic_reports",
-          description: "Indicateurs macro",
         },
         {
           label: "Matières Premières",
           path: "/dashboard/commodities-management",
           icon: Globe,
           permission: "create_indices",
-          description: "Commodités",
         },
       ],
     },
+
+    // Section Analytics
     {
-      title: "📈 ANALYTICS",
+      title: "📈 ANALYSE",
       items: [
         {
-          label: "Analytics",
+          label: "Tableaux de bord",
           path: "/dashboard/analytics",
           icon: Activity,
           permission: "view_analytics",
-          description: "Statistiques détaillées",
         },
         {
           label: "Rapports",
           path: "/dashboard/reports",
           icon: FileText,
           permission: "create_economic_reports",
-          description: "Rapports économiques",
         },
       ],
     },
+
+    // Section Modération
     {
       title: "🛡️ MODÉRATION",
       condition: () =>
-        hasPermission("moderate_comments") ||
-        hasPermission("manage_user_reports"),
+        hasPermission("moderate_comments") || hasPermission("manage_user_reports"),
       items: [
         {
           label: "Centre de Modération",
@@ -221,6 +215,8 @@ export default function DashboardSidebar() {
         },
       ],
     },
+
+    // Section Administration
     {
       title: "⚙️ ADMINISTRATION",
       condition: () =>
@@ -246,14 +242,22 @@ export default function DashboardSidebar() {
         },
       ],
     },
+
+    // Section Compte
     {
-      title: "👤 PERSONNEL",
+      title: "👤 MON COMPTE",
       items: [
         {
-          label: "Mon Profil",
+          label: "Profil",
           path: "/dashboard/profile",
           icon: User,
-          description: "Mes informations",
+        },
+        {
+          label: "Déconnexion",
+          path: "#",
+          icon: LogOut,
+          onClick: handleLogout,
+          className: "text-red-600 hover:bg-red-50",
         },
       ],
     },

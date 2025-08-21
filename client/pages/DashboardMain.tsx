@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import DashboardLayout from "../components/DashboardLayout";
 import {
   FileText,
   Mic,
@@ -17,7 +16,6 @@ import {
   AlertTriangle,
   CheckCircle,
   Clock,
-  Download,
   Star,
   Globe,
   Target,
@@ -160,26 +158,18 @@ export default function DashboardMain() {
   };
 
   return (
-    <DashboardLayout
-      title={`${getGreeting()}, ${user?.firstName}!`}
-      subtitle={`Voici un aperçu de vos activités sur la plateforme Amani`}
-      actions={
-        <div className="flex items-center gap-2">
-          <button className="flex items-center gap-2 px-4 py-2 bg-amani-primary text-white rounded-lg hover:bg-amani-primary/90 transition-colors">
-            <Download className="w-4 h-4" />
-            Exporter
-          </button>
-        </div>
-      }
-    >
-      <div className="space-y-8">
+    <div className="space-y-8">
         {/* Welcome Message & User Roles */}
         <div className="bg-gradient-to-r from-amani-primary to-amani-primary/80 rounded-2xl p-8 text-white">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-2xl font-bold mb-2">
-                Tableau de bord - {user?.organization}
+                {`${getGreeting()}, ${user?.firstName}!`}
               </h2>
+              <p className="text-white/90 mb-2">
+                {`Voici un aperçu de vos activités sur la plateforme Amani`}
+              </p>
+              <p className="text-white/80 mb-4">Tableau de bord - {user?.organization}</p>
               <p className="text-white/90 mb-4">
                 Gérez votre contenu et suivez les performances de la plateforme
               </p>
@@ -415,19 +405,11 @@ export default function DashboardMain() {
                     <span className="font-bold text-amani-primary">12</span>
                   </div>
                 )}
-                <div className="flex items-center justify-between border-t pt-3">
-                  <span className="text-sm text-gray-600">
-                    Dernière connexion
-                  </span>
-                  <span className="text-sm text-gray-500">
-                    {user?.lastLogin}
-                  </span>
-                </div>
+                {/* Additional personal stats can be added here */}
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </DashboardLayout>
+    </div>
   );
 }
