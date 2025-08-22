@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
+import { useArticles } from "../hooks/useArticles";
+import { usePodcasts } from "../hooks/usePodcasts";
 import {
   Plus,
   Edit,
@@ -34,7 +36,6 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
-import DashboardLayout from "../components/DashboardLayout";
 
 const ContentManagement = () => {
   const navigate = useNavigate();
@@ -46,13 +47,14 @@ const ContentManagement = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
 
+  // Données temps réel depuis Supabase
+  const { articles, loading: loadingArticles, error: errorArticles } = useArticles({ status: 'all', limit: 50 });
+  const { podcasts, loading: loadingPodcasts, error: errorPodcasts } = usePodcasts({ status: 'all', limit: 50 });
+
   // Vérification des permissions
   if (!user || !hasPermission("create_articles")) {
     return (
-      <DashboardLayout
-        title="Accès refusé"
-        subtitle="Permissions insuffisantes"
-      >
+      <>
         <div className="flex items-center justify-center py-12">
           <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md text-center">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
@@ -66,152 +68,93 @@ const ContentManagement = () => {
             </Button>
           </div>
         </div>
-      </DashboardLayout>
+      </>
     );
   }
 
-  const contentSections = [
-    {
-      id: "all",
-      name: "Tout le contenu",
-      icon: FileText,
-      color: "text-gray-600",
-      count: 24,
-    },
-    {
-      id: "economie",
-      name: "Économie",
-      icon: BarChart3,
-      color: "text-green-600",
-      count: 8,
-    },
-    {
-      id: "marche",
-      name: "Marchés",
-      icon: TrendingUp,
-      color: "text-blue-600",
-      count: 6,
-    },
-    {
-      id: "industrie",
-      name: "Industrie",
-      icon: Settings,
-      color: "text-purple-600",
-      count: 4,
-    },
-    {
-      id: "tech",
-      name: "Technologie",
-      icon: FileText,
-      color: "text-indigo-600",
-      count: 3,
-    },
-    {
-      id: "podcast",
-      name: "Podcasts",
-      icon: Mic,
-      color: "text-pink-600",
-      count: 3,
-    },
-  ];
+  // Construire les éléments à partir des données réelles
+  const itemsFromArticles = (articles || []).map((a) => ({
+    id: a.id,
+    title: a.title,
+    section: a.category_info?.name || 'Général',
+    type: 'Article' as const,
+    status: a.status === 'published' ? 'Publié' : (a.status === 'draft' ? 'Brouillon' : a.status === 'review' ? 'En révision' : a.status),
+    author: a.author?.first_name ? `${a.author.first_name} ${a.author.last_name || ''}`.trim() : 'Auteur',
+    date: a.created_at,
+    views: `${a.views ?? 0}`,
+    featured: Boolean(a.article_data && (a.article_data as any).featured),
+    editPath: `/dashboard/articles/edit/${a.id}`,
+    viewPath: `/article/${a.slug || a.id}`,
+  }));
 
-  const contentItems = [
-    {
-      id: 1,
-      title: "Analyse du marché boursier africain Q1 2024",
-      section: "Marchés",
-      type: "Article",
-      status: "Publié",
-      author: "Dr. Amina Kone",
-      date: "2024-03-15",
-      views: "5.2K",
-      featured: true,
-      editPath: "/dashboard/articles/1/edit",
-    },
-    {
-      id: 2,
-      title: "L'impact de l'IA sur l'économie africaine",
-      section: "Technologie",
-      type: "Article",
-      status: "Brouillon",
-      author: "Prof. Jean-Baptiste",
-      date: "2024-03-14",
-      views: "0",
-      featured: false,
-      editPath: "/dashboard/articles/2/edit",
-    },
-    {
-      id: 3,
-      title: "Podcast: L'avenir de la fintech en Afrique",
-      section: "Podcasts",
-      type: "Podcast",
-      status: "Publié",
-      author: "Sarah Diallo",
-      date: "2024-03-13",
-      views: "3.1K",
-      featured: true,
-      editPath: "/dashboard/podcasts/3/edit",
-    },
-    {
-      id: 4,
-      title: "Opportunités d'investissement dans l'agriculture",
-      section: "Économie",
-      type: "Article",
-      status: "En révision",
-      author: "Mohamed El Fassi",
-      date: "2024-03-12",
-      views: "1.8K",
-      featured: false,
-      editPath: "/dashboard/articles/4/edit",
-    },
-    {
-      id: 5,
-      title: "Indice économique Mali - Mars 2024",
-      section: "Économie",
-      type: "Indice",
-      status: "Publié",
-      author: "Fatou Diop",
-      date: "2024-03-11",
-      views: "2.4K",
-      featured: false,
-      editPath: "/dashboard/indices/5/edit",
-    },
-  ];
+  const itemsFromPodcasts = (podcasts || []).map((p) => ({
+    id: p.id,
+    title: p.title,
+    section: p.categories?.name || 'Podcasts',
+    type: 'Podcast' as const,
+    status: p.status === 'published' ? 'Publié' : (p.status === 'draft' ? 'Brouillon' : p.status === 'scheduled' ? 'Programmé' : p.status),
+    author: 'Podcast',
+    date: p.created_at,
+    views: `${p.views ?? 0}`,
+    featured: Boolean(p.podcast_data && p.podcast_data.rating && p.podcast_data.rating >= 4.5),
+    editPath: `/dashboard/podcasts/edit/${p.id}`,
+    viewPath: `/podcast`,
+  }));
 
+  const contentItems = [...itemsFromArticles, ...itemsFromPodcasts];
+
+  const totalPublished = contentItems.filter(ci => ci.status === 'Publié').length;
   const contentStats = [
     {
       title: "Articles Publiés",
-      value: "18",
-      change: "+3 ce mois",
+      value: `${itemsFromArticles.filter(a => a.status === 'Publié').length}`,
+      change: "",
       icon: FileText,
       color: "text-blue-600",
       bg: "bg-blue-100",
     },
     {
       title: "Podcasts",
-      value: "3",
-      change: "+1 ce mois",
+      value: `${itemsFromPodcasts.length}`,
+      change: "",
       icon: Mic,
       color: "text-purple-600",
       bg: "bg-purple-100",
     },
     {
-      title: "Vues Totales",
-      value: "12.5K",
-      change: "+15% ce mois",
+      title: "Contenu total",
+      value: `${contentItems.length}`,
+      change: "",
       icon: Eye,
       color: "text-green-600",
       bg: "bg-green-100",
     },
     {
-      title: "En Attente",
-      value: "3",
-      change: "À réviser",
+      title: "Publiés",
+      value: `${totalPublished}`,
+      change: "",
       icon: Clock,
       color: "text-orange-600",
       bg: "bg-orange-100",
     },
   ];
+
+  const distinctSections = Array.from(new Set(contentItems.map(ci => ci.section))).filter(Boolean);
+  const contentSections = [
+    { id: 'all', name: 'Tout le contenu', icon: FileText, color: 'text-gray-600', count: contentItems.length },
+    ...distinctSections.map((name) => ({ id: name.toLowerCase(), name, icon: Tag, color: 'text-blue-600', count: contentItems.filter(ci => ci.section.toLowerCase() === String(name).toLowerCase()).length }))
+  ];
+
+  // Affichage: gestion du chargement/erreur simple
+  if (errorArticles || errorPodcasts) {
+    return (
+      <>
+        <div className="p-6 bg-red-50 border border-red-200 rounded-lg text-red-700">
+          Une erreur est survenue lors du chargement du contenu.
+        </div>
+      </>
+    );
+  }
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -282,29 +225,29 @@ const ContentManagement = () => {
   };
 
   const handleView = (item: any) => {
-    success("Aperçu", `Affichage de "${item.title}"`);
+    if (item.viewPath) {
+      navigate(item.viewPath);
+    } else {
+      success("Aperçu", `Affichage de \"${item.title}\"`);
+    }
   };
 
   return (
-    <DashboardLayout
-      title="Gestion de Contenu"
-      subtitle="Créez, modifiez et gérez tout votre contenu depuis un seul endroit"
-      actions={
-        <div className="flex items-center gap-3">
-          <Button
-            onClick={() => handleCreateNew("article")}
-            className="bg-blue-600 hover:bg-blue-700"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Nouvel Article
-          </Button>
-          <Button onClick={() => handleCreateNew("podcast")} variant="outline">
-            <Mic className="h-4 w-4 mr-2" />
-            Nouveau Podcast
-          </Button>
-        </div>
-      }
-    >
+    <>
+      {/* Actions bar previously in DashboardLayout */}
+      <div className="mb-6 flex items-center gap-3 flex-wrap">
+        <Button
+          onClick={() => handleCreateNew("article")}
+          className="bg-blue-600 hover:bg-blue-700"
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Nouvel Article
+        </Button>
+        <Button onClick={() => handleCreateNew("podcast")} variant="outline">
+          <Mic className="h-4 w-4 mr-2" />
+          Nouveau Podcast
+        </Button>
+      </div>
       <div className="space-y-8">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -578,7 +521,7 @@ const ContentManagement = () => {
           </CardContent>
         </Card>
       </div>
-    </DashboardLayout>
+    </>
   );
 };
 

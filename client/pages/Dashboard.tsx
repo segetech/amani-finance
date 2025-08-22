@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { getRoleDisplayName, getRoleColor } from "../lib/demoAccounts";
-import DashboardLayout from "../components/DashboardLayout";
 import {
   BarChart3,
   Users,
@@ -25,11 +24,9 @@ export default function Dashboard() {
 
   if (!user) {
     return (
-      <DashboardLayout title="Accès refusé">
-        <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md mx-auto">
-          <h2 className="text-2xl font-bold text-amani-primary mb-4">
-            Accès refusé
-          </h2>
+      <div className="flex items-center justify-center py-12">
+        <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md">
+          <h2 className="text-2xl font-bold text-amani-primary mb-4">Accès refusé</h2>
           <p className="text-gray-600 mb-6">
             Vous devez être connecté pour accéder au tableau de bord.
           </p>
@@ -40,7 +37,7 @@ export default function Dashboard() {
             Se connecter
           </Link>
         </div>
-      </DashboardLayout>
+      </div>
     );
   }
 

@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
-import DashboardLayout from "../components/DashboardLayout";
+import { useIndices, Indice } from "../hooks/useIndices";
 import {
   BarChart3,
   TrendingUp,
@@ -32,11 +32,25 @@ import {
 export default function IndicesManager() {
   const { user, hasPermission } = useAuth();
   const { success, error, warning } = useToast();
+  const { fetchIndices, deleteIndice, loading } = useIndices();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
   const [filterCountry, setFilterCountry] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
   const [selectedIndices, setSelectedIndices] = useState<string[]>([]);
+  const [indices, setIndices] = useState<Indice[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const items = await fetchIndices();
+        setIndices(items);
+      } catch (e) {
+        console.error(e);
+        error("Erreur", "Impossible de charger les indices");
+      }
+    })();
+  }, [fetchIndices]);
 
   // Check permissions
   if (
@@ -44,138 +58,48 @@ export default function IndicesManager() {
     (!hasPermission("view_indices") && !hasPermission("create_indices"))
   ) {
     return (
-      <DashboardLayout title="Accès refusé">
+      <div className="p-4 sm:p-6">
         <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md mx-auto">
-          <h2 className="text-2xl font-bold text-amani-primary mb-4">
-            Accès refusé
-          </h2>
+          <h2 className="text-2xl font-bold text-amani-primary mb-4">Accès refusé</h2>
           <p className="text-gray-600 mb-6">
-            Vous n'avez pas les permissions nécessaires pour gérer les indices
-            économiques.
+            Vous n'avez pas les permissions nécessaires pour gérer les indices économiques.
           </p>
         </div>
-      </DashboardLayout>
+      </div>
     );
   }
 
-  // Mock data - in real app would come from API
-  const indices = [
-    {
-      id: "1",
-      name: "Taux directeur BCEAO",
-      code: "BCEAO_RATE",
-      category: "monetary",
-      country: "uemoa",
-      currency: "XOF",
-      unit: "percent",
-      frequency: "monthly",
-      currentValue: "3.50",
-      previousValue: "3.25",
-      changePercent: "7.69",
-      changeDirection: "up",
-      lastUpdated: "2024-01-15",
-      source: "BCEAO",
-      status: "published",
-      isPublic: true,
-      description:
-        "Taux directeur de la Banque Centrale des États de l'Afrique de l'Ouest",
-      views: 12450,
-      subscribers: 890,
-    },
-    {
-      id: "2",
-      name: "BRVM Composite",
-      code: "BRVM_COMP",
-      category: "market",
-      country: "regional",
-      currency: "XOF",
-      unit: "index",
-      frequency: "daily",
-      currentValue: "185.42",
-      previousValue: "181.25",
-      changePercent: "2.30",
-      changeDirection: "up",
-      lastUpdated: "2024-01-15",
-      source: "BRVM",
-      status: "published",
-      isPublic: true,
-      description:
-        "Indice composite de la Bourse Régionale des Valeurs Mobilières",
-      views: 8920,
-      subscribers: 1250,
-    },
-    {
-      id: "3",
-      name: "Inflation Mali",
-      code: "MALI_INF",
-      category: "inflation",
-      country: "mali",
-      currency: "XOF",
-      unit: "percent",
-      frequency: "monthly",
-      currentValue: "4.20",
-      previousValue: "3.80",
-      changePercent: "10.53",
-      changeDirection: "up",
-      lastUpdated: "2024-01-12",
-      source: "INSTAT Mali",
-      status: "published",
-      isPublic: true,
-      description: "Taux d'inflation annuel au Mali",
-      views: 5630,
-      subscribers: 420,
-    },
-    {
-      id: "4",
-      name: "PIB Burkina Faso",
-      code: "BF_GDP",
-      category: "gdp",
-      country: "burkina",
-      currency: "XOF",
-      unit: "billions",
-      frequency: "quarterly",
-      currentValue: "9870.5",
-      previousValue: "9654.2",
-      changePercent: "2.24",
-      changeDirection: "up",
-      lastUpdated: "2024-01-10",
-      source: "INSD Burkina",
-      status: "draft",
-      isPublic: false,
-      description: "Produit Intérieur Brut du Burkina Faso",
-      views: 3240,
-      subscribers: 185,
-    },
-    {
-      id: "5",
-      name: "Cours de l'or",
-      code: "GOLD_PRICE",
-      category: "mining",
-      country: "regional",
-      currency: "USD",
-      unit: "dollars",
-      frequency: "daily",
-      currentValue: "2045.80",
-      previousValue: "2038.50",
-      changePercent: "0.36",
-      changeDirection: "up",
-      lastUpdated: "2024-01-15",
-      source: "London Bullion Market",
-      status: "published",
-      isPublic: true,
-      description: "Prix de l'once d'or sur le marché international",
-      views: 15620,
-      subscribers: 2100,
-    },
-  ];
+  // Helper mappers from DB row to UI fields
+  const mapIndiceToUI = (i: Indice) => ({
+    id: i.id,
+    name: i.title,
+    code: i.indice_data?.code || i.slug,
+    category: 'economic',
+    country: i.country || 'mali',
+    currency: i.indice_data?.currency || 'XOF',
+    unit: i.indice_data?.unit || 'index',
+    frequency: i.indice_data?.frequency || 'monthly',
+    currentValue: i.indice_data?.currentValue || '-',
+    previousValue: i.indice_data?.previousValue || '-',
+    changePercent: i.indice_data?.changePercent || '0',
+    changeDirection: i.indice_data?.changeDirection || 'neutral',
+    lastUpdated: i.indice_data?.lastUpdated || i.published_at || '',
+    source: i.indice_data?.source || '',
+    status: i.status,
+    isPublic: i.indice_data?.isPublic ?? true,
+    description: i.description || i.summary || '',
+    views: i.views || 0,
+    subscribers: 0,
+  });
 
+  const uiItems = indices.map(mapIndiceToUI);
   const stats = {
-    total: indices.length,
-    published: indices.filter((i) => i.status === "published").length,
-    draft: indices.filter((i) => i.status === "draft").length,
-    totalViews: indices.reduce((sum, i) => sum + i.views, 0),
-    totalSubscribers: indices.reduce((sum, i) => sum + i.subscribers, 0),
-    upTrending: indices.filter((i) => i.changeDirection === "up").length,
+    total: uiItems.length,
+    published: uiItems.filter((i) => i.status === "published").length,
+    draft: uiItems.filter((i) => i.status === "draft").length,
+    totalViews: uiItems.reduce((sum, i) => sum + (i.views || 0), 0),
+    totalSubscribers: uiItems.reduce((sum, i) => sum + (i.subscribers || 0), 0),
+    upTrending: uiItems.filter((i) => i.changeDirection === "up").length,
   };
 
   const categories = [
@@ -257,8 +181,14 @@ export default function IndicesManager() {
 
   const handleDeleteIndice = async (indiceId: string) => {
     if (confirm("Êtes-vous sûr de vouloir supprimer cet indice ?")) {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      error("Indice supprimé", "L'indice a été supprimé avec succès");
+      try {
+        await deleteIndice(indiceId);
+        setIndices((prev) => prev.filter((i) => i.id !== indiceId));
+        error("Indice supprimé", "L'indice a été supprimé avec succès");
+      } catch (e) {
+        console.error(e);
+        error("Erreur", "Échec de suppression");
+      }
     }
   };
 
@@ -270,7 +200,7 @@ export default function IndicesManager() {
     );
   };
 
-  const filteredIndices = indices.filter((indice) => {
+  const filteredIndices = uiItems.filter((indice) => {
     const matchesSearch =
       indice.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       indice.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -326,11 +256,14 @@ export default function IndicesManager() {
   };
 
   return (
-    <DashboardLayout
-      title="Indices économiques"
-      subtitle="Gérez et suivez les indicateurs économiques de la région"
-      actions={
-        hasPermission("create_indices") && (
+    <div className="p-4 sm:p-6 space-y-8">
+      {/* Page header inside content (since global layout provides the app header) */}
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-amani-primary">Indices économiques</h1>
+          <p className="text-gray-600 mt-1">Gérez et suivez les indicateurs économiques de la région</p>
+        </div>
+        {hasPermission("create_indices") && (
           <Link
             to="/dashboard/indices/new"
             className="flex items-center gap-2 px-4 py-2 bg-amani-primary text-white rounded-lg hover:bg-amani-primary/90 transition-colors"
@@ -338,9 +271,9 @@ export default function IndicesManager() {
             <Plus className="w-4 h-4" />
             Nouvel indice
           </Link>
-        )
-      }
-    >
+        )}
+      </div>
+
       <div className="space-y-8">
         {/* Statistics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -650,7 +583,7 @@ export default function IndicesManager() {
 
                         {hasPermission("edit_indices") && (
                           <Link
-                            to={`/dashboard/indices/${indice.id}/edit`}
+                            to={`/dashboard/indices/edit/${indice.id}`}
                             className="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
                           >
                             <Edit className="w-4 h-4" />
@@ -708,6 +641,6 @@ export default function IndicesManager() {
           </div>
         )}
       </div>
-    </DashboardLayout>
+    </div>
   );
 }

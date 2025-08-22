@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import { useArticles } from "../hooks/useArticles";
-import DashboardLayout from "../components/DashboardLayout";
 import {
   FileText,
   Plus,
@@ -58,28 +57,23 @@ export default function Articles() {
   // Check permissions after all hooks
   if (!user || !hasPermission("create_articles")) {
     return (
-      <DashboardLayout
-        title="Accès refusé"
-        subtitle="Vous n'avez pas les permissions nécessaires"
-      >
-        <div className="flex items-center justify-center py-12">
-          <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md">
-            <h2 className="text-2xl font-bold text-amani-primary mb-4">
-              Accès refusé
-            </h2>
-            <p className="text-gray-600 mb-6">
-              Vous n'avez pas les permissions nécessaires pour voir les
-              articles.
-            </p>
-            <Link
-              to="/dashboard"
-              className="bg-amani-primary text-white px-6 py-2 rounded-lg hover:bg-amani-primary/90 transition-colors"
-            >
-              Retour au tableau de bord
-            </Link>
-          </div>
+      <div className="flex items-center justify-center py-12">
+        <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md">
+          <h2 className="text-2xl font-bold text-amani-primary mb-4">
+            Accès refusé
+          </h2>
+          <p className="text-gray-600 mb-6">
+            Vous n'avez pas les permissions nécessaires pour voir les
+            articles.
+          </p>
+          <Link
+            to="/dashboard"
+            className="bg-amani-primary text-white px-6 py-2 rounded-lg hover:bg-amani-primary/90 transition-colors"
+          >
+            Retour au tableau de bord
+          </Link>
         </div>
-      </DashboardLayout>
+      </div>
     );
   }
 
@@ -202,10 +196,13 @@ export default function Articles() {
   };
 
   return (
-    <DashboardLayout
-      title="Gestion des articles"
-      subtitle="Créez, modifiez et gérez vos articles"
-      actions={
+    <div className="space-y-8">
+      {/* Header: title, subtitle and actions (moved from DashboardLayout props) */}
+      <div className="flex items-start justify-between">
+        <div className="mb-4">
+          <h1 className="text-2xl font-bold text-amani-primary">Gestion des articles</h1>
+          <p className="text-gray-600">Créez, modifiez et gérez vos articles</p>
+        </div>
         <div className="flex items-center gap-4">
           {/* Bouton de création principale */}
           {hasPermission("create_articles") && (
@@ -262,8 +259,8 @@ export default function Articles() {
             </div>
           </div>
         </div>
-      }
-    >
+      </div>
+
       <div className="space-y-8">
         {/* Loading State */}
         {loading && (
@@ -446,6 +443,6 @@ export default function Articles() {
           </div>
         </div>
       </div>
-    </DashboardLayout>
+    </div>
   );
 }

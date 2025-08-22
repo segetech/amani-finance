@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
-import DashboardLayout from "../components/DashboardLayout";
 import {
   demoAccounts,
   getRoleDisplayName,
@@ -46,8 +45,8 @@ export default function Users() {
   // Check permissions
   if (!user || !hasPermission("manage_users")) {
     return (
-      <DashboardLayout title="Accès refusé">
-        <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md mx-auto">
+      <div className="flex items-center justify-center py-12">
+        <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md">
           <h2 className="text-2xl font-bold text-amani-primary mb-4">
             Accès refusé
           </h2>
@@ -62,7 +61,7 @@ export default function Users() {
             Retour au tableau de bord
           </Link>
         </div>
-      </DashboardLayout>
+      </div>
     );
   }
 
@@ -267,11 +266,12 @@ export default function Users() {
   };
 
   return (
-    <DashboardLayout
-      title="Gestion des utilisateurs"
-      subtitle="Gérez les comptes utilisateurs, rôles et permissions"
-    >
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="max-w-7xl mx-auto space-y-8">
+        {/* Header */}
+        <div>
+          <h1 className="text-2xl font-bold text-amani-primary">Gestion des utilisateurs</h1>
+          <p className="text-gray-600">Gérez les comptes utilisateurs, rôles et permissions</p>
+        </div>
         {/* Navigation */}
         <div className="mb-8">
           <Link
@@ -904,6 +904,5 @@ export default function Users() {
           </div>
         )}
       </div>
-    </DashboardLayout>
   );
 }

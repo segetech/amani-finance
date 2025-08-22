@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
-import DashboardLayout from "../components/DashboardLayout";
 import {
   Bell,
   Search,
@@ -31,10 +30,7 @@ export default function Notifications() {
   // Check permissions after all hooks
   if (!user || !hasPermission("system_settings")) {
     return (
-      <DashboardLayout
-        title="Accès refusé"
-        subtitle="Vous n'avez pas les permissions nécessaires"
-      >
+      <>
         <div className="flex items-center justify-center py-12">
           <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md">
             <h2 className="text-2xl font-bold text-amani-primary mb-4">
@@ -51,7 +47,7 @@ export default function Notifications() {
             </Link>
           </div>
         </div>
-      </DashboardLayout>
+      </>
     );
   }
 
@@ -224,54 +220,50 @@ export default function Notifications() {
   };
 
   return (
-    <DashboardLayout
-      title="Centre de notifications"
-      subtitle="Gérez vos notifications système et alertes"
-      actions={
-        <>
-          <div className="flex items-center gap-2">
-            <Search className="w-4 h-4 text-gray-500" />
-            <input
-              type="text"
-              placeholder="Rechercher une notification..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent w-64"
-            />
-          </div>
-          <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-gray-500" />
-            <select
-              value={filterType}
-              onChange={(e) => setFilterType(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
-            >
-              {types.map((type) => (
-                <option key={type.id} value={type.id}>
-                  {type.label}
-                </option>
-              ))}
-            </select>
-          </div>
+    <>
+      {/* Actions bar previously in DashboardLayout */}
+      <div className="mb-6 flex items-center gap-4 flex-wrap">
+        <div className="flex items-center gap-2">
+          <Search className="w-4 h-4 text-gray-500" />
+          <input
+            type="text"
+            placeholder="Rechercher une notification..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent w-64"
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <Filter className="w-4 h-4 text-gray-500" />
           <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
+            value={filterType}
+            onChange={(e) => setFilterType(e.target.value)}
             className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
           >
-            <option value="all">Toutes</option>
-            <option value="unread">Non lues</option>
-            <option value="read">Lues</option>
+            {types.map((type) => (
+              <option key={type.id} value={type.id}>
+                {type.label}
+              </option>
+            ))}
           </select>
-          <button
-            onClick={handleMarkAllAsRead}
-            className="flex items-center gap-2 px-4 py-2 bg-amani-primary text-white rounded-lg hover:bg-amani-primary/90 transition-colors"
-          >
-            <Check className="w-4 h-4" />
-            Tout marquer comme lu
-          </button>
-        </>
-      }
-    >
+        </div>
+        <select
+          value={filterStatus}
+          onChange={(e) => setFilterStatus(e.target.value)}
+          className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
+        >
+          <option value="all">Toutes</option>
+          <option value="unread">Non lues</option>
+          <option value="read">Lues</option>
+        </select>
+        <button
+          onClick={handleMarkAllAsRead}
+          className="flex items-center gap-2 px-4 py-2 bg-amani-primary text-white rounded-lg hover:bg-amani-primary/90 transition-colors"
+        >
+          <Check className="w-4 h-4" />
+          Tout marquer comme lu
+        </button>
+      </div>
       <div className="space-y-8">
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -409,6 +401,6 @@ export default function Notifications() {
           </div>
         </div>
       </div>
-    </DashboardLayout>
+    </>
   );
 }

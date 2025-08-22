@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import DashboardLayout from "../components/DashboardLayout";
 import {
   BarChart3,
   Users,
@@ -24,28 +23,23 @@ export default function Analytics() {
   // Check permissions
   if (!user || !hasPermission("view_analytics")) {
     return (
-      <DashboardLayout
-        title="Accès refusé"
-        subtitle="Vous n'avez pas les permissions nécessaires"
-      >
-        <div className="flex items-center justify-center py-12">
-          <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md">
-            <h2 className="text-2xl font-bold text-amani-primary mb-4">
-              Accès refusé
-            </h2>
-            <p className="text-gray-600 mb-6">
-              Vous n'avez pas les permissions nécessaires pour accéder aux
-              analyses.
-            </p>
-            <Link
-              to="/dashboard"
-              className="bg-amani-primary text-white px-6 py-2 rounded-lg hover:bg-amani-primary/90 transition-colors"
-            >
-              Retour au tableau de bord
-            </Link>
-          </div>
+      <div className="flex items-center justify-center py-12">
+        <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md">
+          <h2 className="text-2xl font-bold text-amani-primary mb-4">
+            Accès refusé
+          </h2>
+          <p className="text-gray-600 mb-6">
+            Vous n'avez pas les permissions nécessaires pour accéder aux
+            analyses.
+          </p>
+          <Link
+            to="/dashboard"
+            className="bg-amani-primary text-white px-6 py-2 rounded-lg hover:bg-amani-primary/90 transition-colors"
+          >
+            Retour au tableau de bord
+          </Link>
         </div>
-      </DashboardLayout>
+      </div>
     );
   }
 
@@ -122,11 +116,14 @@ export default function Analytics() {
   ];
 
   return (
-    <DashboardLayout
-      title="Analytics & Statistiques"
-      subtitle="Analysez les performances de votre contenu et l'engagement des utilisateurs"
-      actions={
-        <>
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="flex items-start justify-between">
+        <div className="mb-4">
+          <h1 className="text-2xl font-bold text-amani-primary">Analytics & Statistiques</h1>
+          <p className="text-gray-600">Analysez les performances de votre contenu et l'engagement des utilisateurs</p>
+        </div>
+        <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
             <Filter className="w-4 h-4 text-gray-500" />
             <select
@@ -144,9 +141,9 @@ export default function Analytics() {
             <Download className="w-4 h-4" />
             Exporter
           </button>
-        </>
-      }
-    >
+        </div>
+      </div>
+
       <div className="space-y-8">
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -355,6 +352,6 @@ export default function Analytics() {
           </div>
         </div>
       </div>
-    </DashboardLayout>
+    </div>
   );
 }

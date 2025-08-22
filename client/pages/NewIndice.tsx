@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
-import DashboardLayout from "../components/DashboardLayout";
+import { useIndices } from "../hooks/useIndices";
 import {
   ArrowLeft,
   Save,
@@ -25,6 +25,7 @@ export default function NewIndice() {
   const { success, error } = useToast();
   const navigate = useNavigate();
   const [isSaving, setIsSaving] = useState(false);
+  const { createIndice, loading } = useIndices();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -55,7 +56,7 @@ export default function NewIndice() {
   // Check permissions
   if (!user || !hasPermission("create_indices")) {
     return (
-      <DashboardLayout title="Accès refusé">
+      <>
         <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md mx-auto">
           <h2 className="text-2xl font-bold text-amani-primary mb-4">
             Accès refusé
@@ -71,7 +72,7 @@ export default function NewIndice() {
             Retour au tableau de bord
           </Link>
         </div>
-      </DashboardLayout>
+      </>
     );
   }
 
@@ -163,30 +164,49 @@ export default function NewIndice() {
     }
 
     setIsSaving(true);
+    try {
+      const summary = formData.description
+        ? formData.description.slice(0, 180)
+        : formData.name;
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+      await createIndice({
+        name: formData.name,
+        code: formData.code,
+        summary,
+        description: formData.description,
+        status: formData.status as "draft" | "published",
+        // keep default category resolver (economie) by not forcing mapping from UI categories
+        // categorySlug: 'economie',
+        country: formData.country,
+        tags: formData.tags,
+        isPublic: formData.isPublic,
+        unit: formData.unit,
+        frequency: formData.frequency,
+        currency: formData.currency,
+        source: formData.source,
+        methodology: formData.methodology,
+        historicalNote: formData.historicalNote,
+        currentValue: formData.currentValue,
+        previousValue: formData.previousValue,
+        changePercent: formData.changePercent,
+        changeDirection: formData.changeDirection as any,
+        lastUpdated: formData.lastUpdated,
+        publishDate: formData.publishDate,
+      });
 
-    const indiceData = {
-      id: `indice-${Date.now()}`,
-      ...formData,
-      createdAt: new Date().toISOString(),
-      createdBy: `${user.firstName} ${user.lastName}`,
-      views: 0,
-      subscribers: 0,
-    };
-
-    console.log("Creating economic indice:", indiceData);
-
-    success(
-      "Indice créé",
-      `L'indice "${formData.name}" a été ${
-        formData.status === "published" ? "publié" : "sauvegardé en brouillon"
-      } avec succès.`,
-    );
-
-    setIsSaving(false);
-    navigate("/dashboard/indices-management");
+      success(
+        "Indice créé",
+        `L'indice "${formData.name}" a été ${
+          formData.status === "published" ? "publié" : "sauvegardé en brouillon"
+        } avec succès.`,
+      );
+      navigate("/dashboard/indices-management");
+    } catch (e: any) {
+      console.error(e);
+      error("Erreur", e.message || "Échec de la création de l'indice");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const categories = [
@@ -261,10 +281,7 @@ export default function NewIndice() {
   };
 
   return (
-    <DashboardLayout
-      title="Nouvel indice économique"
-      subtitle="Créez et publiez un nouvel indicateur économique"
-    >
+    <>
       <div className="max-w-4xl mx-auto space-y-8">
         {/* Navigation */}
         <div className="mb-8">
@@ -776,6 +793,6 @@ export default function NewIndice() {
           </div>
         </form>
       </div>
-    </DashboardLayout>
+    </>
   );
 }

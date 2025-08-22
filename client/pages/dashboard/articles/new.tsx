@@ -8,7 +8,6 @@ import { Input } from '../../../components/ui/input';
 import { Label } from '../../../components/ui/label';
 import { Textarea } from '../../../components/ui/textarea';
 import { ArrowLeft, Save, AlertCircle } from 'lucide-react';
-import DashboardLayout from '../../../components/DashboardLayout';
 
 type FormData = {
   title: string;
@@ -119,36 +118,32 @@ export default function NewArticle() {
 
   if (!user || !hasPermission('create_articles')) {
     return (
-      <DashboardLayout title="Accès refusé" subtitle="Vous n'avez pas les permissions nécessaires">
-        <div className="flex items-center justify-center py-12">
-          <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md text-center">
-            <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              Accès refusé
-            </h2>
-            <p className="text-gray-600 mb-6">
-              Vous n'avez pas les permissions nécessaires pour créer des articles.
-            </p>
-            <Button onClick={() => navigate('/dashboard/articles')}>
-              Retour aux articles
-            </Button>
-          </div>
+      <div className="flex items-center justify-center py-12">
+        <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md text-center">
+          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Accès refusé</h2>
+          <p className="text-gray-600 mb-6">
+            Vous n'avez pas les permissions nécessaires pour créer des articles.
+          </p>
+          <Button onClick={() => navigate('/dashboard/articles')}>Retour aux articles</Button>
         </div>
-      </DashboardLayout>
+      </div>
     );
   }
 
   return (
-    <DashboardLayout 
-      title="Nouvel article" 
-      subtitle="Rédigez un nouvel article pour votre blog"
-      actions={
+    <>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Nouvel article</h1>
+          <p className="text-gray-600">Rédigez un nouvel article pour votre blog</p>
+        </div>
         <Button variant="outline" onClick={() => navigate('/dashboard/articles')}>
           <ArrowLeft className="h-4 w-4 mr-2" />
           Retour aux articles
         </Button>
-      }
-    >
+      </div>
+
       {error && (
         <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
           <div className="flex">
@@ -248,6 +243,6 @@ export default function NewArticle() {
           </div>
         </div>
       </form>
-    </DashboardLayout>
+    </>
   );
 }

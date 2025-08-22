@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
-import DashboardLayout from "../components/DashboardLayout";
 import {
   AlertTriangle,
   Eye,
@@ -63,10 +62,7 @@ export default function ReportsModeration() {
   // Vérification des permissions
   if (!user || !hasPermission("manage_user_reports")) {
     return (
-      <DashboardLayout
-        title="Accès refusé"
-        subtitle="Permissions insuffisantes"
-      >
+      <>
         <div className="flex items-center justify-center py-12">
           <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md text-center">
             <Shield className="w-16 h-16 text-red-500 mx-auto mb-4" />
@@ -85,7 +81,7 @@ export default function ReportsModeration() {
             </button>
           </div>
         </div>
-      </DashboardLayout>
+      </>
     );
   }
 
@@ -258,48 +254,44 @@ export default function ReportsModeration() {
   ];
 
   return (
-    <DashboardLayout
-      title="Gestion des Signalements"
-      subtitle="Modérez et gérez les signalements de contenu"
-      actions={
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 bg-white border border-gray-300 rounded-lg px-3 py-2 min-w-[300px]">
-            <Search className="w-4 h-4 text-gray-500" />
-            <input
-              type="text"
-              placeholder="Rechercher un signalement..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="flex-1 outline-none text-sm"
-            />
-          </div>
-
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="all">Tous les statuts</option>
-            <option value="pending">En attente</option>
-            <option value="reviewed">Révisés</option>
-            <option value="resolved">Résolus</option>
-            <option value="dismissed">Rejetés</option>
-          </select>
-
-          <select
-            value={priorityFilter}
-            onChange={(e) => setPriorityFilter(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="all">Toutes priorités</option>
-            <option value="urgent">🔴 Urgent</option>
-            <option value="high">🟠 Élevée</option>
-            <option value="medium">🟡 Moyenne</option>
-            <option value="low">🟢 Faible</option>
-          </select>
+    <>
+      {/* Actions bar previously in DashboardLayout */}
+      <div className="mb-6 flex items-center gap-4 flex-wrap">
+        <div className="flex items-center gap-2 bg-white border border-gray-300 rounded-lg px-3 py-2 min-w-[300px]">
+          <Search className="w-4 h-4 text-gray-500" />
+          <input
+            type="text"
+            placeholder="Rechercher un signalement..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="flex-1 outline-none text-sm"
+          />
         </div>
-      }
-    >
+
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="all">Tous les statuts</option>
+          <option value="pending">En attente</option>
+          <option value="reviewed">Révisés</option>
+          <option value="resolved">Résolus</option>
+          <option value="dismissed">Rejetés</option>
+        </select>
+
+        <select
+          value={priorityFilter}
+          onChange={(e) => setPriorityFilter(e.target.value)}
+          className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="all">Toutes priorités</option>
+          <option value="urgent">🔴 Urgent</option>
+          <option value="high">🟠 Élevée</option>
+          <option value="medium">🟡 Moyenne</option>
+          <option value="low">🟢 Faible</option>
+        </select>
+      </div>
       <div className="space-y-8">
         {/* Statistiques */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -443,6 +435,6 @@ export default function ReportsModeration() {
           </div>
         </div>
       </div>
-    </DashboardLayout>
+    </>
   );
 }

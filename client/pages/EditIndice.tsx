@@ -1,6 +1,6 @@
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import DashboardLayout from "../components/DashboardLayout";
+// DashboardLayout removed – page content will be rendered within the global layout
 import {
   Save,
   ArrowLeft,
@@ -13,6 +13,7 @@ import {
   Info,
   Eye,
 } from "lucide-react";
+import { useIndices } from "../hooks/useIndices";
 
 interface IndiceData {
   id: string;
@@ -32,84 +33,93 @@ interface IndiceData {
 export default function EditIndice() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { fetchIndiceById, updateIndice } = useIndices();
 
-  // Mock data - En production, récupérer depuis une API
-  const [indice, setIndice] = React.useState<IndiceData>({
-    id: id || "1",
-    name: "BRVM Composite",
-    symbol: "BRVM",
-    value: "185.42",
-    change: "+4.28",
-    changePercent: "+2.3%",
+  // Form state driven by real data
+  const [formData, setFormData] = React.useState<IndiceData>({
+    id: id || "",
+    name: "",
+    symbol: "",
+    value: "",
+    change: "0",
+    changePercent: "0%",
     isPositive: true,
     lastUpdate: new Date().toISOString(),
-    description:
-      "Indice principal de la Bourse Régionale des Valeurs Mobilières",
-    category: "brvm",
-    source: "BRVM",
+    description: "",
+    category: "economic",
+    unit: undefined,
+    source: undefined,
   });
-
-  const [formData, setFormData] = React.useState<IndiceData>(indice);
   const [isSaving, setIsSaving] = React.useState(false);
   const [saveSuccess, setSaveSuccess] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(true);
 
+  // Load indice by id from backend
   React.useEffect(() => {
-    // Simulation de chargement des données
-    if (id === "2") {
-      const mockData = {
-        id: "2",
-        name: "FCFA/EUR",
-        symbol: "XOF/EUR",
-        value: "655.957",
-        change: "0",
-        changePercent: "0%",
-        isPositive: true,
-        lastUpdate: new Date().toISOString(),
-        description: "Taux de change Franc CFA / Euro",
-        category: "economic" as const,
-        source: "BCE",
-      };
-      setIndice(mockData);
-      setFormData(mockData);
-    } else if (id === "3") {
-      const mockData = {
-        id: "3",
-        name: "Or",
-        symbol: "XAU/USD",
-        value: "2025.50",
-        change: "+15.20",
-        changePercent: "+0.75%",
-        isPositive: true,
-        lastUpdate: new Date().toISOString(),
-        description: "Prix de l'or en dollars US par once troy",
-        category: "commodity" as const,
-        unit: "USD/oz",
-        source: "COMEX",
-      };
-      setIndice(mockData);
-      setFormData(mockData);
-    }
-  }, [id]);
+    let active = true;
+    (async () => {
+      if (!id) {
+        navigate("/dashboard/indices");
+        return;
+      }
+      setIsLoading(true);
+      try {
+        const item = await fetchIndiceById(id);
+        if (!active) return;
+        const fd: IndiceData = {
+          id: item.id,
+          name: item.title,
+          symbol: item.indice_data?.code || item.slug,
+          value: item.indice_data?.currentValue || "",
+          change: item.indice_data?.previousValue ? `${parseFloat(item.indice_data.currentValue || '0') - parseFloat(item.indice_data.previousValue || '0')}` : "0",
+          changePercent: item.indice_data?.changePercent || "0%",
+          isPositive: (item.indice_data?.changeDirection || "neutral") === "up" || parseFloat(item.indice_data?.changePercent || "0") >= 0,
+          lastUpdate: item.indice_data?.lastUpdated || item.updated_at,
+          description: item.description || item.summary || "",
+          category: "economic",
+          unit: item.indice_data?.unit,
+          source: item.indice_data?.source,
+        };
+        setFormData(fd);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        if (active) setIsLoading(false);
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, [id, fetchIndiceById, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
 
     try {
-      // Simulation d'API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Compute direction from change/changePercent
+      const pct = parseFloat(String(formData.changePercent).replace('%', ''));
+      const dir = pct > 0 ? 'up' : pct < 0 ? 'down' : 'neutral';
 
-      // Mettre à jour isPositive basé sur le change
-      const updatedData = {
-        ...formData,
-        isPositive: parseFloat(formData.change) >= 0,
+      if (!id) throw new Error('Missing id');
+      await updateIndice(id, {
+        name: formData.name,
+        code: formData.symbol,
+        currentValue: formData.value,
+        changePercent: String(formData.changePercent),
+        changeDirection: dir,
+        unit: formData.unit,
+        source: formData.source,
+        description: formData.description,
+        lastUpdated: new Date().toISOString().slice(0, 10),
+      });
+
+      setFormData((prev) => ({
+        ...prev,
+        isPositive: dir === 'up' || (dir === 'neutral' && parseFloat(prev.change) >= 0),
         lastUpdate: new Date().toISOString(),
-      };
-
-      setFormData(updatedData);
-      setIndice(updatedData);
+      }));
       setSaveSuccess(true);
-
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch (error) {
       console.error("Erreur lors de la sauvegarde:", error);
@@ -142,7 +152,7 @@ export default function EditIndice() {
   const CategoryIcon = getCategoryIcon(formData.category);
 
   return (
-    <DashboardLayout>
+    <>
       <div className="max-w-4xl mx-auto space-y-8">
         {/* En-tête avec navigation */}
         <div className="flex items-center justify-between">
@@ -538,6 +548,6 @@ export default function EditIndice() {
           </div>
         </div>
       </div>
-    </DashboardLayout>
+    </>
   );
 }

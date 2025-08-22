@@ -4,7 +4,6 @@ import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import { usePodcasts } from "../hooks/usePodcasts";
 import { useContentCategories } from "../hooks/useContentCategories";
-import DashboardLayout from "../components/DashboardLayout";
 import UnifiedContentForm from "../components/UnifiedContentForm";
 import { ArrowLeft, Mic, AlertCircle } from "lucide-react";
 
@@ -19,10 +18,7 @@ export default function NewPodcast() {
   // Check permissions
   if (!user || !hasPermission("create_podcasts")) {
     return (
-      <DashboardLayout
-        title="Accès refusé"
-        subtitle="Vous n'avez pas les permissions nécessaires"
-      >
+      <>
         <div className="flex items-center justify-center py-12">
           <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md text-center">
             <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
@@ -41,7 +37,7 @@ export default function NewPodcast() {
             </button>
           </div>
         </div>
-      </DashboardLayout>
+      </>
     );
   }
 
@@ -110,10 +106,12 @@ export default function NewPodcast() {
   };
 
   return (
-    <DashboardLayout
-      title="Créer un nouveau podcast"
-      subtitle="Partagez vos analyses audio en utilisant des liens externes"
-      actions={
+    <>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Créer un nouveau podcast</h1>
+          <p className="text-gray-600">Partagez vos analyses audio en utilisant des liens externes</p>
+        </div>
         <button
           onClick={() => navigate("/dashboard/podcasts")}
           className="flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
@@ -121,8 +119,7 @@ export default function NewPodcast() {
           <ArrowLeft className="w-4 h-4" />
           Retour
         </button>
-      }
-    >
+      </div>
       <div className="max-w-4xl mx-auto">
         {/* Formulaire unifié pour podcasts */}
         <UnifiedContentForm
@@ -131,6 +128,6 @@ export default function NewPodcast() {
           onCancel={handleCancel}
         />
       </div>
-    </DashboardLayout>
+    </>
   );
 }

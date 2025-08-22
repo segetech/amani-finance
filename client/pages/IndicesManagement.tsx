@@ -1,6 +1,5 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import DashboardLayout from "../components/DashboardLayout";
 import {
   Plus,
   Edit3,
@@ -18,6 +17,7 @@ import {
   HelpCircle,
   Info,
 } from "lucide-react";
+import { useIndices, type Indice, type CreateIndiceInput, type UpdateIndiceInput } from "../hooks/useIndices";
 
 interface IndexData {
   id: string;
@@ -34,53 +34,109 @@ interface IndexData {
   source?: string;
 }
 
+// Extended form state to support keeping track of the previous value while editing
+type IndexEditForm = Partial<IndexData> & { originalValue?: string; ytdPercent?: string; group?: string };
+
+// Map category from DB slug/text to UI group id
+function mapDbCategoryToUi(cat?: string): IndexData["category"] {
+  if (!cat) return "economic";
+  const c = cat.toLowerCase();
+  if (c.includes("matiere") || c.includes("commodity")) return "commodity";
+  if (c.includes("brvm") || c.includes("bourse")) return "brvm";
+  return "economic"; // economie, macro, etc.
+}
+
+function mapUiCategoryToSlug(ui: string | undefined): string {
+  switch ((ui || "economic").toLowerCase()) {
+    case "commodity":
+      return "matieres-premieres";
+    case "brvm":
+      return "economie"; // fallback slug commonly present
+    case "economic":
+    default:
+      return "economie";
+  }
+}
+
+function computeChangeFromValues(current?: string, previous?: string): string | undefined {
+  const a = parseFloat(current || "");
+  const b = parseFloat(previous || "");
+  if (isNaN(a) || isNaN(b)) return undefined;
+  const diff = a - b;
+  return `${diff >= 0 ? "+" : ""}${diff.toFixed(2)}`;
+}
+
+function mapIndiceToIndexData(row: Indice): IndexData {
+  const current = row.indice_data?.currentValue;
+  const previous = row.indice_data?.previousValue;
+  const change = computeChangeFromValues(current, previous) || (row as any).change || "0";
+  const isPositive = row.indice_data?.changeDirection
+    ? row.indice_data?.changeDirection === "up"
+    : (parseFloat(change) || 0) >= 0;
+  return {
+    id: row.id,
+    name: row.title,
+    symbol: row.indice_data?.code || "",
+    value: current || "0",
+    change,
+    changePercent: row.indice_data?.changePercent || "0%",
+    isPositive,
+    lastUpdate: row.updated_at || row.indice_data?.lastUpdated || new Date().toISOString(),
+    description: row.description || row.summary || "",
+    category: mapDbCategoryToUi((row as any).category || "economie"),
+    unit: row.indice_data?.unit,
+    source: row.indice_data?.source,
+  };
+}
+
+function buildCreateInput(form: IndexEditForm): CreateIndiceInput {
+  return {
+    name: form.name || "",
+    code: form.symbol || "",
+    summary: (form.description || form.name || "").slice(0, 140),
+    description: form.description || undefined,
+    status: "published",
+    categorySlug: mapUiCategoryToSlug(form.category),
+    unit: form.unit,
+    source: form.source,
+    currentValue: form.value || "0",
+    previousValue: form.originalValue,
+    changePercent: form.changePercent,
+    changeDirection: form.isPositive === undefined ? undefined : form.isPositive ? "up" : "down",
+    lastUpdated: new Date().toISOString().slice(0, 10),
+    ytdPercent: form.ytdPercent,
+    group: form.group,
+  };
+}
+
+function buildUpdateInput(form: IndexEditForm): UpdateIndiceInput {
+  const out: UpdateIndiceInput = {};
+  if (form.name !== undefined) out.name = form.name;
+  if (form.symbol !== undefined) out.code = form.symbol;
+  if (form.description !== undefined) {
+    out.description = form.description;
+    out.summary = (form.description || form.name || "").slice(0, 140);
+  }
+  if (form.category !== undefined) out.categorySlug = mapUiCategoryToSlug(form.category);
+  if (form.unit !== undefined) out.unit = form.unit;
+  if (form.source !== undefined) out.source = form.source;
+  if (form.value !== undefined) out.currentValue = form.value;
+  if (form.originalValue !== undefined) out.previousValue = form.originalValue;
+  if (form.changePercent !== undefined) out.changePercent = form.changePercent;
+  if (form.isPositive !== undefined) out.changeDirection = form.isPositive ? "up" : "down";
+  if (form.ytdPercent !== undefined) out.ytdPercent = form.ytdPercent;
+  if (form.group !== undefined) out.group = form.group;
+  out.status = "published";
+  out.lastUpdated = new Date().toISOString().slice(0, 10);
+  return out;
+}
+
 export default function IndicesManagement() {
-  const [indices, setIndices] = React.useState<IndexData[]>([
-    {
-      id: "1",
-      name: "BRVM Composite",
-      symbol: "BRVM",
-      value: "185.42",
-      change: "+4.28",
-      changePercent: "+2.3%",
-      isPositive: true,
-      lastUpdate: new Date().toISOString(),
-      description:
-        "Indice principal de la Bourse Régionale des Valeurs Mobilières",
-      category: "brvm",
-      source: "BRVM",
-    },
-    {
-      id: "2",
-      name: "FCFA/EUR",
-      symbol: "XOF/EUR",
-      value: "655.957",
-      change: "0",
-      changePercent: "0%",
-      isPositive: true,
-      lastUpdate: new Date().toISOString(),
-      description: "Taux de change Franc CFA / Euro",
-      category: "economic",
-      source: "BCE",
-    },
-    {
-      id: "3",
-      name: "Or",
-      symbol: "XAU/USD",
-      value: "2025.50",
-      change: "+15.20",
-      changePercent: "+0.75%",
-      isPositive: true,
-      lastUpdate: new Date().toISOString(),
-      description: "Prix de l'or en dollars US par once troy",
-      category: "commodity",
-      unit: "USD/oz",
-      source: "COMEX",
-    },
-  ]);
+  const { fetchIndices, createIndice, updateIndice, deleteIndice: deleteIndiceApi, loading, error } = useIndices();
+  const [indices, setIndices] = React.useState<IndexData[]>([]);
 
   const [isEditing, setIsEditing] = React.useState<string | null>(null);
-  const [editForm, setEditForm] = React.useState<Partial<IndexData>>({});
+  const [editForm, setEditForm] = React.useState<IndexEditForm>({});
   const [showAddForm, setShowAddForm] = React.useState(false);
   const [selectedCategory, setSelectedCategory] = React.useState<string>("all");
 
@@ -112,23 +168,24 @@ export default function IndicesManagement() {
     setEditForm({ ...index, originalValue: index.value });
   };
 
-  const saveEdit = () => {
+  const saveEdit = async () => {
     if (isEditing && editForm) {
-      // Calculer automatiquement les valeurs dérivées avec l'ancienne valeur
       const updatedForm = calculateDerivedValues(
         editForm,
         editForm.originalValue,
       );
-
-      setIndices((prev) =>
-        prev.map((index) =>
-          index.id === isEditing
-            ? { ...index, ...updatedForm, lastUpdate: new Date().toISOString() }
-            : index,
-        ),
-      );
-      setIsEditing(null);
-      setEditForm({});
+      try {
+        const payload: UpdateIndiceInput = buildUpdateInput(updatedForm);
+        const updated = await updateIndice(isEditing, payload);
+        const mapped = mapIndiceToIndexData(updated);
+        setIndices((prev) => prev.map((i) => (i.id === isEditing ? mapped : i)));
+      } catch (e) {
+        console.error('[IndicesManagement.saveEdit] update failed', e);
+        alert('La sauvegarde a échoué. Voir la console pour plus de détails.');
+      } finally {
+        setIsEditing(null);
+        setEditForm({});
+      }
     }
   };
 
@@ -173,37 +230,44 @@ export default function IndicesManagement() {
     setEditForm({});
   };
 
-  const deleteIndex = (id: string) => {
+  const deleteIndex = async (id: string) => {
     if (window.confirm("Êtes-vous sûr de vouloir supprimer cet indice ?")) {
-      setIndices((prev) => prev.filter((index) => index.id !== id));
+      try {
+        await deleteIndiceApi(id);
+        setIndices((prev) => prev.filter((index) => index.id !== id));
+      } catch (e) {
+        console.error('[IndicesManagement.deleteIndex] delete failed', e);
+        alert('La suppression a échoué.');
+      }
     }
   };
 
-  const addNewIndex = () => {
-    // Calculer automatiquement les valeurs dérivées
-    const calculatedForm = calculateDerivedValues(editForm);
-
-    const newIndex: IndexData = {
-      id: Date.now().toString(),
-      name: calculatedForm.name || "",
-      symbol: calculatedForm.symbol || "",
-      value: calculatedForm.value || "0",
-      change: calculatedForm.change || "0",
-      changePercent: calculatedForm.changePercent || "0%",
-      isPositive:
-        calculatedForm.isPositive ??
-        parseFloat(calculatedForm.change || "0") >= 0,
-      lastUpdate: new Date().toISOString(),
-      description: calculatedForm.description || "",
-      category: calculatedForm.category || "brvm",
-      unit: calculatedForm.unit,
-      source: calculatedForm.source,
-    };
-
-    setIndices((prev) => [...prev, newIndex]);
-    setShowAddForm(false);
-    setEditForm({});
+  const addNewIndex = async () => {
+    const calculatedForm = calculateDerivedValues(editForm, editForm.originalValue);
+    try {
+      const input: CreateIndiceInput = buildCreateInput(calculatedForm);
+      const created = await createIndice(input);
+      const mapped = mapIndiceToIndexData(created);
+      setIndices((prev) => [...prev, mapped]);
+      setShowAddForm(false);
+      setEditForm({});
+    } catch (e) {
+      console.error('[IndicesManagement.addNewIndex] create failed', e);
+      alert('La création a échoué.');
+    }
   };
+
+  // Initial load from Supabase
+  React.useEffect(() => {
+    (async () => {
+      try {
+        const rows = await fetchIndices({ status: 'published' });
+        setIndices(rows.map(mapIndiceToIndexData));
+      } catch (e) {
+        console.error('[IndicesManagement.useEffect] fetch failed', e);
+      }
+    })();
+  }, [fetchIndices]);
 
   const getCategoryColor = (category: string) => {
     const colors = {
@@ -226,7 +290,7 @@ export default function IndicesManagement() {
   };
 
   return (
-    <DashboardLayout>
+    <>
       <div className="space-y-8">
         {/* En-tête */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
@@ -240,13 +304,13 @@ export default function IndicesManagement() {
               économiques affichés sur votre site
             </p>
           </div>
-          <button
-            onClick={() => setShowAddForm(true)}
+          <Link
+            to="/dashboard/indices/new"
             className="mt-4 sm:mt-0 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 font-semibold"
           >
             <Plus className="w-5 h-5" />
             Ajouter un indice
-          </button>
+          </Link>
         </div>
 
         {/* Guide complet pour débutants */}
@@ -597,6 +661,30 @@ export default function IndicesManagement() {
                             {editForm.changePercent ||
                               "Calculé automatiquement"}
                           </strong>
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3">
+                            <div>
+                              <label className="block text-xs text-blue-800 mb-1">Variation 31 décembre (%)</label>
+                              <input
+                                type="text"
+                                value={editForm.ytdPercent || ""}
+                                onChange={(e) => setEditForm((p) => ({ ...p, ytdPercent: e.target.value }))}
+                                className="w-full border border-blue-300 rounded px-2 py-1 text-sm"
+                                placeholder="Ex: 1.51"
+                              />
+                            </div>
+                            <div className="md:col-span-2">
+                              <label className="block text-xs text-blue-800 mb-1">Groupe d'affichage</label>
+                              <select
+                                value={editForm.group || "indices"}
+                                onChange={(e) => setEditForm((p) => ({ ...p, group: e.target.value }))}
+                                className="w-full border border-blue-300 rounded px-2 py-1 text-sm"
+                              >
+                                <option value="indices">Indices</option>
+                                <option value="indices-sectoriels-nouveaux">Indices sectoriels nouveaux</option>
+                                <option value="indices-sectoriels-anciens">Indices sectoriels anciens</option>
+                              </select>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     )}
@@ -1022,6 +1110,29 @@ export default function IndicesManagement() {
                       placeholder="Ex: BRVM, COMEX, BCEAO"
                     />
                   </div>
+                  {/* YTD and Group */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Variation 31 décembre (%)</label>
+                    <input
+                      type="text"
+                      value={editForm.ytdPercent || ""}
+                      onChange={(e) => setEditForm((p) => ({ ...p, ytdPercent: e.target.value }))}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Ex: 1.51"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Groupe d'affichage</label>
+                    <select
+                      value={editForm.group || "indices"}
+                      onChange={(e) => setEditForm((p) => ({ ...p, group: e.target.value }))}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                      <option value="indices">Indices</option>
+                      <option value="indices-sectoriels-nouveaux">Indices sectoriels nouveaux</option>
+                      <option value="indices-sectoriels-anciens">Indices sectoriels anciens</option>
+                    </select>
+                  </div>
                 </div>
 
                 {/* Description */}
@@ -1125,6 +1236,6 @@ export default function IndicesManagement() {
           </div>
         )}
       </div>
-    </DashboardLayout>
+    </>
   );
 }

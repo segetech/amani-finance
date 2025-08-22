@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
-import DashboardLayout from "../components/DashboardLayout";
 import {
   Database,
   Search,
@@ -31,10 +30,7 @@ export default function Logs() {
   // Check permissions after all hooks
   if (!user || !hasPermission("access_logs")) {
     return (
-      <DashboardLayout
-        title="Accès refusé"
-        subtitle="Vous n'avez pas les permissions nécessaires"
-      >
+      <>
         <div className="flex items-center justify-center py-12">
           <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md">
             <h2 className="text-2xl font-bold text-amani-primary mb-4">
@@ -51,7 +47,7 @@ export default function Logs() {
             </Link>
           </div>
         </div>
-      </DashboardLayout>
+      </>
     );
   }
 
@@ -257,63 +253,59 @@ export default function Logs() {
   };
 
   return (
-    <DashboardLayout
-      title="Logs système"
-      subtitle="Consultez les journaux d'activité du système"
-      actions={
-        <>
-          <div className="flex items-center gap-2">
-            <Search className="w-4 h-4 text-gray-500" />
-            <input
-              type="text"
-              placeholder="Rechercher dans les logs..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent w-64"
-            />
-          </div>
-          <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-gray-500" />
-            <select
-              value={filterLevel}
-              onChange={(e) => setFilterLevel(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
-            >
-              {levels.map((level) => (
-                <option key={level.id} value={level.id}>
-                  {level.label}
-                </option>
-              ))}
-            </select>
-          </div>
+    <>
+      {/* Actions bar previously in DashboardLayout */}
+      <div className="mb-6 flex items-center gap-4 flex-wrap">
+        <div className="flex items-center gap-2">
+          <Search className="w-4 h-4 text-gray-500" />
+          <input
+            type="text"
+            placeholder="Rechercher dans les logs..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent w-64"
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <Filter className="w-4 h-4 text-gray-500" />
           <select
-            value={filterService}
-            onChange={(e) => setFilterService(e.target.value)}
+            value={filterLevel}
+            onChange={(e) => setFilterLevel(e.target.value)}
             className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
           >
-            {services.map((service) => (
-              <option key={service.id} value={service.id}>
-                {service.label}
+            {levels.map((level) => (
+              <option key={level.id} value={level.id}>
+                {level.label}
               </option>
             ))}
           </select>
-          <button
-            onClick={handleRefreshLogs}
-            className="flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            <RefreshCw className="w-4 h-4" />
-            Actualiser
-          </button>
-          <button
-            onClick={handleExportLogs}
-            className="flex items-center gap-2 px-4 py-2 bg-amani-primary text-white rounded-lg hover:bg-amani-primary/90 transition-colors"
-          >
-            <Download className="w-4 h-4" />
-            Exporter
-          </button>
-        </>
-      }
-    >
+        </div>
+        <select
+          value={filterService}
+          onChange={(e) => setFilterService(e.target.value)}
+          className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amani-primary focus:border-transparent"
+        >
+          {services.map((service) => (
+            <option key={service.id} value={service.id}>
+              {service.label}
+            </option>
+          ))}
+        </select>
+        <button
+          onClick={handleRefreshLogs}
+          className="flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+        >
+          <RefreshCw className="w-4 h-4" />
+          Actualiser
+        </button>
+        <button
+          onClick={handleExportLogs}
+          className="flex items-center gap-2 px-4 py-2 bg-amani-primary text-white rounded-lg hover:bg-amani-primary/90 transition-colors"
+        >
+          <Download className="w-4 h-4" />
+          Exporter
+        </button>
+      </div>
       <div className="space-y-8">
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -430,6 +422,6 @@ export default function Logs() {
           </div>
         </div>
       </div>
-    </DashboardLayout>
+    </>
   );
 }

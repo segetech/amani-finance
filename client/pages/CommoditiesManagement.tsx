@@ -1,6 +1,5 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import DashboardLayout from "../components/DashboardLayout";
 import {
   Plus,
   Edit3,
@@ -213,7 +212,7 @@ export default function CommoditiesManagement() {
   };
 
   return (
-    <DashboardLayout>
+    <>
       <div className="space-y-8">
         {/* En-tête */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
@@ -832,6 +831,6 @@ export default function CommoditiesManagement() {
           </div>
         )}
       </div>
-    </DashboardLayout>
+    </>
   );
 }

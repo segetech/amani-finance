@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useEffect, useMemo, useState } from "react";
+import { supabase } from "../lib/supabase";
 import {
   FileText,
   Mic,
@@ -24,59 +26,143 @@ import {
 
 export default function DashboardMain() {
   const { user, hasPermission } = useAuth();
+  
+  // Dashboard state (from Supabase)
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [stats, setStats] = useState({
+    articles: { total: 0, thisMonth: 0, growth: 0 },
+    podcasts: { total: 0, thisMonth: 0, growth: 0 },
+    indices: { total: 0, thisMonth: 0, growth: 0 },
+    users: { total: 0, thisMonth: 0, growth: 0 },
+    views: { total: 0, thisWeek: 0, growth: 0 },
+    reports: { pending: 0, resolved: 0, total: 0 },
+  });
+  const [recentActivity, setRecentActivity] = useState<Array<{
+    id: string;
+    type: string;
+    title: string;
+    description?: string | null;
+    time: string;
+    user?: string;
+    icon: React.ComponentType<{ className?: string }>;
+    color: string;
+  }>>([]);
+  const [personal, setPersonal] = useState({
+    myArticles: 0,
+    myPodcasts: 0,
+    myIndices: 0,
+  });
 
-  // Mock data - in real app this would come from API
-  const stats = {
-    articles: { total: 156, thisMonth: 23, growth: 12.5 },
-    podcasts: { total: 48, thisMonth: 4, growth: 8.3 },
-    indices: { total: 87, thisMonth: 12, growth: 15.2 },
-    users: { total: 25847, thisMonth: 1247, growth: 5.1 },
-    views: { total: 189456, thisWeek: 23456, growth: 18.7 },
-    reports: { pending: 12, resolved: 145, total: 157 },
-  };
+  useEffect(() => {
+    let isMounted = true;
+    async function load() {
+      setLoading(true);
+      setError(null);
+      try {
+        // Ensure auth/session ready to satisfy RLS
+        await supabase.auth.getSession();
 
-  const recentActivity = [
-    {
-      id: 1,
-      type: "article",
-      title: "Nouvel article publié",
-      description: "Évolution du FCFA face à l'Euro en 2024",
-      time: "Il y a 2 heures",
-      user: "Fatou Diallo",
-      icon: FileText,
-      color: "text-blue-600",
-    },
-    {
-      id: 2,
-      type: "indice",
-      title: "Indice mis à jour",
-      description: "Taux directeur BCEAO - 3.5%",
-      time: "Il y a 4 heures",
-      user: "Ibrahim Touré",
-      icon: BarChart3,
-      color: "text-green-600",
-    },
-    {
-      id: 3,
-      type: "moderation",
-      title: "Commentaire modéré",
-      description: "Signalement traité - contenu inapproprié",
-      time: "Il y a 6 heures",
-      user: "Aïcha Koné",
-      icon: Shield,
-      color: "text-amber-600",
-    },
-    {
-      id: 4,
-      type: "user",
-      title: "Nouvel utilisateur",
-      description: "Inscription d'un analyste - INSTAT",
-      time: "Il y a 8 heures",
-      user: "Système",
-      icon: Users,
-      color: "text-purple-600",
-    },
-  ];
+        // Date helpers for "this month"
+        const now = new Date();
+        const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+
+        // Counts by type
+        const countByType = async (type: string, createdField: string = "created_at") => {
+          const base = supabase
+            .from("contents")
+            .select("id", { count: "exact", head: true })
+            .eq("type", type);
+          const { count: total, error: e1 } = await base;
+          if (e1) throw e1;
+          const { count: thisMonth, error: e2 } = await supabase
+            .from("contents")
+            .select("id", { count: "exact", head: true })
+            .eq("type", type)
+            .gte(createdField, monthStart);
+          if (e2) throw e2;
+          return { total: total || 0, thisMonth: thisMonth || 0 };
+        };
+
+        const [art, pod, ind] = await Promise.all([
+          countByType("article"),
+          countByType("podcast"),
+          countByType("indice"),
+        ]);
+
+        // Users count from profiles (if available)
+        let usersTotal = 0;
+        try {
+          const { count: usersCount } = await supabase
+            .from("profiles")
+            .select("id", { count: "exact", head: true });
+          usersTotal = usersCount || 0;
+        } catch {}
+
+        // Recent activity from contents
+        const { data: recent, error: recentErr } = await supabase
+          .from("contents")
+          .select("id, type, title, summary, created_at")
+          .order("created_at", { ascending: false })
+          .limit(6);
+        if (recentErr) throw recentErr;
+
+        const mapped = (recent || []).map((r) => {
+          const t = r.type as string;
+          const icon = t === "article" ? FileText : t === "podcast" ? Mic : t === "indice" ? BarChart3 : Activity;
+          const color = t === "article" ? "text-blue-600" : t === "podcast" ? "text-purple-600" : t === "indice" ? "text-green-600" : "text-gray-600";
+          const when = new Date(r.created_at);
+          const time = when.toLocaleDateString();
+          return {
+            id: r.id as string,
+            type: t,
+            title: r.title as string,
+            description: (r as any).summary as string | null,
+            time,
+            user: undefined,
+            icon,
+            color,
+          };
+        });
+
+        // Personal stats (by author_id)
+        let myArticles = 0, myPodcasts = 0, myIndices = 0;
+        if (user?.id) {
+          const byMe = async (type: string) => {
+            const { count } = await supabase
+              .from("contents")
+              .select("id", { count: "exact", head: true })
+              .eq("type", type)
+              .eq("author_id", user.id);
+            return count || 0;
+          };
+          [myArticles, myPodcasts, myIndices] = await Promise.all([
+            byMe("article"),
+            byMe("podcast"),
+            byMe("indice"),
+          ]);
+        }
+
+        if (!isMounted) return;
+        setStats((prev) => ({
+          ...prev,
+          articles: { total: art.total, thisMonth: art.thisMonth, growth: 0 },
+          podcasts: { total: pod.total, thisMonth: pod.thisMonth, growth: 0 },
+          indices: { total: ind.total, thisMonth: ind.thisMonth, growth: 0 },
+          users: { total: usersTotal, thisMonth: 0, growth: 0 },
+        }));
+        setRecentActivity(mapped);
+        setPersonal({ myArticles, myPodcasts, myIndices });
+      } catch (e: any) {
+        if (!isMounted) return;
+        setError(e?.message || "Erreur lors du chargement du tableau de bord");
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    }
+    load();
+    return () => { isMounted = false; };
+  }, [user?.id]);
 
   const quickActions = [
     {
@@ -159,6 +245,12 @@ export default function DashboardMain() {
 
   return (
     <div className="space-y-8">
+        {loading && (
+          <div className="bg-white rounded-2xl p-6 border border-gray-200 text-sm text-gray-600">Chargement des données...</div>
+        )}
+        {error && (
+          <div className="bg-red-50 text-red-700 border border-red-200 rounded-lg p-4 text-sm">{error}</div>
+        )}
         {/* Welcome Message & User Roles */}
         <div className="bg-gradient-to-r from-amani-primary to-amani-primary/80 rounded-2xl p-8 text-white">
           <div className="flex items-center justify-between">
@@ -292,8 +384,8 @@ export default function DashboardMain() {
                         {activity.description}
                       </div>
                       <div className="flex items-center gap-2 mt-1 text-xs text-gray-500">
-                        <span>Par {activity.user}</span>
-                        <span>•</span>
+                        {activity.user && <span>Par {activity.user}</span>}
+                        {activity.user && <span>•</span>}
                         <span>{activity.time}</span>
                       </div>
                     </div>
@@ -386,7 +478,7 @@ export default function DashboardMain() {
                     <span className="text-sm text-gray-600">
                       Articles créés
                     </span>
-                    <span className="font-bold text-amani-primary">23</span>
+                    <span className="font-bold text-amani-primary">{personal.myArticles}</span>
                   </div>
                 )}
                 {hasPermission("create_podcasts") && (
@@ -394,7 +486,7 @@ export default function DashboardMain() {
                     <span className="text-sm text-gray-600">
                       Podcasts publiés
                     </span>
-                    <span className="font-bold text-amani-primary">4</span>
+                    <span className="font-bold text-amani-primary">{personal.myPodcasts}</span>
                   </div>
                 )}
                 {hasPermission("create_indices") && (
@@ -402,7 +494,7 @@ export default function DashboardMain() {
                     <span className="text-sm text-gray-600">
                       Indices mis à jour
                     </span>
-                    <span className="font-bold text-amani-primary">12</span>
+                    <span className="font-bold text-amani-primary">{personal.myIndices}</span>
                   </div>
                 )}
                 {/* Additional personal stats can be added here */}

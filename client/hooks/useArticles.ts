@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 
 // Helper: strict UUID v4 detection
@@ -120,6 +120,10 @@ export const useArticles = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [count, setCount] = useState<number>(0);
+  // Attendre que l'auth Supabase soit prête avant le 1er fetch
+  const [authReady, setAuthReady] = useState(false);
+  // Éviter double-fetch en StrictMode (dev)
+  const didInitialFetch = useRef(false);
 
   const fetchArticles = useCallback(async () => {
     try {
@@ -256,6 +260,25 @@ export const useArticles = ({
     }
   }, [status, limit, offset, category, authorId]);
 
+  // Marquer l'auth comme prête et relancer en cas de changement de session
+  useEffect(() => {
+    let unsub: { subscription?: { unsubscribe?: () => void } } | null = null;
+    // getSession résout même si pas connecté; on l'utilise comme signal de readiness
+    supabase.auth.getSession().then(() => setAuthReady(true));
+    const sub = supabase.auth.onAuthStateChange((_event, _session) => {
+      // Quand la session change, refetch pour éviter d'avoir à redémarrer
+      setAuthReady(true);
+      // Refetch non bloquant
+      fetchArticles().catch((e) => console.warn('Refetch après changement de session échoué:', e));
+    });
+    unsub = sub?.data as any;
+    return () => {
+      try {
+        unsub?.subscription?.unsubscribe?.();
+      } catch {}
+    };
+  }, [fetchArticles]);
+
   const fetchArticleBySlug = useCallback(async (slug: string): Promise<Article> => {
     try {
       setLoading(true);
@@ -289,7 +312,8 @@ export const useArticles = ({
       const formattedData: Article = {
         ...(content as any),
         type: 'article',
-        published_at: content.published_at ? new Date(content.published_at).toISOString() : null,
+        // Normalize to yyyy-MM-dd for HTML date inputs
+        published_at: content.published_at ? new Date(content.published_at).toISOString().slice(0, 10) : null,
         created_at: new Date(content.created_at).toISOString(),
         updated_at: new Date(content.updated_at).toISOString(),
         // author left as-is (no FK join available yet)
@@ -340,6 +364,99 @@ export const useArticles = ({
       setLoading(false);
     }
   }, []);
+
+  const fetchArticleById = useCallback(async (id: string): Promise<Article> => {
+    try {
+      setLoading(true);
+
+      const { data, error } = await supabase
+        .from('contents')
+        .select(`
+          *,
+          categories:content_categories!category_id(
+            id,
+            name,
+            slug,
+            description,
+            color,
+            icon,
+            parent_id,
+            sort_order,
+            is_active,
+            content_types
+          )
+        `)
+        .eq('id', id)
+        .eq('type', 'article')
+        .single();
+
+      if (error) throw error;
+      if (!data) throw new Error('Article not found');
+
+      const { categories, ...content } = (data as any);
+
+      const formattedData: Article = {
+        ...(content as any),
+        type: 'article',
+        // Normalize to yyyy-MM-dd for HTML date inputs
+        published_at: content.published_at ? new Date(content.published_at).toISOString().slice(0, 10) : null,
+        created_at: new Date(content.created_at).toISOString(),
+        updated_at: new Date(content.updated_at).toISOString(),
+        // author left as-is (no FK join available yet)
+        author: {
+          id: content.author_id,
+          email: 'author@example.com',
+          first_name: 'Auteur',
+          last_name: 'Test',
+          avatar_url: undefined,
+          role: 'editor' as const,
+          permissions: ['create_content', 'edit_content'],
+          organization: undefined,
+          country: undefined,
+          phone: undefined,
+          location: undefined,
+          bio: undefined,
+          website: undefined,
+          linkedin: undefined,
+          twitter: undefined,
+          preferences: undefined,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          last_login: undefined,
+          is_active: true
+        },
+        category_info: categories ? {
+          id: categories.id,
+          name: categories.name,
+          slug: categories.slug,
+          description: categories.description,
+          color: categories.color,
+          icon: categories.icon,
+          parent_id: categories.parent_id,
+          sort_order: categories.sort_order || 0,
+          is_active: categories.is_active ?? true,
+          content_types: categories.content_types || ['article']
+        } : undefined,
+        comment_count: 0,
+        is_liked_by_user: false
+      };
+
+      return formattedData;
+    } catch (err) {
+      console.error('Error fetching article by id:', err);
+      setError(err as Error);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const fetchArticleByIdOrSlug = useCallback(async (identifier: string): Promise<Article> => {
+    if (isUUID(identifier)) {
+      return fetchArticleById(identifier);
+    }
+    return fetchArticleBySlug(identifier);
+  }, [fetchArticleById, fetchArticleBySlug]);
 
   const createArticle = useCallback(async (articleData: Omit<Article, 'id' | 'created_at' | 'updated_at' | 'views' | 'likes' | 'shares' | 'comment_count' | 'is_liked_by_user'>) => {
     try {
@@ -569,8 +686,15 @@ export const useArticles = ({
   }, []);
 
   useEffect(() => {
+    if (!authReady) return;
+    if (didInitialFetch.current) {
+      // Mises à jour de filtres ou deps
+      fetchArticles();
+      return;
+    }
+    didInitialFetch.current = true;
     fetchArticles();
-  }, [status, limit, offset, category, authorId]);
+  }, [authReady, status, limit, offset, category, authorId, fetchArticles]);
 
   return {
     articles,
@@ -579,6 +703,8 @@ export const useArticles = ({
     count,
     refetch: fetchArticles,
     fetchArticleBySlug,
+    fetchArticleById,
+    fetchArticleByIdOrSlug,
     createArticle,
     updateArticle,
     deleteArticle

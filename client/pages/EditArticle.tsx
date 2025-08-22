@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import { useArticles } from "../hooks/useArticles";
-import DashboardLayout from "../components/DashboardLayout";
+// Removed local DashboardLayout to avoid duplicate sidebar under DashboardShell
 import UnifiedContentForm from "../components/UnifiedContentForm";
 import { Article } from "../hooks/useArticles";
 import {
@@ -20,25 +20,22 @@ export default function EditArticle() {
   const navigate = useNavigate();
   const { user, hasPermission } = useAuth();
   const { success, error } = useToast();
-  const { fetchArticleBySlug, updateArticle } = useArticles();
+  const { fetchArticleByIdOrSlug, updateArticle } = useArticles();
 
   const [article, setArticle] = useState<Article | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
 
-  // Vérification des permissions
+  // Vérification des permissions (render a centered card, without DashboardLayout)
   if (!user || !hasPermission("manage_articles")) {
     return (
-      <DashboardLayout title="Accès refusé">
+      <div className="px-4 py-8">
         <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md mx-auto">
           <div className="text-center">
             <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              Accès refusé
-            </h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Accès refusé</h2>
             <p className="text-gray-600 mb-6">
-              Vous n'avez pas les permissions nécessaires pour modifier des
-              articles.
+              Vous n'avez pas les permissions nécessaires pour modifier des articles.
             </p>
             <button
               onClick={() => navigate("/dashboard")}
@@ -48,7 +45,7 @@ export default function EditArticle() {
             </button>
           </div>
         </div>
-      </DashboardLayout>
+      </div>
     );
   }
 
@@ -65,7 +62,7 @@ export default function EditArticle() {
         setLoading(true);
         console.log("📖 Chargement de l'article:", id);
 
-        const articleData = await fetchArticleBySlug(id);
+        const articleData = await fetchArticleByIdOrSlug(id);
         
         if (articleData) {
           setArticle(articleData);
@@ -82,7 +79,7 @@ export default function EditArticle() {
     };
 
     loadArticle();
-  }, [id, error, fetchArticleBySlug]);
+  }, [id, error, fetchArticleByIdOrSlug]);
 
   // Gestion de la sauvegarde
   const handleSave = async (formData: any) => {
@@ -135,32 +132,24 @@ export default function EditArticle() {
   // État de chargement
   if (loading) {
     return (
-      <DashboardLayout title="Chargement...">
-        <div className="flex items-center justify-center py-12">
-          <div className="text-center">
-            <Loader className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-4" />
-            <p className="text-gray-600">
-              Chargement des données de l'article...
-            </p>
-          </div>
+      <div className="flex items-center justify-center py-12">
+        <div className="text-center">
+          <Loader className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-4" />
+          <p className="text-gray-600">Chargement des données de l'article...</p>
         </div>
-      </DashboardLayout>
+      </div>
     );
   }
 
   // Article non trouvé
   if (notFound || !article) {
     return (
-      <DashboardLayout title="Article introuvable">
+      <div className="px-4 py-8">
         <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md mx-auto">
           <div className="text-center">
             <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              Article introuvable
-            </h2>
-            <p className="text-gray-600 mb-6">
-              L'article avec l'ID "{id}" n'a pas été trouvé.
-            </p>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Article introuvable</h2>
+            <p className="text-gray-600 mb-6">L'article avec l'ID "{id}" n'a pas été trouvé.</p>
             <div className="flex gap-3 justify-center">
               <button
                 onClick={() => navigate("/dashboard/articles")}
@@ -177,16 +166,17 @@ export default function EditArticle() {
             </div>
           </div>
         </div>
-      </DashboardLayout>
+      </div>
     );
   }
 
   return (
-    <DashboardLayout
-      title="Modifier l'article"
-      subtitle={`Modification de "${article.title}"`}
-    >
+    <div className="px-4 py-6">
       <div className="max-w-4xl mx-auto space-y-8">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Modifier l'article</h1>
+          <p className="text-gray-600">Modification de "{article.title}"</p>
+        </div>
         {/* Navigation */}
         <div className="flex items-center gap-4">
           <button
@@ -220,7 +210,7 @@ export default function EditArticle() {
           {/* Lien vers l'article publié */}
           {article.status === "published" && (
             <a
-              href={`/article/${article.slug}`}
+              href={`/article/${article.id}`}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors"
@@ -294,6 +284,6 @@ export default function EditArticle() {
           onCancel={handleCancel}
         />
       </div>
-    </DashboardLayout>
+    </div>
   );
 }

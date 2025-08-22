@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
-import DashboardLayout from "../components/DashboardLayout";
 import {
   Activity,
   Users,
@@ -48,7 +47,7 @@ export default function UserActivity() {
   // Check permissions
   if (!user || !hasPermission("view_user_activity")) {
     return (
-      <DashboardLayout title="Accès refusé">
+      <>
         <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md mx-auto">
           <h2 className="text-2xl font-bold text-amani-primary mb-4">
             Accès refusé
@@ -58,7 +57,7 @@ export default function UserActivity() {
             utilisateurs.
           </p>
         </div>
-      </DashboardLayout>
+      </>
     );
   }
 
@@ -379,19 +378,13 @@ export default function UserActivity() {
   };
 
   return (
-    <DashboardLayout
-      title="Activité des utilisateurs"
-      subtitle="Surveillez et analysez l'activité en temps réel sur la plateforme"
-      actions={
-        <button
-          onClick={handleExportActivity}
-          className="flex items-center gap-2 px-4 py-2 bg-amani-primary text-white rounded-lg hover:bg-amani-primary/90 transition-colors"
-        >
-          <Download className="w-4 h-4" />
-          Exporter
-        </button>
-      }
-    >
+    <>
+      {/* Header previously from DashboardLayout props can be re-added locally if desired */}
+      {/* <div className="mb-6">
+        <h1 className="text-2xl font-bold text-amani-primary">Activité des utilisateurs</h1>
+        <p className="text-gray-600">Surveillez et analysez l'activité en temps réel sur la plateforme</p>
+      </div> */}
+      {/* actions JSX was previously provided via DashboardLayout props */}
       <div className="space-y-8">
         {/* Statistics Overview */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -686,6 +679,6 @@ export default function UserActivity() {
           </div>
         )}
       </div>
-    </DashboardLayout>
+    </>
   );
 }

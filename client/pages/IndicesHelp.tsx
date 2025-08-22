@@ -1,5 +1,4 @@
 import React from "react";
-import DashboardLayout from "../components/DashboardLayout";
 import {
   BookOpen,
   BarChart3,
@@ -18,7 +17,7 @@ import {
 
 export default function IndicesHelp() {
   return (
-    <DashboardLayout>
+    <>
       <div className="max-w-4xl mx-auto space-y-8">
         {/* En-tête */}
         <div className="text-center">
@@ -415,6 +414,6 @@ export default function IndicesHelp() {
           </div>
         </div>
       </div>
-    </DashboardLayout>
+    </>
   );
 }

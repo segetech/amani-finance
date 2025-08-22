@@ -40,6 +40,8 @@ import {
   CommoditiesData,
   getCommodityIcon,
 } from "../services/commoditiesApi";
+import { useArticles } from "../hooks/useArticles";
+import { usePodcasts } from "../hooks/usePodcasts";
 
 export default function Index() {
   // État pour les données BRVM et commodités en temps réel
@@ -48,6 +50,10 @@ export default function Index() {
     React.useState<CommoditiesData | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [lastUpdate, setLastUpdate] = React.useState<Date | null>(null);
+
+  // Données réelles: articles et podcasts publiés depuis Supabase
+  const { articles, loading: loadingArticles } = useArticles({ status: 'published', limit: 4, offset: 0 });
+  const { podcasts, loading: loadingPodcasts } = usePodcasts({ status: 'published', limit: 2, offset: 0 });
 
   // Fonction pour charger toutes les données (BRVM + Commodités)
   const loadAllData = async () => {
@@ -135,92 +141,39 @@ export default function Index() {
     ];
   }, [brvmData]);
 
-  const latestNews = [
-    {
-      id: 1,
-      title:
-        "Le Mali annonce de nouveaux investissements dans les infrastructures",
-      excerpt:
-        "Le gouvernement malien a dévoilé un plan d'investissement de 500 milliards de FCFA...",
-      category: "Économie",
-      date: "2024-01-15",
-      author: "Amadou Diallo",
-      image: "/placeholder.svg",
-    },
-    {
-      id: 2,
-      title: "BRVM : hausse de 2.3% portée par les valeurs bancaires",
-      excerpt:
-        "La Bourse Régionale des Valeurs Mobilières a clôturé en hausse grâce aux performances...",
-      category: "Marché",
-      date: "2024-01-15",
-      author: "Fatou Kone",
-      image: "/placeholder.svg",
-    },
-    {
-      id: 3,
-      title: "Burkina Faso : nouveau gisement d'or découvert",
-      excerpt:
-        "Une société minière canadienne annonce la découverte d'un important gisement...",
-      category: "Industrie",
-      date: "2024-01-14",
-      author: "Ibrahim Traore",
-      image: "/placeholder.svg",
-    },
-  ];
-
-  const podcasts = [
-    {
-      id: 1,
-      title: "L'avenir de l'économie sahélienne",
-      duration: "45 min",
-      date: "2024-01-12",
-      description:
-        "Discussion avec des experts sur les perspectives économiques de la région",
-      image: "/placeholder.svg",
-    },
-    {
-      id: 2,
-      title: "Investir dans les startups africaines",
-      duration: "38 min",
-      date: "2024-01-08",
-      description:
-        "Analyse des opportunités d'investissement dans la tech africaine",
-      image: "/placeholder.svg",
-    },
-  ];
+  // Dérivés pour l'affichage public
+  const heroArticle = React.useMemo(() => articles?.[0], [articles]);
+  const otherArticles = React.useMemo(() => (articles || []).slice(1, 4), [articles]);
 
   return (
     <div className="min-h-screen bg-[#E5DDD2]">
-      {/* Hero Section */}
+      {/* Hero Section – utilise le dernier article publié s'il existe */}
       <section className="bg-amani-primary text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <h1 className="text-4xl lg:text-6xl font-bold mb-6">À la une</h1>
               <h2 className="text-2xl lg:text-3xl font-semibold mb-4">
-                Le Mali lance son plus grand projet d'infrastructure
+                {heroArticle ? heroArticle.title : "Le Mali lance son plus grand projet d'infrastructure"}
               </h2>
               <p className="text-lg mb-8 text-gray-200">
-                Un investissement de 2 milliards d'euros pour moderniser les
-                réseaux de transport et d'énergie, promettant de transformer
-                l'économie du pays d'ici 2027.
+                {heroArticle?.summary || "Un investissement de 2 milliards d'euros pour moderniser les réseaux de transport et d'énergie, promettant de transformer l'économie du pays d'ici 2027."}
               </p>
               <div className="flex flex-wrap gap-4 items-center mb-8">
                 <span className="bg-white/20 px-3 py-1 rounded-full text-sm">
-                  Économie
+                  {heroArticle?.category_info?.name || "Économie"}
                 </span>
                 <span className="flex items-center gap-2 text-sm">
                   <Calendar className="w-4 h-4" />
-                  15 janvier 2024
+                  {heroArticle?.published_at ? new Date(heroArticle.published_at).toLocaleDateString('fr-FR') : '15 janvier 2024'}
                 </span>
                 <span className="flex items-center gap-2 text-sm">
                   <User className="w-4 h-4" />
-                  Amadou Diallo
+                  {heroArticle?.author_id ? "Auteur" : "Amadou Diallo"}
                 </span>
               </div>
               <Link
-                to="/article/1"
+                to={heroArticle ? `/article/${heroArticle.id}` : "/article/1"}
                 className="inline-flex items-center gap-2 bg-white text-amani-primary px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
               >
                 Lire l'article
@@ -229,8 +182,8 @@ export default function Index() {
             </div>
             <div className="relative">
               <img
-                src="/placeholder.svg"
-                alt="Infrastructure project"
+                src={heroArticle?.featured_image || "/placeholder.svg"}
+                alt={heroArticle?.title || "Infrastructure project"}
                 className="w-full h-80 object-cover rounded-lg shadow-xl"
               />
             </div>
@@ -313,7 +266,7 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Latest News - Improved section with fixed encoding */}
+      {/* Dernières actualités – affiche les articles publiés en base */}
       <section className="py-16 bg-gradient-to-br from-gray-50 to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -330,8 +283,8 @@ export default function Index() {
             <div className="lg:col-span-2">
               <div className="relative overflow-hidden rounded-2xl shadow-2xl group">
                 <img
-                  src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&h=500&fit=crop"
-                  alt="Article principal"
+                  src={heroArticle?.featured_image || "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&h=500&fit=crop"}
+                  alt={heroArticle?.title || "Article principal"}
                   className="w-full h-96 lg:h-[500px] object-cover group-hover:scale-105 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
@@ -340,26 +293,23 @@ export default function Index() {
                     🔥 À LA UNE
                   </span>
                   <h3 className="text-3xl lg:text-4xl font-bold text-white mb-4 leading-tight">
-                    Le Mali annonce de nouveaux investissements dans les
-                    infrastructures
+                    {heroArticle?.title || 'Le Mali annonce de nouveaux investissements dans les infrastructures'}
                   </h3>
                   <p className="text-xl text-gray-200 mb-6 leading-relaxed">
-                    Le gouvernement malien a dévoilé un plan d'investissement de
-                    500 milliards de FCFA pour moderniser les infrastructures du
-                    pays et stimuler la croissance économique.
+                    {heroArticle?.summary || "Le gouvernement malien a dévoilé un plan d'investissement de 500 milliards de FCFA pour moderniser les infrastructures du pays et stimuler la croissance économique."}
                   </p>
                   <div className="flex items-center gap-6 text-white">
                     <div className="flex items-center gap-2">
                       <Calendar className="w-5 h-5" />
-                      <span className="font-medium">15 Mars 2025</span>
+                      <span className="font-medium">{heroArticle?.published_at ? new Date(heroArticle.published_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' }) : '15 Mars 2025'}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <User className="w-5 h-5" />
-                      <span className="font-medium">Dr. Mohamed Keita</span>
+                      <span className="font-medium">{heroArticle?.author_id ? 'Auteur' : 'Rédaction Amani'}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Eye className="w-5 h-5" />
-                      <span className="font-medium">2.1K vues</span>
+                      <span className="font-medium">{typeof heroArticle?.views === 'number' ? `${heroArticle.views} vues` : '2.1K vues'}</span>
                     </div>
                   </div>
                 </div>
@@ -382,52 +332,23 @@ export default function Index() {
               </div>
 
               <div className="space-y-6">
-                {[
-                  {
-                    title: "La BCEAO maintient son taux directeur à 3.5%",
-                    category: "Finance",
-                    time: "Il y a 2 heures",
-                    color: "bg-blue-500",
-                  },
-                  {
-                    title: "Croissance du secteur agricole au Burkina Faso",
-                    category: "Agriculture",
-                    time: "Il y a 4 heures",
-                    color: "bg-green-500",
-                  },
-                  {
-                    title: "Nouveau partenariat commercial Mali-Sénégal",
-                    category: "Commerce",
-                    time: "Il y a 6 heures",
-                    color: "bg-purple-500",
-                  },
-                  {
-                    title: "Innovation technologique dans la fintech africaine",
-                    category: "Tech",
-                    time: "Il y a 8 heures",
-                    color: "bg-orange-500",
-                  },
-                  {
-                    title: "Inflation modérée dans la zone UEMOA",
-                    category: "Économie",
-                    time: "Il y a 12 heures",
-                    color: "bg-red-500",
-                  },
-                ].map((item, index) => (
-                  <div key={index} className="group cursor-pointer">
+                {(otherArticles.length ? otherArticles : []).map((item, index) => (
+                  <Link key={index} to={`/article/${item.id}`} className="group cursor-pointer block">
                     <div className="flex gap-3">
                       <div
-                        className={`flex-shrink-0 w-3 h-3 ${item.color} rounded-full mt-2`}
+                        className={`flex-shrink-0 w-3 h-3 ${item.category_info?.color ? '' : 'bg-blue-500'} rounded-full mt-2`}
+                        style={item.category_info?.color ? { backgroundColor: item.category_info.color } : undefined}
                       ></div>
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
                           <span
-                            className={`text-xs px-2 py-1 ${item.color} text-white rounded-full font-medium`}
+                            className={`text-xs px-2 py-1 text-white rounded-full font-medium`}
+                            style={{ backgroundColor: item.category_info?.color || '#1D4ED8' }}
                           >
-                            {item.category}
+                            {item.category_info?.name || 'Actualités'}
                           </span>
                           <span className="text-xs text-gray-500">
-                            {item.time}
+                            {item.published_at ? new Date(item.published_at).toLocaleDateString('fr-FR') : ''}
                           </span>
                         </div>
                         <h5 className="font-medium text-gray-900 leading-tight group-hover:text-blue-600 transition-colors">
@@ -435,7 +356,7 @@ export default function Index() {
                         </h5>
                       </div>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </div>
@@ -443,7 +364,7 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Podcast Section */}
+      {/* Podcast Section – données réelles Supabase */}
       <section className="py-16 bg-amani-secondary/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-8">
@@ -453,14 +374,14 @@ export default function Index() {
             </Link>
           </div>
           <div className="grid lg:grid-cols-2 gap-8">
-            {podcasts.map((podcast) => (
+            {(podcasts || []).map((podcast) => (
               <div
                 key={podcast.id}
                 className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
               >
                 <div className="flex gap-4">
                   <img
-                    src={podcast.image}
+                    src={(podcast as any).featured_image || "/placeholder.svg"}
                     alt={podcast.title}
                     className="w-20 h-20 rounded-lg object-cover flex-shrink-0"
                   />
@@ -468,13 +389,17 @@ export default function Index() {
                     <h3 className="text-xl font-semibold text-amani-primary mb-2">
                       {podcast.title}
                     </h3>
-                    <p className="text-gray-600 mb-3 text-sm">
-                      {podcast.description}
-                    </p>
+                    {podcast.summary && (
+                      <p className="text-gray-600 mb-3 text-sm">
+                        {podcast.summary}
+                      </p>
+                    )}
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4 text-sm text-gray-500">
-                        <span>{podcast.duration}</span>
-                        <span>{podcast.date}</span>
+                        {(podcast as any)?.podcast_data?.duration && (
+                          <span>{(podcast as any).podcast_data.duration}</span>
+                        )}
+                        <span>{podcast.published_at ? new Date(podcast.published_at).toLocaleDateString('fr-FR') : ''}</span>
                       </div>
                       <button className="flex items-center gap-2 bg-amani-primary text-white px-4 py-2 rounded-lg hover:bg-amani-primary/90 transition-colors">
                         <Play className="w-4 h-4" />
@@ -485,6 +410,9 @@ export default function Index() {
                 </div>
               </div>
             ))}
+            {(!podcasts || podcasts.length === 0) && (
+              <div className="text-gray-500">Aucun podcast publié pour le moment.</div>
+            )}
           </div>
         </div>
       </section>

@@ -48,10 +48,8 @@ import EditArticle from "./pages/EditArticle";
 import PodcastsManager from "./pages/PodcastsManager";
 import NewPodcast from "./pages/NewPodcast";
 import EditPodcast from "./pages/EditPodcast";
-import IndicesManager from "./pages/IndicesManager";
-import NewIndice from "./pages/NewIndice";
-import EditIndice from "./pages/EditIndice";
-import IndicesManagement from "./pages/IndicesManagement";
+import LegacyIndicesDisabled from "./pages/LegacyIndicesDisabled";
+import BrvmIndicesManagement from "./pages/BrvmIndicesManagement";
 import CommoditiesManagement from "./pages/CommoditiesManagement";
 import IndicesHelp from "./pages/IndicesHelp";
 import Analytics from "./pages/Analytics";
@@ -132,10 +130,10 @@ const AppContent = () => {
           <Route path="podcasts" element={<PodcastsManager />} />
           <Route path="podcasts/new" element={<NewPodcast />} />
           <Route path="podcasts/edit/:id" element={<EditPodcast />} />
-          <Route path="indices" element={<IndicesManager />} />
-          <Route path="indices/new" element={<NewIndice />} />
-          <Route path="indices/edit/:id" element={<EditIndice />} />
-          <Route path="indices-management" element={<IndicesManagement />} />
+          <Route path="indices" element={<LegacyIndicesDisabled />} />
+          <Route path="indices/new" element={<LegacyIndicesDisabled />} />
+          <Route path="indices/edit/:id" element={<LegacyIndicesDisabled />} />
+          <Route path="indices-management" element={<BrvmIndicesManagement />} />
           <Route path="commodities-management" element={<CommoditiesManagement />} />
           <Route path="indices-help" element={<IndicesHelp />} />
           <Route path="analytics" element={<Analytics />} />

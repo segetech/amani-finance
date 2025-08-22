@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '../lib/supabase';
  
 
@@ -76,6 +76,10 @@ export const usePodcasts = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [count, setCount] = useState<number>(0);
+  // Attendre readiness auth pour éviter fetch à vide sous RLS
+  const [authReady, setAuthReady] = useState(false);
+  // Eviter double-fetch en StrictMode
+  const didInitialFetch = useRef(false);
 
   const fetchPodcasts = useCallback(async () => {
     try {
@@ -175,6 +179,20 @@ export const usePodcasts = ({
       setLoading(false);
     }
   }, [status, limit, offset, category, authorId]);
+
+  // Auth readiness + refetch on session change
+  useEffect(() => {
+    let unsub: { subscription?: { unsubscribe?: () => void } } | null = null;
+    supabase.auth.getSession().then(() => setAuthReady(true));
+    const sub = supabase.auth.onAuthStateChange((_event, _session) => {
+      setAuthReady(true);
+      fetchPodcasts().catch((e) => console.warn('Refetch podcasts après changement de session échoué:', e));
+    });
+    unsub = sub?.data as any;
+    return () => {
+      try { unsub?.subscription?.unsubscribe?.(); } catch {}
+    };
+  }, [fetchPodcasts]);
 
   const fetchPodcastBySlug = useCallback(async (slug: string): Promise<Podcast> => {
     try {
@@ -505,8 +523,14 @@ export const usePodcasts = ({
   }, []);
 
   useEffect(() => {
+    if (!authReady) return;
+    if (didInitialFetch.current) {
+      fetchPodcasts();
+      return;
+    }
+    didInitialFetch.current = true;
     fetchPodcasts();
-  }, [status, limit, offset, category, authorId]);
+  }, [authReady, status, limit, offset, category, authorId, fetchPodcasts]);
 
   return {
     podcasts,

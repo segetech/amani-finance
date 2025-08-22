@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import { useArticles } from "../hooks/useArticles";
-import DashboardLayout from "../components/DashboardLayout";
 import UnifiedContentForm from "../components/UnifiedContentForm";
 import { ArrowLeft, FileText, AlertCircle } from "lucide-react";
 
@@ -17,10 +16,7 @@ export default function NewArticle() {
   // Check permissions
   if (!user || !hasPermission("create_articles")) {
     return (
-      <DashboardLayout
-        title="Accès refusé"
-        subtitle="Vous n'avez pas les permissions nécessaires"
-      >
+      <>
         <div className="flex items-center justify-center py-12">
           <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md text-center">
             <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
@@ -39,7 +35,7 @@ export default function NewArticle() {
             </button>
           </div>
         </div>
-      </DashboardLayout>
+      </>
     );
   }
 
@@ -91,10 +87,12 @@ export default function NewArticle() {
   };
 
   return (
-    <DashboardLayout
-      title="Créer un nouvel article"
-      subtitle="Rédigez un article pour informer votre audience"
-      actions={
+    <>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Créer un nouvel article</h1>
+          <p className="text-gray-600">Rédigez un article pour informer votre audience</p>
+        </div>
         <button
           onClick={() => navigate("/dashboard/articles")}
           className="flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
@@ -102,8 +100,7 @@ export default function NewArticle() {
           <ArrowLeft className="w-4 h-4" />
           Retour
         </button>
-      }
-    >
+      </div>
       <div className="max-w-4xl mx-auto">
         {/* Formulaire unifié pour articles */}
         <UnifiedContentForm
@@ -112,6 +109,6 @@ export default function NewArticle() {
           onCancel={handleCancel}
         />
       </div>
-    </DashboardLayout>
+    </>
   );
 }
