@@ -37,6 +37,7 @@ CREATE TABLE IF NOT EXISTS public.brvm_index_points (
   close NUMERIC(12,2) NOT NULL,
   change NUMERIC(12,2),
   change_percent NUMERIC(7,2),
+  direction TEXT,
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
@@ -49,6 +50,10 @@ ALTER TABLE public.brvm_index_points
   ADD COLUMN IF NOT EXISTS change NUMERIC(12,2);
 ALTER TABLE public.brvm_index_points
   ADD COLUMN IF NOT EXISTS change_percent NUMERIC(7,2);
+
+-- Ensure direction column exists
+ALTER TABLE public.brvm_index_points
+  ADD COLUMN IF NOT EXISTS direction TEXT;
 
 -- Coerce types to NUMERIC if an older schema created them as TEXT (handle comma decimals)
 DO $$ BEGIN
@@ -93,6 +98,79 @@ DO $$ BEGIN
   END IF;
 END $$;
 
+-- 2.c) Privileges: allow anon/authenticated to interact via PostgREST under RLS
+GRANT USAGE ON SCHEMA public TO anon, authenticated;
+-- Read access
+GRANT SELECT ON public.brvm_index_groups, public.brvm_indices, public.brvm_index_points TO anon;
+GRANT SELECT ON public.brvm_index_groups, public.brvm_indices, public.brvm_index_points TO authenticated;
+-- Write access for authenticated
+GRANT INSERT, UPDATE, DELETE ON public.brvm_index_groups, public.brvm_indices, public.brvm_index_points TO authenticated;
+
+-- 2.b) Trigger to auto-compute previous/changes/direction on insert
+CREATE OR REPLACE FUNCTION public.brvm_index_points_bi()
+RETURNS TRIGGER AS $$
+DECLARE
+  v_prev NUMERIC(12,2);
+BEGIN
+  -- If created_at not provided, set now
+  IF NEW.created_at IS NULL THEN
+    NEW.created_at := now();
+  END IF;
+
+  -- Determine previous_close from latest existing point for same indice
+  SELECT p.close INTO v_prev
+  FROM public.brvm_index_points p
+  WHERE p.indice_id = NEW.indice_id
+  ORDER BY p.created_at DESC
+  LIMIT 1;
+
+  -- Only set previous_close if not explicitly provided
+  IF NEW.previous_close IS NULL THEN
+    NEW.previous_close := v_prev;
+  END IF;
+
+  -- Compute change and change_percent if possible
+  IF NEW.previous_close IS NOT NULL THEN
+    NEW.change := COALESCE(NEW.change, ROUND(NEW.close - NEW.previous_close, 2));
+    IF NEW.previous_close <> 0 THEN
+      NEW.change_percent := COALESCE(NEW.change_percent, ROUND(((NEW.close - NEW.previous_close) / NEW.previous_close) * 100.0, 2));
+    ELSE
+      NEW.change_percent := COALESCE(NEW.change_percent, NULL);
+    END IF;
+  ELSE
+    -- First point: no previous value
+    NEW.change := COALESCE(NEW.change, NULL);
+    NEW.change_percent := COALESCE(NEW.change_percent, NULL);
+  END IF;
+
+  -- Compute direction if not provided
+  IF NEW.direction IS NULL THEN
+    IF NEW.change IS NULL THEN
+      NEW.direction := 'neutral';
+    ELSIF NEW.change > 0 THEN
+      NEW.direction := 'up';
+    ELSIF NEW.change < 0 THEN
+      NEW.direction := 'down';
+    ELSE
+      NEW.direction := 'neutral';
+    END IF;
+  END IF;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_trigger WHERE tgname = 'brvm_index_points_bi_trg'
+  ) THEN
+    CREATE TRIGGER brvm_index_points_bi_trg
+    BEFORE INSERT ON public.brvm_index_points
+    FOR EACH ROW
+    EXECUTE FUNCTION public.brvm_index_points_bi();
+  END IF;
+END $$;
+
 -- 2) RLS (basic): public read, authenticated write
 ALTER TABLE public.brvm_index_groups ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.brvm_indices ENABLE ROW LEVEL SECURITY;
@@ -133,17 +211,23 @@ DO $$ BEGIN
   END IF;
 END $$;
 
--- Drop view first to ensure column list is refreshed
-DROP VIEW IF EXISTS public.brvm_indices_latest;
+-- Drop view first to ensure column list is refreshed (CASCADE to drop dependent perms if any)
+DROP VIEW IF EXISTS public.brvm_indices_latest CASCADE;
 CREATE VIEW public.brvm_indices_latest AS
-SELECT i.*,
-       p_latest.close AS latest_close,
-       COALESCE(p_latest.change, (p_latest.close - p_latest.previous_close)) AS latest_change,
-       p_latest.change_percent AS latest_change_percent,
-       p_latest.created_at AS latest_at
+SELECT 
+  i.code,
+  i.name,
+  p_latest.close AS latest_close,
+  COALESCE(p_latest.change, (p_latest.close - p_latest.previous_close)) AS latest_change,
+  p_latest.change_percent AS latest_change_percent,
+  p_latest.created_at AS latest_at
 FROM public.brvm_indices i
 LEFT JOIN LATERAL (
-  SELECT p.* FROM public.brvm_index_points p WHERE p.indice_id = i.id ORDER BY p.created_at DESC LIMIT 1
+  SELECT p.* 
+  FROM public.brvm_index_points p 
+  WHERE p.indice_id = i.id 
+  ORDER BY p.created_at DESC 
+  LIMIT 1
 ) p_latest ON TRUE;
 
 -- 4) Seed groups (upsert by slug)

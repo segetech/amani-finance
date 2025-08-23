@@ -27,6 +27,7 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Podcast from "./pages/Podcast";
 import Indices from "./pages/Indices";
+import BrvmLatest from "./pages/BrvmLatest";
 import Calculateur from "./pages/Calculateur";
 import GuideDebutant from "./pages/GuideDebutant";
 import Actualites from "./pages/Actualites";
@@ -101,6 +102,7 @@ const AppContent = () => {
         <Route path="/contact" element={<Contact />} />
         <Route path="/podcast" element={<Podcast />} />
         <Route path="/indices" element={<Indices />} />
+        <Route path="/brvm-latest" element={<BrvmLatest />} />
         <Route path="/calculateur" element={<Calculateur />} />
         <Route path="/guide-debutant" element={<GuideDebutant />} />
         <Route path="/actualites" element={<Actualites />} />
