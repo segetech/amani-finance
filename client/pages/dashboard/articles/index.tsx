@@ -10,7 +10,7 @@ import { fr } from 'date-fns/locale';
 
 export default function ArticlesList() {
   const [status, setStatus] = useState<'published' | 'draft' | 'all'>('published');
-  const { articles, loading, error } = useArticles(status === 'all' ? 'all' : status);
+  const { articles, loading, error } = useArticles({ status: status === 'all' ? 'all' : status });
   const navigate = useNavigate();
 
   if (loading) {
@@ -82,6 +82,13 @@ export default function ArticlesList() {
                     src={article.featured_image}
                     alt={article.featured_image_alt || article.title}
                     className="w-full h-full object-cover"
+                    loading="lazy"
+                    decoding="async"
+                    onError={(e) => {
+                      const target = e.currentTarget as HTMLImageElement;
+                      target.onerror = null;
+                      target.src = "/placeholder.svg";
+                    }}
                   />
                 </div>
               )}
@@ -120,9 +127,9 @@ export default function ArticlesList() {
                     ? format(new Date(article.published_at), 'PPP', { locale: fr })
                     : 'Non publié'}
                 </div>
-                {article.category && (
+                {article.category_info?.name && (
                   <Badge variant="outline" className="mt-3">
-                    {article.category.name}
+                    {article.category_info.name}
                   </Badge>
                 )}
               </CardContent>

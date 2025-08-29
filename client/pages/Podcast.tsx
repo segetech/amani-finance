@@ -12,98 +12,96 @@ import {
   TrendingUp,
   Headphones,
   Star,
-  Eye,
   Download,
 } from "lucide-react";
 import SocialShare from '../components/SocialShare';
+import { usePodcasts } from "../hooks/usePodcasts";
 
 export default function Podcast() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [currentlyPlaying, setCurrentlyPlaying] = useState<string | null>(null);
+  // Inline playback: no modal
+  const [viewMode, setViewMode] = useState<'list' | 'grid'>('grid');
 
-  const podcasts = [
-    {
-      id: "1",
-      title: "Évolution du FCFA : Enjeux et Perspectives 2024",
-      description: "Une analyse approfondie des fluctuations du FCFA et leur impact sur les économies sahéliennes",
-      host: "Fatou Diallo",
-      guest: "Dr. Amadou Traoré, Économiste BCEAO",
-      category: "Économie",
-      duration: "32:45",
-      publishedAt: "2024-01-15",
-      plays: 12500,
-      downloads: 3200,
-      rating: 4.8,
-      coverImage: "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=400",
-      audioUrl: "#",
-      tags: ["FCFA", "Monnaie", "BCEAO", "Économie"],
-    },
-    {
-      id: "2",
-      title: "Tech Startup au Sahel : Révolution ou Illusion ?",
-      description: "Décryptage de l'écosystème technologique émergent dans la région sahélienne",
-      host: "Ibrahim Diarra",
-      guest: "Sarah Konate, CEO TechMali",
-      category: "Tech",
-      duration: "28:15",
-      publishedAt: "2024-01-12",
-      plays: 8700,
-      downloads: 2100,
-      rating: 4.6,
-      coverImage: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400",
-      audioUrl: "#",
-      tags: ["Startup", "Innovation", "Digital"],
-    },
-    {
-      id: "3",
-      title: "Investissement Minier : Opportunités au Burkina Faso",
-      description: "Les nouvelles perspectives d'investissement dans le secteur aurifère burkinabé",
-      host: "Adjoa Kone",
-      guest: "Mohamed Ouédraogo, Ministre des Mines",
-      category: "Industrie",
-      duration: "41:20",
-      publishedAt: "2024-01-10",
-      plays: 15300,
-      downloads: 4800,
-      rating: 4.9,
-      coverImage: "https://images.unsplash.com/photo-1541840031508-326b77c9a17e?w=400",
-      audioUrl: "#",
-      tags: ["Or", "Mines", "Investissement"],
-    },
-    {
-      id: "4",
-      title: "Commerce Transfrontalier : Défis et Solutions",
-      description: "Comment faciliter les échanges commerciaux entre les pays de l'UEMOA",
-      host: "Mariama Sy",
-      guest: "Dr. Ousmane Ba, Expert UEMOA",
-      category: "Marché",
-      duration: "35:50",
-      publishedAt: "2024-01-08",
-      plays: 9800,
-      downloads: 2900,
-      rating: 4.7,
-      coverImage: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=400",
-      audioUrl: "#",
-      tags: ["Commerce", "UEMOA", "Échanges"],
-    }
+  const { podcasts: data, loading, error } = usePodcasts({ status: 'published', limit: 50 });
+
+  const mapped = (data || []).map((p) => {
+    const coverImage = p.podcast_data?.cover_image || p.featured_image || "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=400";
+    const duration = p.podcast_data?.duration || undefined;
+    const audioUrl = p.podcast_data?.audio_url || undefined;
+    const videoUrl = p.podcast_data?.video_url || undefined;
+    const plays = (p.podcast_data?.plays as number | undefined) ?? (p.views as number | undefined) ?? 0;
+    const rating = (p.podcast_data?.rating as number | undefined) ?? undefined;
+    const host = p.podcast_data?.host || 'Animateur';
+    const guests = Array.isArray(p.podcast_data?.guests) ? p.podcast_data?.guests : undefined;
+    const categoryName = p.categories?.name || 'Podcast';
+    const publishedAt = p.published_at || p.created_at;
+    const tags = Array.isArray(p.tags) ? p.tags : [];
+    return {
+      id: p.id,
+      title: p.title,
+      description: p.summary || p.description || "",
+      host,
+      guest: guests && guests.length ? guests.join(', ') : undefined,
+      category: categoryName,
+      duration,
+      publishedAt,
+      plays,
+      downloads: (p.podcast_data?.downloads as number | undefined) ?? undefined,
+      rating,
+      coverImage,
+      audioUrl,
+      videoUrl,
+      tags,
+    };
+  });
+
+  const categories = [
+    "all",
+    ...Array.from(new Set(mapped.map((m) => m.category))).filter(Boolean),
   ];
 
-  const categories = ["all", "Économie", "Tech", "Industrie", "Marché"];
-
-  const filteredPodcasts = podcasts.filter((podcast) => {
-    const matchesSearch = podcast.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         podcast.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         podcast.host.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredPodcasts = mapped.filter((podcast) => {
+    const srch = searchTerm.toLowerCase();
+    const matchesSearch =
+      podcast.title.toLowerCase().includes(srch) ||
+      (podcast.description || "").toLowerCase().includes(srch) ||
+      (podcast.host || "").toLowerCase().includes(srch);
     const matchesCategory = selectedCategory === "all" || podcast.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
+
+  // Extract YouTube video ID and build embed URL
+  const getYouTubeEmbed = (url: string): string | null => {
+    try {
+      const u = new URL(url);
+      // Common params to minimize controls/branding
+      const params = 'controls=0&modestbranding=1&rel=0&disablekb=1&iv_load_policy=3';
+      if (u.hostname.includes('youtu.be')) {
+        const id = u.pathname.replace('/', '');
+        return id ? `https://www.youtube.com/embed/${id}?${params}` : null;
+      }
+      if (u.hostname.includes('youtube.com')) {
+        // watch?v=ID or /embed/ID or /shorts/ID
+        const v = u.searchParams.get('v');
+        if (v) return `https://www.youtube.com/embed/${v}?${params}`;
+        const parts = u.pathname.split('/').filter(Boolean);
+        const idx = parts.findIndex(p => p === 'embed' || p === 'shorts');
+        const id = idx >= 0 && parts[idx + 1] ? parts[idx + 1] : null;
+        return id ? `https://www.youtube.com/embed/${id}?${params}` : null;
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  };
 
   const togglePlay = (podcastId: string) => {
     setCurrentlyPlaying(currentlyPlaying === podcastId ? null : podcastId);
   };
 
-  const featuredPodcast = podcasts[0];
+  const featuredPodcast = mapped[0];
 
   return (
     <div className="min-h-screen bg-[#E5DDD2]">
@@ -143,70 +141,100 @@ export default function Podcast() {
             À l'affiche
           </h2>
           
-          <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-            <div className="md:flex">
-              <div className="md:w-1/3">
-                <img
-                  src={featuredPodcast.coverImage}
-                  alt={featuredPodcast.title}
-                  className="w-full h-64 md:h-full object-cover"
-                />
-              </div>
-              <div className="md:w-2/3 p-8">
-                <div className="flex items-center gap-3 mb-4">
-                  <span className="bg-amani-primary text-white px-3 py-1 rounded-full text-sm font-medium">
-                    {featuredPodcast.category}
-                  </span>
-                  <span className="flex items-center gap-1 text-sm text-gray-600">
-                    <Clock className="w-4 h-4" />
-                    {featuredPodcast.duration}
-                  </span>
-                  <span className="flex items-center gap-1 text-sm text-gray-600">
-                    <Eye className="w-4 h-4" />
-                    {featuredPodcast.plays.toLocaleString()} écoutes
-                  </span>
+          {loading ? (
+            <div className="text-gray-600">Chargement...</div>
+          ) : error ? (
+            <div className="text-red-600">Erreur: {String(error.message || error)}</div>
+          ) : !featuredPodcast ? (
+            <div className="text-gray-600">Aucun podcast publié pour le moment.</div>
+          ) : (
+            <div className="rounded-2xl shadow-xl overflow-hidden border border-amani-primary/10 bg-gradient-to-br from-white to-amani-secondary/5">
+              <div className="md:flex">
+                <div className="md:w-7/12 lg:w-8/12">
+                  {currentlyPlaying === featuredPodcast.id && featuredPodcast.videoUrl ? (
+                    <div className="w-full aspect-video bg-black">
+                      <iframe
+                        className="w-full h-full"
+                        src={getYouTubeEmbed(featuredPodcast.videoUrl) || undefined}
+                        title={featuredPodcast.title}
+                        frameBorder={0}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowFullScreen
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-full aspect-video">
+                      <img
+                        src={featuredPodcast.coverImage}
+                        alt={featuredPodcast.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
                 </div>
-                
-                <h3 className="text-2xl font-bold text-amani-primary mb-4">
-                  {featuredPodcast.title}
-                </h3>
-                
-                <p className="text-gray-600 mb-6 leading-relaxed">
-                  {featuredPodcast.description}
-                </p>
-                
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <User className="w-4 h-4" />
-                    <span>Animé par <strong>{featuredPodcast.host}</strong></span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <Calendar className="w-4 h-4" />
-                    <span>{new Date(featuredPodcast.publishedAt).toLocaleDateString("fr-FR")}</span>
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-4">
-                  <button
-                    onClick={() => togglePlay(featuredPodcast.id)}
-                    className="flex items-center gap-3 px-6 py-3 bg-amani-primary text-white rounded-lg hover:bg-amani-primary/90 transition-colors font-medium"
-                  >
-                    {currentlyPlaying === featuredPodcast.id ? (
-                      <Pause className="w-5 h-5" />
-                    ) : (
-                      <Play className="w-5 h-5 ml-1" />
+                <div className="md:w-5/12 lg:w-4/12 p-8">
+                  <div className="mb-3 flex items-center gap-3">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amani-secondary/20 text-amani-secondary">
+                      À l'affiche
+                    </span>
+                    <span className="bg-amani-primary text-white px-3 py-1 rounded-full text-sm font-medium">
+                      {featuredPodcast.category}
+                    </span>
+                    {featuredPodcast.duration && (
+                      <span className="flex items-center gap-1 text-sm text-gray-600">
+                        <Clock className="w-4 h-4" />
+                        {featuredPodcast.duration}
+                      </span>
                     )}
-                    {currentlyPlaying === featuredPodcast.id ? "Pause" : "Écouter"}
-                  </button>
+                  </div>
+                  <h2 className="text-2xl md:text-3xl font-extrabold mb-3 leading-tight text-amani-primary">
+                    {featuredPodcast.title}
+                  </h2>
+                  <p className="text-gray-700 mb-4 leading-relaxed line-clamp-3">
+                    {featuredPodcast.description}
+                  </p>
+
+                  {featuredPodcast.tags && featuredPodcast.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mb-6">
+                      {featuredPodcast.tags.map((t: string, i: number) => (
+                        <span key={i} className="px-2 py-1 bg-white/70 border border-gray-200 text-gray-700 rounded-full text-xs">#{t}</span>
+                      ))}
+                    </div>
+                  )}
                   
-                  <SocialShare
-                    title={featuredPodcast.title}
-                    description={featuredPodcast.description}
-                  />
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <User className="w-4 h-4" />
+                      <span>Animé par <strong>{featuredPodcast.host}</strong></span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <Calendar className="w-4 h-4" />
+                      <span>{new Date(featuredPodcast.publishedAt).toLocaleDateString("fr-FR")}</span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-4">
+                    <button
+                      onClick={() => togglePlay(featuredPodcast.id)}
+                      className="flex items-center gap-3 px-6 py-3 bg-amani-primary text-white rounded-lg hover:bg-amani-primary/90 transition-colors font-medium"
+                    >
+                      {currentlyPlaying === featuredPodcast.id ? (
+                        <Pause className="w-5 h-5" />
+                      ) : (
+                        <Play className="w-5 h-5 ml-1" />
+                      )}
+                      {currentlyPlaying === featuredPodcast.id ? "Pause" : (featuredPodcast.videoUrl ? "Regarder" : "Écouter")}
+                    </button>
+                    
+                    <SocialShare
+                      title={featuredPodcast.title}
+                      description={featuredPodcast.description}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
       </section>
 
@@ -239,6 +267,23 @@ export default function Podcast() {
                 ))}
               </select>
             </div>
+            {/* View mode toggle */}
+            <div className="flex items-center gap-2 ml-auto">
+              <button
+                className={`px-3 py-2 rounded border ${viewMode === 'list' ? 'bg-amani-primary text-white border-amani-primary' : 'bg-white text-gray-700 border-gray-300'}`}
+                onClick={() => setViewMode('list')}
+                aria-pressed={viewMode === 'list'}
+              >
+                Liste
+              </button>
+              <button
+                className={`px-3 py-2 rounded border ${viewMode === 'grid' ? 'bg-amani-primary text-white border-amani-primary' : 'bg-white text-gray-700 border-gray-300'}`}
+                onClick={() => setViewMode('grid')}
+                aria-pressed={viewMode === 'grid'}
+              >
+                Grille
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -250,107 +295,150 @@ export default function Podcast() {
             Tous les épisodes ({filteredPodcasts.length})
           </h2>
           
-          <div className="space-y-6">
-            {filteredPodcasts.map((podcast) => (
-              <div
-                key={podcast.id}
-                className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow p-6"
-              >
-                <div className="flex items-start gap-6">
-                  {/* Cover Image */}
-                  <div className="flex-shrink-0">
-                    <img
-                      src={podcast.coverImage}
-                      alt={podcast.title}
-                      className="w-24 h-24 md:w-32 md:h-32 object-cover rounded-lg"
-                    />
-                  </div>
-                  
-                  {/* Content */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3 mb-3">
-                      <span className="bg-amani-primary text-white px-3 py-1 rounded-full text-sm font-medium">
-                        {podcast.category}
-                      </span>
-                      <span className="flex items-center gap-1 text-sm text-gray-600">
-                        <Clock className="w-4 h-4" />
-                        {podcast.duration}
-                      </span>
-                      <div className="flex items-center gap-1">
-                        <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                        <span className="text-sm text-gray-600">{podcast.rating}</span>
-                      </div>
-                    </div>
-                    
-                    <h3 className="text-xl font-bold text-amani-primary mb-2 leading-tight">
-                      {podcast.title}
-                    </h3>
-                    
-                    <p className="text-gray-600 mb-4 leading-relaxed">
-                      {podcast.description}
-                    </p>
-                    
-                    <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
-                      <span className="flex items-center gap-1">
-                        <User className="w-4 h-4" />
-                        {podcast.host}
-                      </span>
-                      {podcast.guest && (
-                        <span>Invité: {podcast.guest}</span>
-                      )}
-                      <span className="flex items-center gap-1">
-                        <Calendar className="w-4 h-4" />
-                        {new Date(podcast.publishedAt).toLocaleDateString("fr-FR")}
-                      </span>
-                    </div>
-                    
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {podcast.tags.map((tag, index) => (
-                        <span
-                          key={index}
-                          className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs"
-                        >
-                          #{tag}
-                        </span>
-                      ))}
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4 text-sm text-gray-500">
-                        <span className="flex items-center gap-1">
-                          <Eye className="w-4 h-4" />
-                          {podcast.plays.toLocaleString()}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                          {podcast.rating}
-                        </span>
-                      </div>
-                      
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => togglePlay(podcast.id)}
-                          className="flex items-center gap-2 px-4 py-2 bg-amani-primary text-white rounded-lg hover:bg-amani-primary/90 transition-colors"
-                        >
-                          {currentlyPlaying === podcast.id ? (
-                            <Pause className="w-4 h-4" />
-                          ) : (
-                            <Play className="w-4 h-4 ml-0.5" />
-                          )}
-                          {currentlyPlaying === podcast.id ? "Pause" : "Écouter"}
-                        </button>
-                        
-                        <SocialShare
-                          title={podcast.title}
-                          description={podcast.description}
+          {/* List/Grid container */}
+          {loading && <div className="text-gray-600">Chargement...</div>}
+          {!loading && !error && filteredPodcasts.length === 0 && (
+            <div className="text-gray-600">Aucun épisode trouvé.</div>
+          )}
+          {!loading && !error && viewMode === 'list' && (
+            <div className="space-y-6">
+              {filteredPodcasts.map((podcast) => (
+                <div
+                  key={podcast.id}
+                  className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow p-6"
+                >
+                  <div className="flex items-start gap-6">
+                    {/* Media */}
+                    <div className="flex-shrink-0">
+                      {currentlyPlaying === podcast.id && (podcast as any).videoUrl ? (
+                        <div className="w-64 h-36 md:w-80 md:h-44 bg-black rounded-lg overflow-hidden">
+                          <iframe
+                            className="w-full h-full"
+                            src={getYouTubeEmbed((podcast as any).videoUrl) || undefined}
+                            title={podcast.title}
+                            frameBorder={0}
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            allowFullScreen
+                          />
+                        </div>
+                      ) : (
+                        <img
+                          src={podcast.coverImage}
+                          alt={podcast.title}
+                          className="w-64 h-36 md:w-80 md:h-44 object-cover rounded-lg"
                         />
+                      )}
+                    </div>
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-3 mb-3">
+                        <span className="bg-amani-primary text-white px-3 py-1 rounded-full text-sm font-medium">
+                          {podcast.category}
+                        </span>
+                        {podcast.duration && (
+                          <span className="flex items-center gap-1 text-sm text-gray-600">
+                            <Clock className="w-4 h-4" />
+                            {podcast.duration}
+                          </span>
+                        )}
+                        <div className="flex items-center gap-1">
+                          <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                          <span className="text-sm text-gray-600">{podcast.rating ?? '—'}</span>
+                        </div>
+                      </div>
+                      <h3 className="text-lg md:text-xl font-bold text-amani-primary mb-1 leading-tight">
+                        {podcast.title}
+                      </h3>
+                      <p className="text-gray-600 mb-3 leading-relaxed line-clamp-2">
+                        {podcast.description}
+                      </p>
+                      <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
+                        <span className="flex items-center gap-1">
+                          <User className="w-4 h-4" />
+                          {podcast.host}
+                        </span>
+                        {podcast.guest && (
+                          <span>Invité: {podcast.guest}</span>
+                        )}
+                        <span className="flex items-center gap-1">
+                          <Calendar className="w-4 h-4" />
+                          {new Date(podcast.publishedAt).toLocaleDateString("fr-FR")}
+                        </span>
+                      </div>
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {podcast.tags.map((tag, index) => (
+                          <span key={index} className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">#{tag}</span>
+                        ))}
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4 text-sm text-gray-500">
+                          <span className="flex items-center gap-1">
+                            <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                            {podcast.rating}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => togglePlay(podcast.id)}
+                            className="flex items-center gap-2 px-4 py-2 bg-amani-primary text-white rounded-lg hover:bg-amani-primary/90 transition-colors"
+                          >
+                            {currentlyPlaying === podcast.id ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
+                            {currentlyPlaying === podcast.id ? "Pause" : ((podcast as any).videoUrl ? "Regarder" : "Écouter")}
+                          </button>
+                          <SocialShare title={podcast.title} description={podcast.description} />
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
+          {!loading && !error && viewMode === 'grid' && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredPodcasts.map((podcast) => (
+                <div key={podcast.id} className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow overflow-hidden">
+                  {/* Media */}
+                  <div className="w-full aspect-video bg-black">
+                    {currentlyPlaying === podcast.id && (podcast as any).videoUrl ? (
+                      <iframe
+                        className="w-full h-full"
+                        src={getYouTubeEmbed((podcast as any).videoUrl) || undefined}
+                        title={podcast.title}
+                        frameBorder={0}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowFullScreen
+                      />
+                    ) : (
+                      <img src={podcast.coverImage} alt={podcast.title} className="w-full h-full object-cover" />
+                    )}
+                  </div>
+                  <div className="p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="bg-amani-primary text-white px-2 py-0.5 rounded-full text-xs font-medium">{podcast.category}</span>
+                      {podcast.duration && (
+                        <span className="flex items-center gap-1 text-xs text-gray-600"><Clock className="w-3 h-3" />{podcast.duration}</span>
+                      )}
+                    </div>
+                    <h3 className="text-base md:text-lg font-semibold text-amani-primary line-clamp-2 mb-1">{podcast.title}</h3>
+                    <p className="text-sm text-gray-600 line-clamp-2 mb-3">{podcast.description}</p>
+                    <div className="flex items-center justify-between">
+                      <span />
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => togglePlay(podcast.id)}
+                          className="flex items-center gap-1 px-3 py-1.5 bg-amani-primary text-white rounded hover:bg-amani-primary/90 text-sm"
+                        >
+                          {currentlyPlaying === podcast.id ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                          {currentlyPlaying === podcast.id ? "Pause" : ((podcast as any).videoUrl ? "Regarder" : "Écouter")}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -375,6 +463,9 @@ export default function Podcast() {
           </div>
         </div>
       </section>
+
+      {/* Inline audio fallback when no videoUrl */}
+      {/* We render audio inside each card only when playing; handled above */}
     </div>
   );
 }

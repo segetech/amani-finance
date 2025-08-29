@@ -94,9 +94,10 @@ export default function UnifiedContentForm({
           (mergedData as any)[key] = value as any;
         }
       });
-      // Pré-remplir la catégorie à partir du slug si disponible
-      const initialCategory = (initialData as any).category
-        || (initialData as any)?.category_info?.slug
+      // Pré-remplir la catégorie en PRIORITÉ avec le slug (category_info.slug),
+      // sinon fallback sur l'ancien champ texte `category`
+      const initialCategory = (initialData as any)?.category_info?.slug
+        || (initialData as any).category
         || "";
       mergedData.category = initialCategory;
       // Garder category_id tel quel pour la DB si fourni
@@ -114,8 +115,9 @@ export default function UnifiedContentForm({
   useEffect(() => {
     if (initialData) {
       console.log('🔄 initialData reçu:', initialData);
-      const derivedCategory = (initialData as any).category
-        || (initialData as any)?.category_info?.slug
+      // Pendant la synchronisation, privilégier également le slug
+      const derivedCategory = (initialData as any)?.category_info?.slug
+        || (initialData as any).category
         || "";
 
       setFormData(prev => {
@@ -298,6 +300,8 @@ export default function UnifiedContentForm({
       // Préparer les données finales
       const finalData = {
         ...formData,
+        // S'assurer que category_id est bien défini (slug ou UUID)
+        category_id: (formData as any).category_id || (formData as any).category,
         type,
         author_id: user?.id,
         featured_image: imageUrl,

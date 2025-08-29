@@ -50,12 +50,19 @@ export const ArticleList: React.FC<{ status?: 'published' | 'draft' | 'archived'
                   src={article.featured_image}
                   alt={article.featured_image_alt || article.title}
                   className="w-full h-48 object-cover rounded-lg"
+                  loading="lazy"
+                  decoding="async"
+                  onError={(e) => {
+                    const target = e.currentTarget as HTMLImageElement;
+                    target.onerror = null;
+                    target.src = "/placeholder.svg";
+                  }}
                 />
               </div>
             )}
             <div className={`${article.featured_image ? 'md:w-2/3' : 'w-full'}`}>
               <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
-                <span>{article.categories?.name}</span>
+                <span>{article.category_info?.name}</span>
                 <span>•</span>
                 <span>
                   {format(new Date(article.published_at || article.created_at), 'd MMMM yyyy', { locale: fr })}
@@ -81,6 +88,13 @@ export const ArticleList: React.FC<{ status?: 'published' | 'draft' | 'archived'
                     src={article.author.avatar_url} 
                     alt={`${article.author.first_name} ${article.author.last_name}`}
                     className="w-8 h-8 rounded-full"
+                    loading="lazy"
+                    decoding="async"
+                    onError={(e) => {
+                      const target = e.currentTarget as HTMLImageElement;
+                      target.onerror = null;
+                      target.src = "/placeholder.svg";
+                    }}
                   />
                 )}
                 <span className="text-sm text-gray-600">

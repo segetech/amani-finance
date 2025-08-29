@@ -54,6 +54,8 @@ export default function Index() {
   // Données réelles: articles et podcasts publiés depuis Supabase
   const { articles, loading: loadingArticles } = useArticles({ status: 'published', limit: 4, offset: 0 });
   const { podcasts, loading: loadingPodcasts } = usePodcasts({ status: 'published', limit: 2, offset: 0 });
+  // Articles économiques
+  const { articles: ecoArticles, loading: loadingEco } = useArticles({ status: 'published', limit: 4, offset: 0, category: 'economie' });
 
   // Fonction pour charger toutes les données (BRVM + Commodités)
   const loadAllData = async () => {
@@ -190,6 +192,9 @@ export default function Index() {
           </div>
         </div>
       </section>
+
+
+      
 
       {/* Key Indices Widget - BRVM en temps réel */}
       <section className="py-8 bg-white border-b">
@@ -364,46 +369,88 @@ export default function Index() {
         </div>
       </section>
 
+      {/* Actualités Économiques – section dédiée (placée après Dernières actualités) */}
+      <section className="py-14 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-end justify-between mb-8">
+            <div>
+              <h2 className="text-3xl font-bold text-amani-primary">Actualités économiques</h2>
+              <p className="text-gray-600 mt-1">Sélection d'articles récents dans la catégorie Économie</p>
+            </div>
+            <Link to="/economie" className="text-amani-primary hover:underline">Voir plus →</Link>
+          </div>
+
+          {/* Grid des articles économiques */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {(ecoArticles || []).map((item) => (
+              <Link key={item.id} to={`/article/${item.id}`} className="group block bg-white rounded-xl shadow hover:shadow-lg transition-shadow overflow-hidden">
+                <div className="relative aspect-[16/10] bg-gray-100">
+                  <img src={item.featured_image || '/placeholder.svg'} alt={item.title} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                </div>
+                <div className="p-4">
+                  <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-amani-secondary/20 text-amani-primary font-medium">
+                      {item.category_info?.name || 'Économie'}
+                    </span>
+                    {item.published_at && (
+                      <span>{new Date(item.published_at).toLocaleDateString('fr-FR')}</span>
+                    )}
+                  </div>
+                  <h3 className="text-base font-semibold text-[#373B3A] leading-snug line-clamp-2 mb-1">{item.title}</h3>
+                  <p className="text-sm text-gray-600 line-clamp-2">{item.summary}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          {(!ecoArticles || ecoArticles.length === 0) && (
+            <div className="text-gray-500">Aucune actualité économique disponible pour le moment.</div>
+          )}
+        </div>
+      </section>
+
       {/* Podcast Section – données réelles Supabase */}
       <section className="py-16 bg-amani-secondary/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-bold text-amani-primary">Podcasts</h2>
+            <h2 className="text-2xl md:text-3xl font-bold text-amani-primary">Podcasts</h2>
             <Link to="/podcast" className="text-amani-primary hover:underline">
               Tous les podcasts →
             </Link>
           </div>
-          <div className="grid lg:grid-cols-2 gap-8">
+          <div className="grid lg:grid-cols-2 gap-6 lg:gap-8">
             {(podcasts || []).map((podcast) => (
               <div
                 key={podcast.id}
-                className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
+                className="bg-white rounded-xl shadow-md p-5 hover:shadow-lg transition-shadow"
               >
                 <div className="flex gap-4">
-                  <img
-                    src={(podcast as any).featured_image || "/placeholder.svg"}
-                    alt={podcast.title}
-                    className="w-20 h-20 rounded-lg object-cover flex-shrink-0"
-                  />
-                  <div className="flex-1">
-                    <h3 className="text-xl font-semibold text-amani-primary mb-2">
+                  <div className="relative w-36 md:w-40 aspect-video rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
+                    <img
+                      src={(podcast as any).featured_image || "/placeholder.svg"}
+                      alt={podcast.title}
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-base md:text-lg font-semibold text-amani-primary leading-tight line-clamp-2 mb-1">
                       {podcast.title}
                     </h3>
                     {podcast.summary && (
-                      <p className="text-gray-600 mb-3 text-sm">
+                      <p className="text-sm text-gray-600 line-clamp-2 mb-3">
                         {podcast.summary}
                       </p>
                     )}
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4 text-sm text-gray-500">
+                      <div className="flex items-center gap-3 text-xs md:text-sm text-gray-500">
                         {(podcast as any)?.podcast_data?.duration && (
                           <span>{(podcast as any).podcast_data.duration}</span>
                         )}
                         <span>{podcast.published_at ? new Date(podcast.published_at).toLocaleDateString('fr-FR') : ''}</span>
                       </div>
-                      <button className="flex items-center gap-2 bg-amani-primary text-white px-4 py-2 rounded-lg hover:bg-amani-primary/90 transition-colors">
+                      <button className="flex items-center gap-1.5 px-3 py-1.5 bg-amani-primary text-white rounded-md hover:bg-amani-primary/90 text-sm">
                         <Play className="w-4 h-4" />
-                        Écouter
+                        <span className="hidden sm:inline">Écouter</span>
                       </button>
                     </div>
                   </div>

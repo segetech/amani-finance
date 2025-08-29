@@ -94,7 +94,8 @@ export default function EditArticle() {
         description: formData.description,
         content: formData.content,
         status: formData.status,
-        category_id: formData.category,
+        // Passer un UUID si disponible, sinon le slug (le hook résoudra vers l'UUID)
+        category_id: formData.category_id || formData.category,
         author_id: user?.id || '',
         country: formData.country,
         tags: formData.tags,

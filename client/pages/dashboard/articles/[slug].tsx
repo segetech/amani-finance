@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useArticle } from '../../../hooks/useArticles';
+import { useEffect, useState } from 'react';
+import { useArticles, type Article } from '../../../hooks/useArticles';
 import { Button } from '../../../components/ui/button';
 import { Badge } from '../../../components/ui/badge';
 import { ArrowLeft, Edit, Eye, Clock, Calendar, User } from 'lucide-react';
@@ -92,8 +93,17 @@ const CodeBlock = ({ language, code }: { language: string; code: string }) => {
 
 export default function ArticleDetail() {
   const { slug } = useParams<{ slug: string }>();
-  const { article, loading, error } = useArticle(slug || '');
+  const { fetchArticleByIdOrSlug, loading, error } = useArticles();
+  const [article, setArticle] = useState<Article | null>(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!slug) return;
+    fetchArticleByIdOrSlug(slug)
+      .then(setArticle)
+      .catch((e) => console.error('Failed to load article', e));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slug]);
 
   if (loading) {
     return (
@@ -141,6 +151,13 @@ export default function ArticleDetail() {
               src={article.featured_image}
               alt={article.featured_image_alt || article.title}
               className="w-full h-full object-cover"
+              loading="lazy"
+              decoding="async"
+              onError={(e) => {
+                const target = e.currentTarget as HTMLImageElement;
+                target.onerror = null;
+                target.src = "/placeholder.svg";
+              }}
             />
           </div>
         )}
@@ -150,9 +167,9 @@ export default function ArticleDetail() {
             <Badge variant={article.status === 'published' ? 'default' : 'secondary'}>
               {article.status === 'published' ? 'Publié' : 'Brouillon'}
             </Badge>
-            {article.category && (
+            {article.category_info?.name && (
               <Badge variant="outline">
-                {article.category.name}
+                {article.category_info.name}
               </Badge>
             )}
           </div>
@@ -233,6 +250,13 @@ export default function ArticleDetail() {
                           src={src} 
                           alt={alt || 'Image'} 
                           className="mx-auto rounded-lg max-w-full h-auto"
+                          loading="lazy"
+                          decoding="async"
+                          onError={(e) => {
+                            const target = e.currentTarget as HTMLImageElement;
+                            target.onerror = null;
+                            target.src = "/placeholder.svg";
+                          }}
                         />
                         {alt && (
                           <p className="text-center text-sm text-muted-foreground mt-2">
