@@ -1,6 +1,37 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 
+// Normalize featured image to a public URL if only a path was stored
+const normalizeFeaturedImage = (value?: string | null): string | null => {
+  if (!value) return null;
+  // Already an absolute URL
+  if (/^https?:\/\//i.test(value)) return value;
+
+  const base = import.meta.env.VITE_SUPABASE_URL;
+  if (!base) return value; // fallback: return as-is
+
+  // If it's already a storage public URL path, keep as-is
+  if (value.includes('/storage/v1/object/public/')) return value;
+
+  // Ensure no leading slash on path
+  let path = value.replace(/^\/+/, '');
+
+  // If path does not start with the bucket name, prefix with our default bucket 'images'
+  if (!/^images\//.test(path)) {
+    path = `images/${path}`;
+  }
+
+  const publicUrl = `${base}/storage/v1/object/public/${path}`;
+  // Debug once per distinct value (safe console for diagnosis; can be removed later)
+  try {
+    // Avoid noisy logs for avatar placeholders etc.
+    if (process.env.NODE_ENV !== 'production') {
+      console.debug('🖼️ normalizeFeaturedImage:', { input: value, output: publicUrl });
+    }
+  } catch {}
+  return publicUrl;
+};
+
 // Helper: strict UUID v4 detection
 const isUUID = (value: string | undefined | null): boolean => {
   if (!value || typeof value !== 'string') return false;
@@ -226,6 +257,7 @@ export const useArticles = ({
         const article: Article = {
           ...(content as any),
           type: 'article',
+          featured_image: normalizeFeaturedImage((content as any).featured_image),
           // author: undefined for now (no FK relationship to join)
           category_info: categories ? {
             id: categories.id,
@@ -312,6 +344,7 @@ export const useArticles = ({
       const formattedData: Article = {
         ...(content as any),
         type: 'article',
+        featured_image: normalizeFeaturedImage((content as any).featured_image),
         // Normalize to yyyy-MM-dd for HTML date inputs
         published_at: content.published_at ? new Date(content.published_at).toISOString().slice(0, 10) : null,
         created_at: new Date(content.created_at).toISOString(),
@@ -398,6 +431,7 @@ export const useArticles = ({
       const formattedData: Article = {
         ...(content as any),
         type: 'article',
+        featured_image: normalizeFeaturedImage((content as any).featured_image),
         // Normalize to yyyy-MM-dd for HTML date inputs
         published_at: content.published_at ? new Date(content.published_at).toISOString().slice(0, 10) : null,
         created_at: new Date(content.created_at).toISOString(),

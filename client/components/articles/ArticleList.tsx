@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useArticles } from '@/hooks/useArticles';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
@@ -7,6 +7,15 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 export const ArticleList: React.FC<{ status?: 'published' | 'draft' | 'archived' | 'all' }> = ({ status = 'published' }) => {
   const { articles, loading, error } = useArticles({ status });
+
+  // Debug: inspect featured_image URLs received by the list
+  useEffect(() => {
+    try {
+      // Log a light summary to avoid noise
+      const summary = articles.map(a => ({ title: a.title, featured_image: a.featured_image }));
+      console.log('🧪 ArticleList featured_image check:', summary);
+    } catch {}
+  }, [articles]);
 
   if (loading) {
     return (

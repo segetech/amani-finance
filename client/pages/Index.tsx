@@ -5,8 +5,7 @@ import {
   TrendingDown,
   Play,
   ArrowRight,
-  Calendar,
-  User,
+  
   MapPin,
   Facebook,
   Twitter,
@@ -19,7 +18,7 @@ import {
   Users,
   Target,
   Clock,
-  Eye,
+  
   Bell,
   Download,
   BookOpen,
@@ -40,6 +39,12 @@ import {
   CommoditiesData,
   getCommodityIcon,
 } from "../services/commoditiesApi";
+
+// Feature flags for market widgets (BRVM & Commodities)
+// - ENABLE_MARKET_WIDGET: controls rendering of the section
+// - ENABLE_MARKET_FETCH: controls calling remote APIs; keep false to use simulated data only
+const ENABLE_MARKET_WIDGET = true;
+const ENABLE_MARKET_FETCH = false;
 import { useArticles } from "../hooks/useArticles";
 import { usePodcasts } from "../hooks/usePodcasts";
 
@@ -54,8 +59,26 @@ export default function Index() {
   // Données réelles: articles et podcasts publiés depuis Supabase
   const { articles, loading: loadingArticles } = useArticles({ status: 'published', limit: 4, offset: 0 });
   const { podcasts, loading: loadingPodcasts } = usePodcasts({ status: 'published', limit: 2, offset: 0 });
-  // Articles économiques
+  // Sections par catégories
   const { articles: ecoArticles, loading: loadingEco } = useArticles({ status: 'published', limit: 4, offset: 0, category: 'economie' });
+  // Marchés: inclure deux catégories ('marches-financiers' et 'marches-boursiers') et fusionner
+  const { articles: marketFinArticles, loading: loadingMarketFin } = useArticles({ status: 'published', limit: 4, offset: 0, category: 'marches-financiers' });
+  const { articles: marketBoursArticles, loading: loadingMarketBours } = useArticles({ status: 'published', limit: 4, offset: 0, category: 'marches-boursiers' });
+  const loadingMarket = loadingMarketFin || loadingMarketBours;
+  const marketArticles = React.useMemo(() => {
+    const list = [...(marketFinArticles || []), ...(marketBoursArticles || [])];
+    // Trier par published_at (puis created_at) décroissant et limiter à 4
+    const sorted = list.sort((a, b) => {
+      const aDate = (a.published_at || a.created_at) ? new Date(a.published_at || a.created_at).getTime() : 0;
+      const bDate = (b.published_at || b.created_at) ? new Date(b.published_at || b.created_at).getTime() : 0;
+      return bDate - aDate;
+    });
+    return sorted.slice(0, 4);
+  }, [marketFinArticles, marketBoursArticles]);
+  const { articles: industryArticles, loading: loadingIndustry } = useArticles({ status: 'published', limit: 4, offset: 0, category: 'industrie-miniere' });
+  const { articles: investArticles, loading: loadingInvest } = useArticles({ status: 'published', limit: 4, offset: 0, category: 'investissement' });
+  const { articles: insightsArticles, loading: loadingInsights } = useArticles({ status: 'published', limit: 4, offset: 0, category: 'insights' });
+  const { articles: techArticles, loading: loadingTech } = useArticles({ status: 'published', limit: 4, offset: 0, category: 'technologie' });
 
   // Fonction pour charger toutes les données (BRVM + Commodités)
   const loadAllData = async () => {
@@ -86,8 +109,9 @@ export default function Index() {
     }
   };
 
-  // Charger les données au démarrage et toutes les 5 minutes
+  // Charger les données au démarrage et toutes les 5 minutes (désactivé si fetch OFF)
   React.useEffect(() => {
+    if (!ENABLE_MARKET_FETCH) return;
     loadAllData();
     const interval = setInterval(loadAllData, 5 * 60 * 1000); // 5 minutes
     return () => clearInterval(interval);
@@ -156,37 +180,27 @@ export default function Index() {
             <div>
               <h1 className="text-4xl lg:text-6xl font-bold mb-6">À la une</h1>
               <h2 className="text-2xl lg:text-3xl font-semibold mb-4">
-                {heroArticle ? heroArticle.title : "Le Mali lance son plus grand projet d'infrastructure"}
+                <Link
+                  to={heroArticle ? `/article/${heroArticle.id}` : "/article/1"}
+                  className="hover:underline"
+                >
+                  {heroArticle ? heroArticle.title : "Le Mali lance son plus grand projet d'infrastructure"}
+                </Link>
               </h2>
-              <p className="text-lg mb-8 text-gray-200">
-                {heroArticle?.summary || "Un investissement de 2 milliards d'euros pour moderniser les réseaux de transport et d'énergie, promettant de transformer l'économie du pays d'ici 2027."}
-              </p>
-              <div className="flex flex-wrap gap-4 items-center mb-8">
-                <span className="bg-white/20 px-3 py-1 rounded-full text-sm">
-                  {heroArticle?.category_info?.name || "Économie"}
-                </span>
-                <span className="flex items-center gap-2 text-sm">
-                  <Calendar className="w-4 h-4" />
-                  {heroArticle?.published_at ? new Date(heroArticle.published_at).toLocaleDateString('fr-FR') : '15 janvier 2024'}
-                </span>
-                <span className="flex items-center gap-2 text-sm">
-                  <User className="w-4 h-4" />
-                  {heroArticle?.author_id ? "Auteur" : "Amadou Diallo"}
-                </span>
-              </div>
-              <Link
-                to={heroArticle ? `/article/${heroArticle.id}` : "/article/1"}
-                className="inline-flex items-center gap-2 bg-white text-amani-primary px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
-              >
-                Lire l'article
-                <ArrowRight className="w-4 h-4" />
-              </Link>
+              {/* Extrait et métadonnées supprimés: on souhaite uniquement le titre cliquable */}
             </div>
             <div className="relative">
               <img
                 src={heroArticle?.featured_image || "/placeholder.svg"}
                 alt={heroArticle?.title || "Infrastructure project"}
                 className="w-full h-80 object-cover rounded-lg shadow-xl"
+                loading="lazy"
+                decoding="async"
+                onError={(e) => {
+                  const target = e.currentTarget as HTMLImageElement;
+                  target.onerror = null;
+                  target.src = "/placeholder.svg";
+                }}
               />
             </div>
           </div>
@@ -196,7 +210,8 @@ export default function Index() {
 
       
 
-      {/* Key Indices Widget - BRVM en temps réel */}
+      {/* Key Indices Widget - BRVM en temps réel (hidden if flag OFF) */}
+      {ENABLE_MARKET_WIDGET && (
       <section className="py-8 bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-6">
@@ -215,7 +230,14 @@ export default function Index() {
             </div>
             <div className="flex items-center gap-4">
               <button
-                onClick={loadAllData}
+                onClick={() => {
+                  if (ENABLE_MARKET_FETCH) {
+                    loadAllData();
+                  } else {
+                    // Pas d'appel API: juste mettre à jour l'horodatage pour l'UX
+                    setLastUpdate(new Date());
+                  }
+                }}
                 disabled={loading}
                 className="flex items-center gap-2 text-amani-primary hover:underline disabled:opacity-50"
               >
@@ -270,6 +292,7 @@ export default function Index() {
           </div>
         </div>
       </section>
+      )}
 
       {/* Dernières actualités – affiche les articles publiés en base */}
       <section className="py-16 bg-gradient-to-br from-gray-50 to-white">
@@ -291,6 +314,13 @@ export default function Index() {
                   src={heroArticle?.featured_image || "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&h=500&fit=crop"}
                   alt={heroArticle?.title || "Article principal"}
                   className="w-full h-96 lg:h-[500px] object-cover group-hover:scale-105 transition-transform duration-700"
+                  loading="lazy"
+                  decoding="async"
+                  onError={(e) => {
+                    const target = e.currentTarget as HTMLImageElement;
+                    target.onerror = null;
+                    target.src = "/placeholder.svg";
+                  }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
                 <div className="absolute bottom-0 left-0 right-0 p-8">
@@ -298,25 +328,11 @@ export default function Index() {
                     🔥 À LA UNE
                   </span>
                   <h3 className="text-3xl lg:text-4xl font-bold text-white mb-4 leading-tight">
-                    {heroArticle?.title || 'Le Mali annonce de nouveaux investissements dans les infrastructures'}
+                    <Link to={heroArticle ? `/article/${heroArticle.id}` : '/article/1'} className="hover:underline">
+                      {heroArticle?.title || 'Le Mali annonce de nouveaux investissements dans les infrastructures'}
+                    </Link>
                   </h3>
-                  <p className="text-xl text-gray-200 mb-6 leading-relaxed">
-                    {heroArticle?.summary || "Le gouvernement malien a dévoilé un plan d'investissement de 500 milliards de FCFA pour moderniser les infrastructures du pays et stimuler la croissance économique."}
-                  </p>
-                  <div className="flex items-center gap-6 text-white">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="w-5 h-5" />
-                      <span className="font-medium">{heroArticle?.published_at ? new Date(heroArticle.published_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' }) : '15 Mars 2025'}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <User className="w-5 h-5" />
-                      <span className="font-medium">{heroArticle?.author_id ? 'Auteur' : 'Rédaction Amani'}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Eye className="w-5 h-5" />
-                      <span className="font-medium">{typeof heroArticle?.views === 'number' ? `${heroArticle.views} vues` : '2.1K vues'}</span>
-                    </div>
-                  </div>
+                  {/* Meta et résumé masqués sur la grande carte à la demande: on garde seulement le titre */}
                 </div>
               </div>
             </div>
@@ -336,27 +352,25 @@ export default function Index() {
                 </Link>
               </div>
 
-              <div className="space-y-6">
+              <div className="space-y-3">
                 {(otherArticles.length ? otherArticles : []).map((item, index) => (
-                  <Link key={index} to={`/article/${item.id}`} className="group cursor-pointer block">
-                    <div className="flex gap-3">
-                      <div
-                        className={`flex-shrink-0 w-3 h-3 ${item.category_info?.color ? '' : 'bg-blue-500'} rounded-full mt-2`}
-                        style={item.category_info?.color ? { backgroundColor: item.category_info.color } : undefined}
-                      ></div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span
-                            className={`text-xs px-2 py-1 text-white rounded-full font-medium`}
-                            style={{ backgroundColor: item.category_info?.color || '#1D4ED8' }}
-                          >
-                            {item.category_info?.name || 'Actualités'}
-                          </span>
-                          <span className="text-xs text-gray-500">
-                            {item.published_at ? new Date(item.published_at).toLocaleDateString('fr-FR') : ''}
-                          </span>
-                        </div>
-                        <h5 className="font-medium text-gray-900 leading-tight group-hover:text-blue-600 transition-colors">
+                  <Link key={index} to={`/article/${item.id}`} className="block group">
+                    <div className="relative h-28 rounded-xl overflow-hidden">
+                      <img
+                        src={item.featured_image || '/placeholder.svg'}
+                        alt={item.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        loading="lazy"
+                        decoding="async"
+                        onError={(e) => {
+                          const target = e.currentTarget as HTMLImageElement;
+                          target.onerror = null;
+                          target.src = '/placeholder.svg';
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+                      <div className="absolute bottom-0 left-0 right-0 p-3">
+                        <h5 className="font-semibold text-white leading-snug line-clamp-2">
                           {item.title}
                         </h5>
                       </div>
@@ -381,30 +395,371 @@ export default function Index() {
           </div>
 
           {/* Grid des articles économiques */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {(ecoArticles || []).map((item) => (
-              <Link key={item.id} to={`/article/${item.id}`} className="group block bg-white rounded-xl shadow hover:shadow-lg transition-shadow overflow-hidden">
-                <div className="relative aspect-[16/10] bg-gray-100">
-                  <img src={item.featured_image || '/placeholder.svg'} alt={item.title} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                </div>
-                <div className="p-4">
-                  <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-amani-secondary/20 text-amani-primary font-medium">
-                      {item.category_info?.name || 'Économie'}
-                    </span>
-                    {item.published_at && (
-                      <span>{new Date(item.published_at).toLocaleDateString('fr-FR')}</span>
-                    )}
+          {loadingEco ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="bg-white rounded-xl shadow overflow-hidden animate-pulse">
+                  <div className="aspect-[16/10] bg-gray-200" />
+                  <div className="p-4 space-y-2">
+                    <div className="h-4 bg-gray-200 rounded w-1/3" />
+                    <div className="h-5 bg-gray-200 rounded w-3/4" />
+                    <div className="h-4 bg-gray-200 rounded w-2/3" />
                   </div>
-                  <h3 className="text-base font-semibold text-[#373B3A] leading-snug line-clamp-2 mb-1">{item.title}</h3>
-                  <p className="text-sm text-gray-600 line-clamp-2">{item.summary}</p>
                 </div>
-              </Link>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {(ecoArticles || []).map((item) => (
+                <Link key={item.id} to={`/article/${item.id}`} className="group block bg-white rounded-xl shadow hover:shadow-lg transition-shadow overflow-hidden">
+                  <div className="relative aspect-[16/10] bg-gray-100">
+                    <img
+                      src={item.featured_image || '/placeholder.svg'}
+                      alt={item.title}
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      loading="lazy"
+                      decoding="async"
+                      onError={(e) => {
+                        const target = e.currentTarget as HTMLImageElement;
+                        target.onerror = null;
+                        target.src = '/placeholder.svg';
+                      }}
+                    />
+                  </div>
+                  <div className="p-4">
+                    <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-amani-secondary/20 text-amani-primary font-medium">
+                        {item.category_info?.name || 'Économie'}
+                      </span>
+                      {item.published_at && (
+                        <span>{new Date(item.published_at).toLocaleDateString('fr-FR')}</span>
+                      )}
+                    </div>
+                    <h3 className="text-base font-semibold text-[#373B3A] leading-snug line-clamp-2 mb-1">{item.title}</h3>
+                    <p className="text-sm text-gray-600 line-clamp-2">{item.summary}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
 
           {(!ecoArticles || ecoArticles.length === 0) && (
             <div className="text-gray-500">Aucune actualité économique disponible pour le moment.</div>
+          )}
+        </div>
+      </section>
+
+      {/* Marchés financiers */}
+      <section className="py-14 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-end justify-between mb-8">
+            <div>
+              <h2 className="text-3xl font-bold text-amani-primary">Marchés</h2>
+              <p className="text-gray-600 mt-1">Dernières tendances des marchés et de la bourse</p>
+            </div>
+            <Link to="/marche" className="text-amani-primary hover:underline">Voir plus →</Link>
+          </div>
+          {loadingMarket ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="bg-white rounded-xl shadow overflow-hidden animate-pulse">
+                  <div className="aspect-[16/10] bg-gray-200" />
+                  <div className="p-4 space-y-2">
+                    <div className="h-4 bg-gray-200 rounded w-1/3" />
+                    <div className="h-5 bg-gray-200 rounded w-3/4" />
+                    <div className="h-4 bg-gray-200 rounded w-2/3" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {(marketArticles || []).map((item) => (
+                <Link key={item.id} to={`/article/${item.id}`} className="group block bg-white rounded-xl shadow hover:shadow-lg transition-shadow overflow-hidden">
+                  <div className="relative aspect-[16/10] bg-gray-100">
+                    <img
+                      src={item.featured_image || '/placeholder.svg'}
+                      alt={item.title}
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      loading="lazy"
+                      decoding="async"
+                      onError={(e) => {
+                        const target = e.currentTarget as HTMLImageElement;
+                        target.onerror = null;
+                        target.src = '/placeholder.svg';
+                      }}
+                    />
+                  </div>
+                  <div className="p-4">
+                    <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-amani-secondary/20 text-amani-primary font-medium">
+                        {item.category_info?.name || 'Marché'}
+                      </span>
+                      {item.published_at && (
+                        <span>{new Date(item.published_at).toLocaleDateString('fr-FR')}</span>
+                      )}
+                    </div>
+                    <h3 className="text-base font-semibold text-[#373B3A] leading-snug line-clamp-2 mb-1">{item.title}</h3>
+                    <p className="text-sm text-gray-600 line-clamp-2">{item.summary}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+          {(!marketArticles || marketArticles.length === 0) && (
+            <div className="text-gray-500">Aucun article marché disponible pour le moment.</div>
+          )}
+        </div>
+      </section>
+
+      {/* Industrie */}
+      <section className="py-14 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-end justify-between mb-8">
+            <div>
+              <h2 className="text-3xl font-bold text-amani-primary">Industrie</h2>
+              <p className="text-gray-600 mt-1">Actualités des secteurs industriels clés</p>
+            </div>
+            <Link to="/industrie" className="text-amani-primary hover:underline">Voir plus →</Link>
+          </div>
+          {loadingIndustry ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="bg-white rounded-xl shadow overflow-hidden animate-pulse">
+                  <div className="aspect-[16/10] bg-gray-200" />
+                  <div className="p-4 space-y-2">
+                    <div className="h-4 bg-gray-200 rounded w-1/3" />
+                    <div className="h-5 bg-gray-200 rounded w-3/4" />
+                    <div className="h-4 bg-gray-200 rounded w-2/3" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {(industryArticles || []).map((item) => (
+                <Link key={item.id} to={`/article/${item.id}`} className="group block bg-white rounded-xl shadow hover:shadow-lg transition-shadow overflow-hidden">
+                  <div className="relative aspect-[16/10] bg-gray-100">
+                    <img
+                      src={item.featured_image || '/placeholder.svg'}
+                      alt={item.title}
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      loading="lazy"
+                      decoding="async"
+                      onError={(e) => {
+                        const target = e.currentTarget as HTMLImageElement;
+                        target.onerror = null;
+                        target.src = '/placeholder.svg';
+                      }}
+                    />
+                  </div>
+                  <div className="p-4">
+                    <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-amani-secondary/20 text-amani-primary font-medium">
+                        {item.category_info?.name || 'Industrie'}
+                      </span>
+                      {item.published_at && (
+                        <span>{new Date(item.published_at).toLocaleDateString('fr-FR')}</span>
+                      )}
+                    </div>
+                    <h3 className="text-base font-semibold text-[#373B3A] leading-snug line-clamp-2 mb-1">{item.title}</h3>
+                    <p className="text-sm text-gray-600 line-clamp-2">{item.summary}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+          {(!industryArticles || industryArticles.length === 0) && (
+            <div className="text-gray-500">Aucun article industrie disponible pour le moment.</div>
+          )}
+        </div>
+      </section>
+
+      {/* Investissement */}
+      <section className="py-14 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-end justify-between mb-8">
+            <div>
+              <h2 className="text-3xl font-bold text-amani-primary">Investissement</h2>
+              <p className="text-gray-600 mt-1">Opportunités et mouvements d'investissement</p>
+            </div>
+            <Link to="/investissement" className="text-amani-primary hover:underline">Voir plus →</Link>
+          </div>
+          {loadingInvest ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="bg-white rounded-xl shadow overflow-hidden animate-pulse">
+                  <div className="aspect-[16/10] bg-gray-200" />
+                  <div className="p-4 space-y-2">
+                    <div className="h-4 bg-gray-200 rounded w-1/3" />
+                    <div className="h-5 bg-gray-200 rounded w-3/4" />
+                    <div className="h-4 bg-gray-200 rounded w-2/3" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {(investArticles || []).map((item) => (
+                <Link key={item.id} to={`/article/${item.id}`} className="group block bg-white rounded-xl shadow hover:shadow-lg transition-shadow overflow-hidden">
+                  <div className="relative aspect-[16/10] bg-gray-100">
+                    <img
+                      src={item.featured_image || '/placeholder.svg'}
+                      alt={item.title}
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      loading="lazy"
+                      decoding="async"
+                      onError={(e) => {
+                        const target = e.currentTarget as HTMLImageElement;
+                        target.onerror = null;
+                        target.src = '/placeholder.svg';
+                      }}
+                    />
+                  </div>
+                  <div className="p-4">
+                    <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-amani-secondary/20 text-amani-primary font-medium">
+                        {item.category_info?.name || 'Investissement'}
+                      </span>
+                      {item.published_at && (
+                        <span>{new Date(item.published_at).toLocaleDateString('fr-FR')}</span>
+                      )}
+                    </div>
+                    <h3 className="text-base font-semibold text-[#373B3A] leading-snug line-clamp-2 mb-1">{item.title}</h3>
+                    <p className="text-sm text-gray-600 line-clamp-2">{item.summary}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+          {(!investArticles || investArticles.length === 0) && (
+            <div className="text-gray-500">Aucun article investissement disponible pour le moment.</div>
+          )}
+        </div>
+      </section>
+
+      {/* Insights */}
+      <section className="py-14 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-end justify-between mb-8">
+            <div>
+              <h2 className="text-3xl font-bold text-amani-primary">Insights</h2>
+              <p className="text-gray-600 mt-1">Analyses et perspectives des experts</p>
+            </div>
+            <Link to="/insights" className="text-amani-primary hover:underline">Voir plus →</Link>
+          </div>
+          {loadingInsights ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="bg-white rounded-xl shadow overflow-hidden animate-pulse">
+                  <div className="aspect-[16/10] bg-gray-200" />
+                  <div className="p-4 space-y-2">
+                    <div className="h-4 bg-gray-200 rounded w-1/3" />
+                    <div className="h-5 bg-gray-200 rounded w-3/4" />
+                    <div className="h-4 bg-gray-200 rounded w-2/3" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {(insightsArticles || []).map((item) => (
+                <Link key={item.id} to={`/article/${item.id}`} className="group block bg-white rounded-xl shadow hover:shadow-lg transition-shadow overflow-hidden">
+                  <div className="relative aspect-[16/10] bg-gray-100">
+                    <img
+                      src={item.featured_image || '/placeholder.svg'}
+                      alt={item.title}
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      loading="lazy"
+                      decoding="async"
+                      onError={(e) => {
+                        const target = e.currentTarget as HTMLImageElement;
+                        target.onerror = null;
+                        target.src = '/placeholder.svg';
+                      }}
+                    />
+                  </div>
+                  <div className="p-4">
+                    <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-amani-secondary/20 text-amani-primary font-medium">
+                        {item.category_info?.name || 'Insights'}
+                      </span>
+                      {item.published_at && (
+                        <span>{new Date(item.published_at).toLocaleDateString('fr-FR')}</span>
+                      )}
+                    </div>
+                    <h3 className="text-base font-semibold text-[#373B3A] leading-snug line-clamp-2 mb-1">{item.title}</h3>
+                    <p className="text-sm text-gray-600 line-clamp-2">{item.summary}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+          {(!insightsArticles || insightsArticles.length === 0) && (
+            <div className="text-gray-500">Aucun insight disponible pour le moment.</div>
+          )}
+        </div>
+      </section>
+
+      {/* Tech */}
+      <section className="py-14 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-end justify-between mb-8">
+            <div>
+              <h2 className="text-3xl font-bold text-amani-primary">Tech</h2>
+              <p className="text-gray-600 mt-1">Innovations et technologie au service de l'économie</p>
+            </div>
+            <Link to="/tech" className="text-amani-primary hover:underline">Voir plus →</Link>
+          </div>
+          {loadingTech ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="bg-white rounded-xl shadow overflow-hidden animate-pulse">
+                  <div className="aspect-[16/10] bg-gray-200" />
+                  <div className="p-4 space-y-2">
+                    <div className="h-4 bg-gray-200 rounded w-1/3" />
+                    <div className="h-5 bg-gray-200 rounded w-3/4" />
+                    <div className="h-4 bg-gray-200 rounded w-2/3" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {(techArticles || []).map((item) => (
+                <Link key={item.id} to={`/article/${item.id}`} className="group block bg-white rounded-xl shadow hover:shadow-lg transition-shadow overflow-hidden">
+                  <div className="relative aspect-[16/10] bg-gray-100">
+                    <img
+                      src={item.featured_image || '/placeholder.svg'}
+                      alt={item.title}
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      loading="lazy"
+                      decoding="async"
+                      onError={(e) => {
+                        const target = e.currentTarget as HTMLImageElement;
+                        target.onerror = null;
+                        target.src = '/placeholder.svg';
+                      }}
+                    />
+                  </div>
+                  <div className="p-4">
+                    <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-amani-secondary/20 text-amani-primary font-medium">
+                        {item.category_info?.name || 'Tech'}
+                      </span>
+                      {item.published_at && (
+                        <span>{new Date(item.published_at).toLocaleDateString('fr-FR')}</span>
+                      )}
+                    </div>
+                    <h3 className="text-base font-semibold text-[#373B3A] leading-snug line-clamp-2 mb-1">{item.title}</h3>
+                    <p className="text-sm text-gray-600 line-clamp-2">{item.summary}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+          {(!techArticles || techArticles.length === 0) && (
+            <div className="text-gray-500">Aucun article tech disponible pour le moment.</div>
           )}
         </div>
       </section>

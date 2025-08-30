@@ -58,11 +58,14 @@ export default function NewArticle() {
         tags: formData.tags,
         meta_title: formData.meta_title,
         meta_description: formData.meta_description,
+        // Important: conserver l'URL publique de l'image renvoyée par le formulaire unifié
+        featured_image: formData.featured_image,
         featured_image_alt: formData.featured_image_alt,
         published_at: formData.published_at,
         article_data: formData.article_data || {}
       };
 
+      console.log('🖼️ featured_image utilisé pour la création:', articleData.featured_image);
       const newArticle = await createArticle(articleData);
 
       success(

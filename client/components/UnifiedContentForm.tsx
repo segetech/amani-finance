@@ -191,8 +191,6 @@ export default function UnifiedContentForm({
     setFormData((prev) => ({
       ...prev,
       [name]: newValue,
-      // Si on change la catégorie, synchroniser category_id pour la DB
-      ...(name === "category" && { category_id: newValue as string }),
     }));
 
     // Clear error
@@ -298,10 +296,14 @@ export default function UnifiedContentForm({
       }
 
       // Préparer les données finales
+      // Fallback: si category_id manquant mais slug présent, résoudre via la liste en mémoire
+      const resolvedCategoryId = (formData as any).category_id
+        || categories.find(c => c.slug === (formData as any).category)?.id
+        || (formData as any).category_id; // garde la valeur si déjà présente
+
       const finalData = {
         ...formData,
-        // S'assurer que category_id est bien défini (slug ou UUID)
-        category_id: (formData as any).category_id || (formData as any).category,
+        category_id: resolvedCategoryId,
         type,
         author_id: user?.id,
         featured_image: imageUrl,
@@ -344,15 +346,8 @@ export default function UnifiedContentForm({
   };
 
   // Charger les catégories dynamiquement depuis la base de données
-  const [categories, setCategories] = useState([
-    { value: "economie", label: "Économie" },
-    { value: "marches-financiers", label: "Marchés Financiers" },
-    { value: "politique-monetaire", label: "Politique Monétaire" },
-    { value: "industrie-miniere", label: "Industrie Minière" },
-    { value: "agriculture", label: "Agriculture" },
-    { value: "technologie", label: "Technologie" },
-    { value: "investissement", label: "Investissement" },
-  ]);
+  // Garder l'id (UUID) et le slug pour bien renseigner category_id
+  const [categories, setCategories] = useState<{ id: string; slug: string; label: string }[]>([]);
 
   // Charger les catégories depuis la base de données
   useEffect(() => {
@@ -361,9 +356,9 @@ export default function UnifiedContentForm({
         console.log('🔍 Chargement des catégories...');
         const { data, error } = await supabase
           .from('content_categories')
-          .select('id, name, slug')
-          .eq('is_active', true)
-          .order('sort_order');
+          .select('id, name, slug, sort_order')
+          // Ne pas filtrer sur is_active pour afficher toutes les catégories disponibles
+          .order('sort_order', { ascending: true });
         
         if (error) throw error;
         
@@ -374,7 +369,8 @@ export default function UnifiedContentForm({
           type CategoryRow = { id: string; name: string; slug: string };
           const rows = data as unknown as CategoryRow[];
           const mappedCategories = rows.map((cat) => ({
-            value: cat.slug,
+            id: cat.id,
+            slug: cat.slug,
             label: cat.name,
           }));
           console.log('🏷️ Catégories mappées:', mappedCategories);
@@ -529,10 +525,19 @@ export default function UnifiedContentForm({
                 name="category"
                 value={formData.category || ""}
                 onChange={(e) => {
-                  console.log('🏷️ Catégorie sélectionnée:', e.target.value);
-                  console.log('📋 FormData actuel:', formData);
-                  console.log('🎯 Catégories disponibles:', categories);
-                  handleInputChange(e);
+                  const slug = e.target.value;
+                  const found = categories.find(c => c.slug === slug);
+                  console.log('🏷️ Catégorie sélectionnée:', slug, '→', found?.id);
+                  setFormData((prev) => ({
+                    ...prev,
+                    category: slug,
+                    // Renseigner l'UUID côté DB
+                    category_id: found?.id || prev.category_id,
+                  }));
+                  // Clear error éventuel
+                  if (errors.category) {
+                    setErrors((prev) => ({ ...prev, category: "" }));
+                  }
                 }}
                 className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                   errors.category ? "border-red-300" : "border-gray-300"
@@ -540,7 +545,7 @@ export default function UnifiedContentForm({
               >
                 <option value="">Sélectionner une catégorie</option>
                 {categories.map((cat) => (
-                  <option key={cat.value} value={cat.value}>
+                  <option key={cat.id} value={cat.slug}>
                     {cat.label}
                   </option>
                 ))}
