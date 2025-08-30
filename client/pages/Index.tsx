@@ -178,7 +178,7 @@ export default function Index() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h1 className="text-4xl lg:text-6xl font-bold mb-6">À la une</h1>
+              <h1 className="text-4xl lg:text-6xl font-bold mb-6">À la une Ephhy</h1>
               <h2 className="text-2xl lg:text-3xl font-semibold mb-4">
                 <Link
                   to={heroArticle ? `/article/${heroArticle.id}` : "/article/1"}
