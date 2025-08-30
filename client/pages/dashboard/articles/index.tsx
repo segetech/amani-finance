@@ -35,7 +35,7 @@ export default function ArticlesList() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Gestion des articles</h1>
           <p className="text-muted-foreground">
-            Gérez et publiez vos articles
+            Gérez et publiez vos article
           </p>
         </div>
         <Button onClick={() => navigate('/dashboard/articles/new')}>
