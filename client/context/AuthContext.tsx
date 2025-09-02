@@ -35,6 +35,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const isLoadingRef = useRef(true);
+  const safetyTimeoutRef = useRef<number | null>(null);
 
   // Garder une référence à jour pour éviter les fermetures obsolètes
   useEffect(() => {
@@ -144,9 +145,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     // Fallback: ne jamais rester bloqué en chargement indéfiniment
-    const safetyTimeout = setTimeout(() => {
+    safetyTimeoutRef.current = window.setTimeout(() => {
       if (isLoadingRef.current) {
-        console.warn("[Auth] Timeout de chargement atteint – forcer isLoading=false");
+        if (import.meta.env.MODE !== 'production') {
+          console.warn("[Auth] Timeout de chargement atteint – forcer isLoading=false");
+        }
         setIsLoading(false);
       }
     }, 7000);
@@ -237,16 +240,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setUser(userData);
           // S'assurer que l'UI sort de l'état de chargement quand on reçoit un event positif
           setIsLoading(false);
+          // Annuler le timeout une fois l'auth résolue
+          if (safetyTimeoutRef.current) {
+            clearTimeout(safetyTimeoutRef.current);
+            safetyTimeoutRef.current = null;
+          }
         }
       } else if (event === "SIGNED_OUT") {
         setUser(null);
         setIsLoading(false);
+        if (safetyTimeoutRef.current) {
+          clearTimeout(safetyTimeoutRef.current);
+          safetyTimeoutRef.current = null;
+        }
       }
     });
 
     return () => {
       subscription?.unsubscribe();
-      clearTimeout(safetyTimeout);
+      if (safetyTimeoutRef.current) {
+        clearTimeout(safetyTimeoutRef.current);
+        safetyTimeoutRef.current = null;
+      }
     };
   }, []);
 
