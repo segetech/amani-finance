@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useRef } from "react";
 import { supabase, getCurrentUser } from "../lib/supabase";
 
 interface User {
@@ -34,6 +34,12 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const isLoadingRef = useRef(true);
+
+  // Garder une référence à jour pour éviter les fermetures obsolètes
+  useEffect(() => {
+    isLoadingRef.current = isLoading;
+  }, [isLoading]);
 
   useEffect(() => {
     // Vérifier la session au chargement
@@ -139,7 +145,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Fallback: ne jamais rester bloqué en chargement indéfiniment
     const safetyTimeout = setTimeout(() => {
-      if (isLoading) {
+      if (isLoadingRef.current) {
         console.warn("[Auth] Timeout de chargement atteint – forcer isLoading=false");
         setIsLoading(false);
       }
