@@ -68,9 +68,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             );
           }
 
+          const profileRoles: string[] = Array.isArray(profileData?.roles)
+            ? (profileData!.roles as string[])
+            : [];
           const isAdmin =
-            profileData?.roles?.includes("admin") ||
-            session.user.role === "admin";
+            profileRoles.includes("admin") || session.user.role === "admin";
+          const safePermissions: string[] = Array.isArray(
+            session.user.user_metadata?.permissions,
+          )
+            ? (session.user.user_metadata!.permissions as string[])
+            : [];
           const userData = {
             id: session.user.id,
             email: session.user.email || "",
@@ -87,14 +94,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 .slice(1)
                 .join(" ") ||
               "",
-            organization: profileData?.organization || "",
+            organization:
+              typeof profileData?.organization === "string"
+                ? profileData.organization
+                : "",
             avatarUrl:
-              profileData?.avatar_url ||
-              session.user.user_metadata?.avatar_url ||
-              "",
+              (typeof profileData?.avatar_url === "string"
+                ? profileData.avatar_url
+                : undefined) || session.user.user_metadata?.avatar_url || "",
             user_metadata: session.user.user_metadata,
             role: isAdmin ? "admin" : session.user.role || "user",
-            roles: profileData?.roles || [session.user.role || "user"],
+            roles:
+              profileRoles.length > 0
+                ? profileRoles
+                : [session.user.role || "user"],
             permissions: isAdmin
               ? [
                   "view_dashboard",
@@ -112,7 +125,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                   "view_analytics",
                   "manage_settings",
                 ]
-              : session.user.user_metadata?.permissions || [],
+              : safePermissions,
           };
 
           setUser(userData);
@@ -123,6 +136,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setIsLoading(false);
       }
     };
+
+    // Fallback: ne jamais rester bloqué en chargement indéfiniment
+    const safetyTimeout = setTimeout(() => {
+      if (isLoading) {
+        console.warn("[Auth] Timeout de chargement atteint – forcer isLoading=false");
+        setIsLoading(false);
+      }
+    }, 7000);
 
     checkUser();
 
@@ -146,9 +167,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             .eq("id", session.user.id)
             .maybeSingle();
 
+          const profileRoles: string[] = Array.isArray(profileData?.roles)
+            ? (profileData!.roles as string[])
+            : [];
           const isAdmin =
-            profileData?.roles?.includes("admin") ||
-            session.user.role === "admin";
+            profileRoles.includes("admin") || session.user.role === "admin";
+          const safePermissions: string[] = Array.isArray(
+            session.user.user_metadata?.permissions,
+          )
+            ? (session.user.user_metadata!.permissions as string[])
+            : [];
 
           const userData = {
             id: session.user.id,
@@ -166,14 +194,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 .slice(1)
                 .join(" ") ||
               "",
-            organization: profileData?.organization || "",
+            organization:
+              typeof profileData?.organization === "string"
+                ? profileData.organization
+                : "",
             avatarUrl:
-              profileData?.avatar_url ||
-              session.user.user_metadata?.avatar_url ||
-              "",
+              (typeof profileData?.avatar_url === "string"
+                ? profileData.avatar_url
+                : undefined) || session.user.user_metadata?.avatar_url || "",
             user_metadata: session.user.user_metadata,
             role: isAdmin ? "admin" : session.user.role || "user",
-            roles: profileData?.roles || [session.user.role || "user"],
+            roles:
+              profileRoles.length > 0
+                ? profileRoles
+                : [session.user.role || "user"],
             permissions: isAdmin
               ? [
                   "view_dashboard",
@@ -191,18 +225,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                   "view_analytics",
                   "manage_settings",
                 ]
-              : session.user.user_metadata?.permissions || [],
+              : safePermissions,
           };
 
           setUser(userData);
+          // S'assurer que l'UI sort de l'état de chargement quand on reçoit un event positif
+          setIsLoading(false);
         }
       } else if (event === "SIGNED_OUT") {
         setUser(null);
+        setIsLoading(false);
       }
     });
 
     return () => {
       subscription?.unsubscribe();
+      clearTimeout(safetyTimeout);
     };
   }, []);
 
@@ -293,6 +331,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           ];
         }
 
+        const computedRole: string = (profileData?.role ||
+          data.user.user_metadata?.role ||
+          "user") as string;
         const userData = {
           id: data.user.id,
           email: data.user.email || "",
@@ -309,16 +350,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               .slice(1)
               .join(" ") ||
             "",
-          organization: profileData?.organization || "",
+          organization:
+            typeof profileData?.organization === "string"
+              ? profileData.organization
+              : "",
           avatarUrl:
-            profileData?.avatar_url ||
-            data.user.user_metadata?.avatar_url ||
-            "",
+            (typeof profileData?.avatar_url === "string"
+              ? profileData.avatar_url
+              : undefined) || data.user.user_metadata?.avatar_url || "",
           user_metadata: data.user.user_metadata,
           role: isAdmin
             ? "admin"
-            : profileData?.role || data.user.user_metadata?.role || "user",
-          roles: [profileData?.role || data.user.user_metadata?.role || "user"],
+            : computedRole,
+          roles: [computedRole],
           permissions: userPermissions,
         };
 
