@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useRef } from "react";
 import { supabase, getCurrentUser } from "../lib/supabase";
 
 interface User {
@@ -34,6 +34,13 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const isLoadingRef = useRef(true);
+  const safetyTimeoutRef = useRef<number | null>(null);
+
+  // Garder une référence à jour pour éviter les fermetures obsolètes
+  useEffect(() => {
+    isLoadingRef.current = isLoading;
+  }, [isLoading]);
 
   useEffect(() => {
     // Vérifier la session au chargement
@@ -68,9 +75,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             );
           }
 
+          const profileRoles: string[] = Array.isArray(profileData?.roles)
+            ? (profileData!.roles as string[])
+            : [];
           const isAdmin =
-            profileData?.roles?.includes("admin") ||
-            session.user.role === "admin";
+            profileRoles.includes("admin") || session.user.role === "admin";
+          const safePermissions: string[] = Array.isArray(
+            session.user.user_metadata?.permissions,
+          )
+            ? (session.user.user_metadata!.permissions as string[])
+            : [];
           const userData = {
             id: session.user.id,
             email: session.user.email || "",
@@ -87,14 +101,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 .slice(1)
                 .join(" ") ||
               "",
-            organization: profileData?.organization || "",
+            organization:
+              typeof profileData?.organization === "string"
+                ? profileData.organization
+                : "",
             avatarUrl:
-              profileData?.avatar_url ||
-              session.user.user_metadata?.avatar_url ||
-              "",
+              (typeof profileData?.avatar_url === "string"
+                ? profileData.avatar_url
+                : undefined) || session.user.user_metadata?.avatar_url || "",
             user_metadata: session.user.user_metadata,
             role: isAdmin ? "admin" : session.user.role || "user",
-            roles: profileData?.roles || [session.user.role || "user"],
+            roles:
+              profileRoles.length > 0
+                ? profileRoles
+                : [session.user.role || "user"],
             permissions: isAdmin
               ? [
                   "view_dashboard",
@@ -112,7 +132,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                   "view_analytics",
                   "manage_settings",
                 ]
-              : session.user.user_metadata?.permissions || [],
+              : safePermissions,
           };
 
           setUser(userData);
@@ -123,6 +143,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setIsLoading(false);
       }
     };
+
+    // Fallback: ne jamais rester bloqué en chargement indéfiniment
+    safetyTimeoutRef.current = window.setTimeout(() => {
+      if (isLoadingRef.current) {
+        if (import.meta.env.MODE !== 'production') {
+          console.warn("[Auth] Timeout de chargement atteint – forcer isLoading=false");
+        }
+        setIsLoading(false);
+      }
+    }, 7000);
 
     checkUser();
 
@@ -146,9 +176,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             .eq("id", session.user.id)
             .maybeSingle();
 
+          const profileRoles: string[] = Array.isArray(profileData?.roles)
+            ? (profileData!.roles as string[])
+            : [];
           const isAdmin =
-            profileData?.roles?.includes("admin") ||
-            session.user.role === "admin";
+            profileRoles.includes("admin") || session.user.role === "admin";
+          const safePermissions: string[] = Array.isArray(
+            session.user.user_metadata?.permissions,
+          )
+            ? (session.user.user_metadata!.permissions as string[])
+            : [];
 
           const userData = {
             id: session.user.id,
@@ -166,14 +203,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 .slice(1)
                 .join(" ") ||
               "",
-            organization: profileData?.organization || "",
+            organization:
+              typeof profileData?.organization === "string"
+                ? profileData.organization
+                : "",
             avatarUrl:
-              profileData?.avatar_url ||
-              session.user.user_metadata?.avatar_url ||
-              "",
+              (typeof profileData?.avatar_url === "string"
+                ? profileData.avatar_url
+                : undefined) || session.user.user_metadata?.avatar_url || "",
             user_metadata: session.user.user_metadata,
             role: isAdmin ? "admin" : session.user.role || "user",
-            roles: profileData?.roles || [session.user.role || "user"],
+            roles:
+              profileRoles.length > 0
+                ? profileRoles
+                : [session.user.role || "user"],
             permissions: isAdmin
               ? [
                   "view_dashboard",
@@ -191,18 +234,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                   "view_analytics",
                   "manage_settings",
                 ]
-              : session.user.user_metadata?.permissions || [],
+              : safePermissions,
           };
 
           setUser(userData);
+          // S'assurer que l'UI sort de l'état de chargement quand on reçoit un event positif
+          setIsLoading(false);
+          // Annuler le timeout une fois l'auth résolue
+          if (safetyTimeoutRef.current) {
+            clearTimeout(safetyTimeoutRef.current);
+            safetyTimeoutRef.current = null;
+          }
         }
       } else if (event === "SIGNED_OUT") {
         setUser(null);
+        setIsLoading(false);
+        if (safetyTimeoutRef.current) {
+          clearTimeout(safetyTimeoutRef.current);
+          safetyTimeoutRef.current = null;
+        }
       }
     });
 
     return () => {
       subscription?.unsubscribe();
+      if (safetyTimeoutRef.current) {
+        clearTimeout(safetyTimeoutRef.current);
+        safetyTimeoutRef.current = null;
+      }
     };
   }, []);
 
@@ -293,6 +352,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           ];
         }
 
+        const computedRole: string = (profileData?.role ||
+          data.user.user_metadata?.role ||
+          "user") as string;
         const userData = {
           id: data.user.id,
           email: data.user.email || "",
@@ -309,16 +371,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               .slice(1)
               .join(" ") ||
             "",
-          organization: profileData?.organization || "",
+          organization:
+            typeof profileData?.organization === "string"
+              ? profileData.organization
+              : "",
           avatarUrl:
-            profileData?.avatar_url ||
-            data.user.user_metadata?.avatar_url ||
-            "",
+            (typeof profileData?.avatar_url === "string"
+              ? profileData.avatar_url
+              : undefined) || data.user.user_metadata?.avatar_url || "",
           user_metadata: data.user.user_metadata,
           role: isAdmin
             ? "admin"
-            : profileData?.role || data.user.user_metadata?.role || "user",
-          roles: [profileData?.role || data.user.user_metadata?.role || "user"],
+            : computedRole,
+          roles: [computedRole],
           permissions: userPermissions,
         };
 
