@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '../lib/supabase';
+import type { Database } from '../types/database';
  
 
 export type PodcastStatus = 'draft' | 'published' | 'archived' | 'scheduled';
@@ -128,7 +129,7 @@ export const usePodcasts = ({
         dataLength: data?.length || 0, 
         error: error?.message || 'Aucune erreur', 
         count,
-        firstItem: data?.[0]?.title || 'Aucun'
+        firstItem: (data as any)?.[0]?.title || 'Aucun'
       });
 
       if (error) {
@@ -305,27 +306,34 @@ export const usePodcasts = ({
       }
       console.log('🏷️ Catégorie (legacy text) utilisée pour insertion:', legacyCategoryText);
 
-      // Préparer les données du podcast
-      const podcastToCreate = {
+      // Préparer les données du podcast (respecter Database[contents].Insert)
+      const dbStatus: Database['public']['Tables']['contents']['Row']['status'] =
+        (['draft', 'published', 'archived'] as const).includes(
+          (podcastData.status as unknown as Database['public']['Tables']['contents']['Row']['status']) || 'draft'
+        )
+          ? ((podcastData.status as unknown) as Database['public']['Tables']['contents']['Row']['status'])
+          : 'draft';
+
+      const podcastToCreate: Database['public']['Tables']['contents']['Insert'] = {
         title: podcastData.title,
         slug: slug,
         summary: podcastData.summary,
-        description: podcastData.description || null,
-        content: podcastData.content || null,
-        type: 'podcast' as const,
-        status: podcastData.status || 'draft',
-        category_id: podcastData.category_id,
-        // Compatibilité schéma legacy: certaines bases ont encore "category" (text NOT NULL)
+        description: podcastData.description ?? undefined,
+        content: podcastData.content ?? undefined,
+        type: 'podcast',
+        status: dbStatus,
+        // `category` (legacy texte) + `category_id` (clé étrangère)
         category: legacyCategoryText,
+        category_id: podcastData.category_id,
         country: podcastData.country || 'mali',
         tags: podcastData.tags || [],
         author_id: user.id,
-        meta_title: podcastData.meta_title || null,
-        meta_description: podcastData.meta_description || null,
-        featured_image: podcastData.featured_image || null,
-        featured_image_alt: podcastData.featured_image_alt || null,
-        published_at: podcastData.status === 'published' ? new Date().toISOString() : null,
-        podcast_data: podcastData.podcast_data || {}
+        meta_title: podcastData.meta_title ?? undefined,
+        meta_description: podcastData.meta_description ?? undefined,
+        featured_image: podcastData.featured_image ?? undefined,
+        featured_image_alt: podcastData.featured_image_alt ?? undefined,
+        published_at: dbStatus === 'published' ? new Date().toISOString() : undefined,
+        podcast_data: (podcastData as any).podcast_data ?? undefined
       };
       
       console.log('🔍 Validation des données avant insertion:');
@@ -340,7 +348,9 @@ export const usePodcasts = ({
       const insertStart = Date.now();
       const insertPromise = supabase
         .from('contents')
-        .insert([podcastToCreate])
+        .insert<Database['public']['Tables']['contents']['Insert']>([
+          podcastToCreate as Database['public']['Tables']['contents']['Insert']
+        ])
         .select()
         .single();
       const timeoutMs = 15000; // 15s timeout

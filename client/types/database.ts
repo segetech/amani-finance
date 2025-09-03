@@ -15,6 +15,8 @@ export interface Database {
 
           // MÉTADONNÉES COMMUNES
           status: "draft" | "published" | "archived";
+          // Nouvel ID de catégorie (clé étrangère)
+          category_id: string;
           category: string;
           country: string;
           tags: string[];
@@ -141,6 +143,10 @@ export interface Database {
         >;
       };
     };
+    Views: Record<string, never>;
+    Functions: Record<string, never>;
+    Enums: Record<string, never>;
+    CompositeTypes: Record<string, never>;
   };
 }
 
@@ -266,10 +272,9 @@ export type UserRole = Database["public"]["Tables"]["profiles"]["Row"]["role"];
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
 
 // ===== UNIFIED CONTENT INTERFACE =====
-export interface UnifiedContent
-  extends Database["public"]["Tables"]["contents"]["Row"] {
+export type UnifiedContent = Database["public"]["Tables"]["contents"]["Row"] & {
   author: Database["public"]["Tables"]["profiles"]["Row"];
   category_info: Database["public"]["Tables"]["categories"]["Row"];
   comment_count: number;
   is_liked_by_user?: boolean;
-}
+};

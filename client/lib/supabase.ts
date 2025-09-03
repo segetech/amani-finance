@@ -1,4 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
+import type { SupabaseClient } from '@supabase/supabase-js';
+import type { Database } from '../types/database';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -22,11 +24,11 @@ const authOptions = {
 } as const;
 
 // Singleton côté navigateur pour éviter le warning "Multiple GoTrueClient instances"
-let clientInstance: ReturnType<typeof createClient>;
+let clientInstance: SupabaseClient<Database>;
 if (isBrowser) {
-  const w = window as unknown as { __amani_supabase?: ReturnType<typeof createClient> };
+  const w = window as unknown as { __amani_supabase?: SupabaseClient<Database> };
   if (!w.__amani_supabase) {
-    w.__amani_supabase = createClient(supabaseUrl, supabaseAnonKey, {
+    w.__amani_supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
       auth: authOptions,
       global: {
         headers: {
@@ -38,7 +40,7 @@ if (isBrowser) {
   clientInstance = w.__amani_supabase;
 } else {
   // En environnement non-navigateur, créer une instance isolée
-  clientInstance = createClient(supabaseUrl, supabaseAnonKey, {
+  clientInstance = createClient<Database>(supabaseUrl, supabaseAnonKey, {
     auth: authOptions,
     global: {
       headers: {
