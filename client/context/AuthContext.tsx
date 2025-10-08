@@ -61,29 +61,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
 
         if (session?.user) {
-          // Récupérer les informations du profil (ne jette pas d'exception si aucune ligne)
-          const { data: profileData, error: profileError } = await supabase
-            .from("profiles")
-            .select("*")
-            .eq("id", session.user.id)
-            .maybeSingle();
-
-          if (profileError) {
-            console.warn(
-              "[Auth] Profil non récupéré (continuons avec les métadonnées de session):",
-              profileError,
-            );
-          }
+          // TEMPORAIRE: Désactiver la requête profiles pendant la migration vers Prisma
+          console.log("⚠️ Migration Prisma en cours - utilisation des métadonnées Supabase uniquement");
+          const profileData = null; // Simuler l'absence de profil
+          const profileError = null;
 
           const profileRoles: string[] = Array.isArray(profileData?.roles)
-            ? (profileData!.roles as string[])
+            ? (profileData?.roles as string[])
             : [];
           const isAdmin =
             profileRoles.includes("admin") || session.user.role === "admin";
           const safePermissions: string[] = Array.isArray(
             session.user.user_metadata?.permissions,
           )
-            ? (session.user.user_metadata!.permissions as string[])
+            ? (session.user.user_metadata?.permissions as string[])
             : [];
           const userData = {
             id: session.user.id,
@@ -144,7 +135,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     };
 
-    // Fallback: ne jamais rester bloqué en chargement indéfiniment
+    // Fallback optimisé: timeout plus court pour améliorer les performances
     safetyTimeoutRef.current = window.setTimeout(() => {
       if (isLoadingRef.current) {
         if (import.meta.env.MODE !== 'production') {
@@ -152,7 +143,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
         setIsLoading(false);
       }
-    }, 7000);
+    }, 2000); // Réduit de 7s à 2s
 
     checkUser();
 
@@ -170,21 +161,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       ) {
         if (session?.user) {
           // Recharger les données utilisateur (sans jeter en cas d'absence)
-          const { data: profileData } = await supabase
-            .from("profiles")
-            .select("*")
-            .eq("id", session.user.id)
-            .maybeSingle();
+          // TEMPORAIRE: Désactiver la requête profiles pendant la migration vers Prisma
+          console.log("⚠️ Migration Prisma en cours - utilisation des métadonnées Supabase uniquement");
+          const profileData = null; // Simuler l'absence de profil
 
           const profileRoles: string[] = Array.isArray(profileData?.roles)
-            ? (profileData!.roles as string[])
+            ? (profileData?.roles as string[])
             : [];
           const isAdmin =
             profileRoles.includes("admin") || session.user.role === "admin";
           const safePermissions: string[] = Array.isArray(
             session.user.user_metadata?.permissions,
           )
-            ? (session.user.user_metadata!.permissions as string[])
+            ? (session.user.user_metadata?.permissions as string[])
             : [];
 
           const userData = {
@@ -282,6 +271,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       console.log(`⏱️ Temps de réponse Supabase: ${Date.now() - startTime}ms`);
       console.log("📦 Réponse Supabase:", { data, error });
+      console.log("🔍 Détails utilisateur:", data?.user ? {
+        id: data.user.id,
+        email: data.user.email,
+        role: data.user.role,
+        user_metadata: data.user.user_metadata
+      } : "Aucun utilisateur");
 
       if (error) {
         console.error("❌ Erreur de connexion:", error);
@@ -302,20 +297,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // On ne met pas à jour l'état ici, on attend d'avoir toutes les données
 
         console.log("🔄 Récupération des informations du profil...");
-        const { data: profileData, error: profileError } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", data.user.id)
-          .maybeSingle();
-
-        console.log("📋 Profil data:", profileData);
-        if (profileError) {
-          console.error(
-            "⚠️ Erreur lors de la récupération du profil:",
-            profileError,
-          );
-          console.log("🔄 Continuons sans profil...");
-        }
+        console.log("🆔 ID utilisateur pour recherche profil:", data.user.id);
+        
+        // TEMPORAIRE: Désactiver la requête profiles pendant la migration vers Prisma
+        console.log("⚠️ Migration Prisma en cours - utilisation des métadonnées Supabase uniquement");
+        const profileData = null; // Simuler l'absence de profil
+        const profileError = null;
 
         // Vérifier si l'utilisateur est admin
         const isAdmin =
@@ -389,6 +376,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         console.log("✅ Utilisateur connecté avec les données:", userData);
         setUser(userData);
+        console.log("🎯 Retour de login: true");
+        console.groupEnd();
         return true;
       }
 

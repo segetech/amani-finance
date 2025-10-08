@@ -84,56 +84,58 @@ export const usePodcasts = ({
 
   const fetchPodcasts = useCallback(async () => {
     try {
-      const t0 = Date.now();
-      console.log('🎧 Début récupération podcasts...', { status, limit, offset, category, authorId });
       setLoading(true);
       setError(null);
       
-      console.log('🔗 Requête podcasts...');
-      
+      // Requête optimisée avec sélection minimale des champs
       let query = supabase
         .from('contents')
-        // Use planned count to avoid heavy exact count on large tables
-        .select('*', { count: 'planned' })
+        .select(`
+          id,
+          title,
+          slug,
+          summary,
+          description,
+          content,
+          status,
+          category_id,
+          country,
+          tags,
+          author_id,
+          featured_image,
+          featured_image_alt,
+          created_at,
+          updated_at,
+          published_at,
+          views,
+          likes,
+          shares,
+          read_time,
+          podcast_data
+        `, { count: 'exact' })
         .eq('type', 'podcast');
 
-      console.log('🎯 Filtres appliqués:');
-      
+      // Appliquer les filtres
       if (status !== 'all') {
-        console.log('  - Status:', status);
         query = query.eq('status', status);
-      } else {
-        console.log('  - Status: tous');
       }
       
       if (category) {
-        console.log('  - Catégorie:', category);
         query = query.eq('category_id', category);
       }
       
       if (authorId) {
-        console.log('  - Auteur:', authorId);
         query = query.eq('author_id', authorId);
       }
 
-      console.log('🚀 Exécution de la requête podcasts...');
-      
+      // Exécuter la requête avec pagination optimisée
       const result = await query
         .order('created_at', { ascending: false })
         .range(offset, offset + limit - 1);
       
-      console.log('🔍 Résultat brut Supabase (podcasts):', result);
       const { data, error, count } = result;
 
-      console.log('📊 Résultat requête podcasts:', { 
-        dataLength: data?.length || 0, 
-        error: error?.message || 'Aucune erreur', 
-        count,
-        firstItem: (data as any)?.[0]?.title || 'Aucun'
-      });
-
       if (error) {
-        console.error('❌ Erreur Supabase (podcasts):', error);
         setError(error as Error);
         setPodcasts([]);
         setCount(0);
@@ -141,15 +143,15 @@ export const usePodcasts = ({
       }
 
       if (!data || data.length === 0) {
-        console.log('⚠️ Aucun podcast trouvé');
         setPodcasts([]);
         setCount(0);
         return [];
       }
 
-      console.log('🔄 Formatage des données podcasts...');
+      // Formatage optimisé des données
       const formattedData: Podcast[] = data.map((item: any) => ({
-        ...(item as Podcast),
+        ...item,
+        type: 'podcast' as const,
         author: {
           id: item.author_id,
           first_name: 'Animateur',
@@ -164,11 +166,8 @@ export const usePodcasts = ({
         }
       }));
 
-      console.log('✅ Podcasts récupérés avec succès:', formattedData.length);
       setPodcasts(formattedData);
       if (count !== null) setCount(count);
-      const dt = Date.now() - t0;
-      console.log(`⏱️ fetchPodcasts terminé en ${dt} ms`);
       return formattedData;
     } catch (err) {
       console.error('💥 Erreur dans fetchPodcasts:', err);
@@ -181,19 +180,14 @@ export const usePodcasts = ({
     }
   }, [status, limit, offset, category, authorId]);
 
-  // Auth readiness + refetch on session change
+  // Auth readiness sans refetch automatique
   useEffect(() => {
-    let unsub: { subscription?: { unsubscribe?: () => void } } | null = null;
     supabase.auth.getSession().then(() => setAuthReady(true));
-    const sub = supabase.auth.onAuthStateChange((_event, _session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
       setAuthReady(true);
-      fetchPodcasts().catch((e) => console.warn('Refetch podcasts après changement de session échoué:', e));
     });
-    unsub = sub?.data as any;
-    return () => {
-      try { unsub?.subscription?.unsubscribe?.(); } catch {}
-    };
-  }, [fetchPodcasts]);
+    return () => subscription?.unsubscribe();
+  }, []);
 
   const fetchPodcastBySlug = useCallback(async (slug: string): Promise<Podcast> => {
     try {

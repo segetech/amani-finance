@@ -11,6 +11,7 @@ import { supabase } from "../lib/supabase";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
+import { useContentCategories } from "../hooks/useContentCategories";
 import {
   ContentType,
   UnifiedContent,
@@ -49,6 +50,7 @@ export default function UnifiedContentForm({
   const { user, hasPermission } = useAuth();
   const { success, error } = useToast();
   const navigate = useNavigate();
+  const { categories, loading: categoriesLoading, error: categoriesError } = useContentCategories();
 
   const [isSaving, setIsSaving] = useState(false);
   const [isPreview, setIsPreview] = useState(false);
@@ -270,8 +272,10 @@ export default function UnifiedContentForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('🚀 handleSubmit démarré');
 
     if (!validateForm()) {
+      console.log('❌ Validation échouée');
       error(
         "Erreur de validation",
         "Veuillez corriger les erreurs dans le formulaire.",
@@ -279,6 +283,7 @@ export default function UnifiedContentForm({
       return;
     }
 
+    console.log('✅ Validation réussie, début sauvegarde...');
     setIsSaving(true);
 
     try {
@@ -291,6 +296,7 @@ export default function UnifiedContentForm({
         } catch (imgError) {
           console.error("Erreur upload image:", imgError);
           error("Erreur", "Impossible d'uploader l'image. Veuillez réessayer.");
+          setIsSaving(false);
           return;
         }
       }
@@ -309,7 +315,9 @@ export default function UnifiedContentForm({
         featured_image: imageUrl,
       };
 
+      console.log('📤 Appel onSave avec:', finalData);
       await onSave(finalData);
+      console.log('✅ onSave terminé avec succès');
 
       success(
         `${getTypeLabel()} ${formData.status === "published" ? "publié" : "sauvegardé"}`,
@@ -345,47 +353,13 @@ export default function UnifiedContentForm({
     }
   };
 
-  // Charger les catégories dynamiquement depuis la base de données
-  // Garder l'id (UUID) et le slug pour bien renseigner category_id
-  const [categories, setCategories] = useState<{ id: string; slug: string; label: string }[]>([]);
-
-  // Charger les catégories depuis la base de données
+  // Affichage d'erreur si problème avec les catégories
   useEffect(() => {
-    const loadCategories = async () => {
-      try {
-        console.log('🔍 Chargement des catégories...');
-        const { data, error } = await supabase
-          .from('content_categories')
-          .select('id, name, slug, sort_order')
-          // Ne pas filtrer sur is_active pour afficher toutes les catégories disponibles
-          .order('sort_order', { ascending: true });
-        
-        if (error) throw error;
-        
-        console.log('📊 Catégories récupérées:', data);
-        
-        if (data && data.length > 0) {
-          // Assurer le typage des champs retournés par Supabase
-          type CategoryRow = { id: string; name: string; slug: string };
-          const rows = data as unknown as CategoryRow[];
-          const mappedCategories = rows.map((cat) => ({
-            id: cat.id,
-            slug: cat.slug,
-            label: cat.name,
-          }));
-          console.log('🏷️ Catégories mappées:', mappedCategories);
-          setCategories(mappedCategories);
-        } else {
-          console.log('⚠️ Aucune catégorie trouvée, utilisation des catégories par défaut');
-        }
-      } catch (error) {
-        console.error('Erreur chargement catégories:', error);
-      }
-    };
-    
-    console.log('🚀 Démarrage du chargement des catégories...');
-    loadCategories();
-  }, []);
+    if (categoriesError) {
+      console.error('Erreur chargement catégories:', categoriesError);
+      error('Erreur', 'Impossible de charger les catégories');
+    }
+  }, [categoriesError, error]);
 
   const countries = [
     { value: "mali", label: "Mali" },
@@ -543,10 +517,12 @@ export default function UnifiedContentForm({
                   errors.category ? "border-red-300" : "border-gray-300"
                 }`}
               >
-                <option value="">Sélectionner une catégorie</option>
+                <option value="">
+                  {categoriesLoading ? 'Chargement des catégories...' : 'Sélectionner une catégorie'}
+                </option>
                 {categories.map((cat) => (
                   <option key={cat.id} value={cat.slug}>
-                    {cat.label}
+                    {cat.name}
                   </option>
                 ))}
               </select>

@@ -24,6 +24,7 @@ export const useContentCategories = () => {
   // Récupérer toutes les catégories
   const fetchCategories = useCallback(async (activeOnly = true) => {
     try {
+      console.log('🔍 Début fetchCategories, activeOnly:', activeOnly);
       setLoading(true);
       setError(null);
       
@@ -36,15 +37,20 @@ export const useContentCategories = () => {
         query = query.eq('is_active', true);
       }
       
+      console.log('📤 Exécution requête catégories...');
       const { data, error } = await query;
+      
+      console.log('📊 Réponse catégories:', { data: data?.length, error });
       
       if (error) throw error;
       
       setCategories(data || []);
+      console.log('✅ Catégories chargées:', data?.length || 0);
     } catch (err) {
-      console.error('Erreur récupération catégories:', err);
+      console.error('❌ Erreur récupération catégories:', err);
       setError(err as Error);
     } finally {
+      console.log('🏁 Fin fetchCategories, setLoading(false)');
       setLoading(false);
     }
   }, []);

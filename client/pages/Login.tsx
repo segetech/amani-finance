@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, LogIn, Mail, Lock, Users } from "lucide-react";
-import { useAuth } from "../context/AuthContext";
 import { demoAccounts, getRoleDisplayName } from "../lib/demoAccounts";
 import { supabase } from "../lib/supabase";
 import EnvTest from "@/components/EnvTest";
@@ -16,8 +17,16 @@ export default function Login() {
     rememberMe: false,
   });
 
-  const { login } = useAuth();
+  const { login, user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+
+  // Redirection automatique si déjà connecté
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      console.log("🎯 Utilisateur déjà connecté, redirection...");
+      navigate("/dashboard");
+    }
+  }, [isAuthenticated, user, navigate]);
 
   // Test de connexion Supabase au chargement
   useEffect(() => {

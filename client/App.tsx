@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense, lazy } from "react";
 import { createRoot } from "react-dom/client";
 import "./global.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -18,57 +18,61 @@ import ScrollToTop from "./components/ScrollToTop";
 import { Navigation } from "./components/Navigation";
 import DashboardShell from "./components/DashboardShell";
 
-// Public Pages
+// Pages critiques chargées immédiatement
 import Index from "./pages/Index";
-import Article from "./pages/Article";
 import Login from "./pages/Login";
-import Register from "./pages/Register";
-import About from "./pages/About";
-import Contact from "./pages/Contact";
-import Podcast from "./pages/Podcast";
-import Indices from "./pages/Indices";
-import BrvmLatest from "./pages/BrvmLatest";
-import Calculateur from "./pages/Calculateur";
-import GuideDebutant from "./pages/GuideDebutant";
-import Actualites from "./pages/Actualites";
-import Newsletter from "./pages/Newsletter";
-import Marche from "./pages/Marche";
-import Economie from "./pages/Economie";
-import EconomieNews from "./pages/EconomieNews";
-import Industrie from "./pages/Industrie";
-import Investissement from "./pages/Investissement";
-import Insights from "./pages/Insights";
-import Tech from "./pages/Tech";
 
-// Dashboard Pages
-import DashboardMain from "./pages/DashboardMain";
-import ContentManagement from "./pages/ContentManagement";
-import Articles from "./pages/Articles";
-import NewArticle from "./pages/NewArticle";
-import EditArticle from "./pages/EditArticle";
-import PodcastsManager from "./pages/PodcastsManager";
-import NewPodcast from "./pages/NewPodcast";
-import EditPodcast from "./pages/EditPodcast";
-import LegacyIndicesDisabled from "./pages/LegacyIndicesDisabled";
-import BrvmIndicesManagement from "./pages/BrvmIndicesManagement";
-import CommoditiesManagement from "./pages/CommoditiesManagement";
-import IndicesHelp from "./pages/IndicesHelp";
-import Analytics from "./pages/Analytics";
-import Moderation from "./pages/Moderation";
-import ReportsModeration from "./pages/ReportsModeration";
-import Settings from "./pages/Settings";
-import Profile from "./pages/Profile";
-import PermissionsManager from "./pages/PermissionsManager";
-import Users from "./pages/Users";
-import NewUser from "./pages/NewUser";
-import EditUser from "./pages/EditUser";
-import BannedUsers from "./pages/BannedUsers";
-import Notifications from "./pages/Notifications";
-import Logs from "./pages/Logs";
-import UserActivity from "./pages/UserActivity";
-import ReportsManager from "./pages/ReportsManager";
-import NewUserAdvanced from "./pages/NewUserAdvanced";
-import Integrations from "./pages/Integrations";
+// Pages lazy-loaded pour améliorer les performances
+const Article = lazy(() => import("./pages/Article"));
+const Register = lazy(() => import("./pages/Register"));
+const About = lazy(() => import("./pages/About"));
+const Contact = lazy(() => import("./pages/Contact"));
+const Podcast = lazy(() => import("./pages/Podcast"));
+const Indices = lazy(() => import("./pages/Indices"));
+const BrvmLatest = lazy(() => import("./pages/BrvmLatest"));
+const Calculateur = lazy(() => import("./pages/Calculateur"));
+const GuideDebutant = lazy(() => import("./pages/GuideDebutant"));
+const Actualites = lazy(() => import("./pages/Actualites"));
+const Newsletter = lazy(() => import("./pages/Newsletter"));
+const Marche = lazy(() => import("./pages/Marche"));
+const Economie = lazy(() => import("./pages/Economie"));
+const EconomieNews = lazy(() => import("./pages/EconomieNews"));
+const Industrie = lazy(() => import("./pages/Industrie"));
+const Investissement = lazy(() => import("./pages/Investissement"));
+const Insights = lazy(() => import("./pages/Insights"));
+const Tech = lazy(() => import("./pages/Tech"));
+const TestMedia = lazy(() => import("./pages/TestMedia"));
+const TestArticleForm = lazy(() => import("./pages/TestArticleForm"));
+
+// Dashboard Pages - lazy loaded
+const DashboardMain = lazy(() => import("./pages/DashboardMain"));
+const ContentManagement = lazy(() => import("./pages/ContentManagement"));
+const Articles = lazy(() => import("./pages/Articles"));
+const NewArticle = lazy(() => import("./pages/NewArticle"));
+const EditArticle = lazy(() => import("./pages/EditArticle"));
+const PodcastsManager = lazy(() => import("./pages/PodcastsManager"));
+const NewPodcast = lazy(() => import("./pages/NewPodcast"));
+const EditPodcast = lazy(() => import("./pages/EditPodcast"));
+const LegacyIndicesDisabled = lazy(() => import("./pages/LegacyIndicesDisabled"));
+const BrvmIndicesManagement = lazy(() => import("./pages/BrvmIndicesManagement"));
+const CommoditiesManagement = lazy(() => import("./pages/CommoditiesManagement"));
+const IndicesHelp = lazy(() => import("./pages/IndicesHelp"));
+const Analytics = lazy(() => import("./pages/Analytics"));
+const Moderation = lazy(() => import("./pages/Moderation"));
+const ReportsModeration = lazy(() => import("./pages/ReportsModeration"));
+const Settings = lazy(() => import("./pages/Settings"));
+const Profile = lazy(() => import("./pages/Profile"));
+const PermissionsManager = lazy(() => import("./pages/PermissionsManager"));
+const Users = lazy(() => import("./pages/Users"));
+const NewUser = lazy(() => import("./pages/NewUser"));
+const EditUser = lazy(() => import("./pages/EditUser"));
+const BannedUsers = lazy(() => import("./pages/BannedUsers"));
+const Notifications = lazy(() => import("./pages/Notifications"));
+const Logs = lazy(() => import("./pages/Logs"));
+const UserActivity = lazy(() => import("./pages/UserActivity"));
+const ReportsManager = lazy(() => import("./pages/ReportsManager"));
+const NewUserAdvanced = lazy(() => import("./pages/NewUserAdvanced"));
+const Integrations = lazy(() => import("./pages/Integrations"));
 
 // Create a single instance of QueryClient
 const queryClient = new QueryClient({
@@ -92,12 +96,13 @@ const AppContent = () => {
     <BrowserRouter>
       <ScrollToTop />
       <Navigation />
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<Index />} />
-        <Route path="/article/:id" element={<Article />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+      <Suspense fallback={<LoadingSpinner />}>
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<Index />} />
+          <Route path="/article/:id" element={<Article />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/podcast" element={<Podcast />} />
@@ -114,6 +119,8 @@ const AppContent = () => {
         <Route path="/investissement" element={<Investissement />} />
         <Route path="/insights" element={<Insights />} />
         <Route path="/tech" element={<Tech />} />
+        <Route path="/test-media" element={<TestMedia />} />
+        <Route path="/test-article-form" element={<TestArticleForm />} />
 
         {/* Protected Dashboard Routes (persistent layout with nested routes) */}
         <Route
@@ -172,7 +179,8 @@ const AppContent = () => {
             </div>
           }
         />
-      </Routes>
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 };

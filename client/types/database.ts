@@ -43,6 +43,14 @@ export interface Database {
           article_data?: ArticleData;
           podcast_data?: PodcastData;
           indice_data?: IndiceData;
+
+          // MÉDIAS EXTERNES
+          uploadthing_image_url?: string;
+          uploadthing_image_key?: string;
+          mux_asset_id?: string;
+          mux_playback_id?: string;
+          video_duration?: number;
+          video_aspect_ratio?: string;
         };
         Insert: Omit<
           Database["public"]["Tables"]["contents"]["Row"],

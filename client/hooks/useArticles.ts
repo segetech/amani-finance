@@ -22,13 +22,6 @@ const normalizeFeaturedImage = (value?: string | null): string | null => {
   }
 
   const publicUrl = `${base}/storage/v1/object/public/${path}`;
-  // Debug once per distinct value (safe console for diagnosis; can be removed later)
-  try {
-    // Avoid noisy logs for avatar placeholders etc.
-    if (process.env.NODE_ENV !== 'production') {
-      console.debug('🖼️ normalizeFeaturedImage:', { input: value, output: publicUrl });
-    }
-  } catch {}
   return publicUrl;
 };
 
@@ -38,6 +31,9 @@ const isUUID = (value: string | undefined | null): boolean => {
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   return uuidRegex.test(value);
 };
+
+// Cache simple pour les résolutions de slug vers UUID
+const categorySlugCache = new Map<string, string>();
 
 export type ArticleStatus = 'draft' | 'published' | 'archived' | 'review';
 
@@ -158,86 +154,92 @@ export const useArticles = ({
 
   const fetchArticles = useCallback(async () => {
     try {
-      console.log('📥 Début récupération articles...', { status, limit, offset, category, authorId });
       setLoading(true);
       setError(null);
       
-      // Requête avec jointures pour author et category
-      console.log('🔗 Requête avec jointures profiles et content_categories...');
-
+      // Requête optimisée avec sélection minimale des champs nécessaires
       let query = supabase
         .from('contents')
         .select(`
-          *,
+          id,
+          title,
+          slug,
+          summary,
+          description,
+          content,
+          status,
+          category_id,
+          country,
+          tags,
+          author_id,
+          meta_title,
+          meta_description,
+          featured_image,
+          featured_image_alt,
+          created_at,
+          updated_at,
+          published_at,
+          views,
+          likes,
+          shares,
+          read_time,
+          article_data,
           categories:content_categories!category_id(
             id,
             name,
             slug,
-            description,
             color,
-            icon,
-            parent_id,
-            sort_order,
-            is_active,
-            content_types
+            icon
           )
-        `, { count: 'planned' })
+        `, { count: 'exact' })
         .eq('type', 'article');
 
-      console.log('🎯 Filtres appliqués:');
-      
+      // Appliquer les filtres
       if (status !== 'all') {
-        console.log('  - Status:', status);
         query = query.eq('status', status);
-      } else {
-        console.log('  - Status: tous');
       }
       
       if (category) {
-        console.log('  - Catégorie (input):', category);
         let categoryId = category;
-        // Si ce n'est pas un UUID, on suppose un slug et on le résout
+        // Cache pour éviter les requêtes répétées de résolution de slug
         if (!isUUID(category)) {
-          const { data: cat, error: catErr } = await supabase
-            .from('content_categories')
-            .select('id')
-            .eq('slug', category)
-            .single<{ id: string }>();
-          if (cat?.id) {
-            categoryId = cat.id;
-            console.log('    -> Slug résolu en UUID:', categoryId);
+          // Vérifier le cache d'abord
+          if (categorySlugCache.has(category)) {
+            categoryId = categorySlugCache.get(category)!;
           } else {
-            console.warn('    -> Slug introuvable, aucun résultat ne sera retourné');
-            // UUID impossible pour forcer 0 résultat
-            categoryId = '00000000-0000-0000-0000-000000000000';
+            const { data: cat } = await supabase
+              .from('content_categories')
+              .select('id')
+              .eq('slug', category)
+              .single<{ id: string }>();
+            
+            if (cat?.id) {
+              categoryId = cat.id;
+              // Mettre en cache pour les prochaines fois
+              categorySlugCache.set(category, categoryId);
+            } else {
+              // Retourner vide si catégorie introuvable
+              setArticles([]);
+              setCount(0);
+              return [];
+            }
           }
         }
         query = query.eq('category_id', categoryId);
       }
       
       if (authorId) {
-        console.log('  - Auteur:', authorId);
         query = query.eq('author_id', authorId);
       }
 
-      console.log('🚀 Exécution de la requête...');
-      
+      // Exécuter la requête avec pagination optimisée
       const result = await query
         .order('created_at', { ascending: false })
         .range(offset, offset + limit - 1);
       
-      console.log('🔍 Résultat brut de Supabase:', result);
       const { data, error, count } = result;
 
-      console.log('📊 Résultat requête:', { 
-        dataLength: data?.length || 0, 
-        error: error?.message || 'Aucune erreur', 
-        count,
-        firstItem: data?.[0]?.title || 'Aucun'
-      });
-
       if (error) {
-        console.error('❌ Erreur Supabase:', error);
         setError(error as Error);
         setArticles([]);
         setCount(0);
@@ -245,25 +247,23 @@ export const useArticles = ({
       }
 
       if (!data || data.length === 0) {
-        console.log('⚠️ Aucun article trouvé');
         setArticles([]);
         setCount(0);
         return [];
       }
 
-      console.log('🔄 Formatage des données...');
+      // Formatage optimisé des données
       const formattedData: Article[] = (data as any[]).map((row: any) => {
-        const { categories, ...content } = row || {};
-        const article: Article = {
-          ...(content as any),
-          type: 'article',
-          featured_image: normalizeFeaturedImage((content as any).featured_image),
-          // author: undefined for now (no FK relationship to join)
+        const { categories, ...content } = row;
+        return {
+          ...content,
+          type: 'article' as const,
+          featured_image: normalizeFeaturedImage(content.featured_image),
           category_info: categories ? {
             id: categories.id,
             name: categories.name,
             slug: categories.slug,
-            description: categories.description,
+            description: categories.description || '',
             color: categories.color,
             icon: categories.icon,
             parent_id: categories.parent_id,
@@ -274,10 +274,8 @@ export const useArticles = ({
           comment_count: 0,
           is_liked_by_user: false
         };
-        return article;
       });
 
-      console.log('✅ Articles récupérés avec succès:', formattedData.length);
       setArticles(formattedData);
       if (count !== null) setCount(count);
       return formattedData;
@@ -292,16 +290,14 @@ export const useArticles = ({
     }
   }, [status, limit, offset, category, authorId]);
 
-  // Marquer l'auth comme prête et relancer en cas de changement de session
+  // Marquer l'auth comme prête sans refetch automatique
   useEffect(() => {
     let unsub: { subscription?: { unsubscribe?: () => void } } | null = null;
     // getSession résout même si pas connecté; on l'utilise comme signal de readiness
     supabase.auth.getSession().then(() => setAuthReady(true));
     const sub = supabase.auth.onAuthStateChange((_event, _session) => {
-      // Quand la session change, refetch pour éviter d'avoir à redémarrer
       setAuthReady(true);
-      // Refetch non bloquant
-      fetchArticles().catch((e) => console.warn('Refetch après changement de session échoué:', e));
+      // Pas de refetch automatique pour éviter les requêtes inutiles
     });
     unsub = sub?.data as any;
     return () => {
@@ -309,7 +305,7 @@ export const useArticles = ({
         unsub?.subscription?.unsubscribe?.();
       } catch {}
     };
-  }, [fetchArticles]);
+  }, []);
 
   const fetchArticleBySlug = useCallback(async (slug: string): Promise<Article> => {
     try {
