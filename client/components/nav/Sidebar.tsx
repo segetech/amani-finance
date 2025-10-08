@@ -11,18 +11,15 @@ import {
   BarChart2,
   Shield,
   FileWarning,
-  Bell,
-  Plug,
+  DollarSign,
   User as UserIcon,
   ListChecks,
   LineChart,
   Layers,
-  Globe,
   Activity,
   LogOut,
   ChevronDown,
   ChevronRight,
-  Plus,
 } from "lucide-react";
 
 export interface SidebarProps {
@@ -44,7 +41,7 @@ interface Section {
 
 const SECTIONS: Section[] = [
   {
-    title: "✏️ Création de contenu",
+    title: "📝 Contenu",
     items: [
       {
         label: "Articles",
@@ -64,8 +61,14 @@ const SECTIONS: Section[] = [
           { label: "Nouveau podcast", to: "/dashboard/podcasts/new", icon: Mic, permission: "create_podcasts" },
         ],
       },
+      { label: "Vue unifiée", to: "/dashboard/content-management", icon: Layers, permission: "view_dashboard" },
+    ],
+  },
+  {
+    title: "📊 Données Financières",
+    items: [
       {
-        label: "Indices",
+        label: "Indices Boursiers",
         icon: LineChart,
         permission: "manage_indices",
         children: [
@@ -78,37 +81,14 @@ const SECTIONS: Section[] = [
         permission: "manage_market_data",
         children: [
           { label: "Actions & Prix", to: "/dashboard/market-data-manager", icon: BarChart3, permission: "manage_market_data" },
+          { label: "Devises & Forex", to: "/dashboard/currency-manager", icon: DollarSign, permission: "manage_currencies" },
         ],
       },
-    ],
-  },
-  {
-    title: "📚 Gestion de contenu",
-    items: [
-      { label: "Vue unifiée", to: "/dashboard/content-management", icon: Layers, permission: "view_dashboard" },
-    ],
-  },
-  {
-    title: "🌐 Pages publiques",
-    items: [
-      { label: "Marché", to: "/dashboard/manage-marche", icon: Globe, permission: "manage_settings" },
-      { label: "Économie", to: "/dashboard/manage-economie", icon: Globe, permission: "manage_settings" },
-      { label: "Industrie", to: "/dashboard/manage-industrie", icon: Globe, permission: "manage_settings" },
-      { label: "Investissement", to: "/dashboard/manage-investissement", icon: Globe, permission: "manage_settings" },
-      { label: "Insights", to: "/dashboard/manage-insights", icon: Globe, permission: "manage_settings" },
-      { label: "Tech", to: "/dashboard/manage-tech", icon: Globe, permission: "manage_settings" },
-    ],
-  },
-  {
-    title: "📊 Données",
-    items: [
-      { label: "Données marché", to: "/dashboard/market-data", icon: BarChart3, permission: "view_analytics" },
-      { label: "Données économie", to: "/dashboard/economic-data", icon: BarChart3, permission: "view_analytics" },
       { label: "Matières premières", to: "/dashboard/commodities-management", icon: Layers, permission: "create_indices" },
     ],
   },
   {
-    title: "📈 Analyse",
+    title: "📈 Analytics",
     items: [
       { label: "Tableaux de bord", to: "/dashboard/analytics", icon: BarChart2, permission: "view_analytics" },
       { label: "Rapports", to: "/dashboard/reports", icon: Activity, permission: "view_analytics" },
@@ -164,7 +144,7 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
       const raw = window.localStorage.getItem(storageKey);
       if (raw) return JSON.parse(raw) as Record<string, boolean>;
     } catch {}
-    // Default: expand first two sections
+    // Default: expand first section (Contenu)
     const def: Record<string, boolean> = {};
     visibleSections.forEach((s, idx) => { def[`s:${s.title}`] = idx < 2; });
     return def;

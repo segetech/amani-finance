@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import Footer from '../components/Footer';
 import { useStockIndices } from "../hooks/useStockIndices";
 import { useArticles } from "../hooks/useArticles";
+import { useCurrencies } from "../hooks/useCurrencies";
 import {
   LineChart,
   Line,
@@ -47,9 +48,17 @@ export default function Marche() {
   const [showChart, setShowChart] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
   const [chartPeriod, setChartPeriod] = useState('1J');
+  const [showAllIndices, setShowAllIndices] = useState(false);
+  const [showAllCurrencies, setShowAllCurrencies] = useState(false);
+  const [converterAmount, setConverterAmount] = useState(1);
+  const [fromCurrency, setFromCurrency] = useState('EUR');
+  const [toCurrency, setToCurrency] = useState('XOF');
   
   // Récupérer les indices depuis la base de données
   const { indices, loading: loadingIndices, fetchIndices } = useStockIndices();
+  
+  // Récupérer les devises depuis la base de données
+  const { currencies, getMajorCurrencies, convertCurrency: convertCurrencyFromDB } = useCurrencies();
   
   // Récupérer les articles liés au marché et à l'économie
   const { articles, loading: loadingArticles } = useArticles({ 
@@ -185,9 +194,37 @@ export default function Marche() {
     { value: "1y", label: "1A" },
   ];
 
-  const filteredData = selectedMarket === "all" 
+  // Filtrer les données selon les critères sélectionnés
+  const allFilteredData = selectedMarket === "all" 
     ? displayData 
     : displayData.filter(item => item.category === selectedMarket);
+
+  // Limiter l'affichage à 5 éléments par défaut
+  const filteredData = showAllIndices ? allFilteredData : allFilteredData.slice(0, 5);
+
+  // Utiliser les vraies données de devises depuis la base de données
+  const majorCurrencies = getMajorCurrencies();
+  const allCurrencies = majorCurrencies.map(currency => ({
+    code: currency.code,
+    name: currency.name,
+    flag: currency.flag_emoji || '🏳️',
+    rate: currency.current_rate,
+    previousRate: currency.previous_rate || currency.current_rate,
+    change: currency.change_amount || 0,
+    changePercent: currency.change_percent || 0,
+    isPositive: (currency.change_percent || 0) >= 0,
+    volume: currency.volume || 'N/A',
+    high: currency.daily_high || currency.current_rate,
+    low: currency.daily_low || currency.current_rate
+  }));
+
+  // Filtrer les devises (afficher 4 par défaut)
+  const displayedCurrencies = showAllCurrencies ? allCurrencies : allCurrencies.slice(0, 4);
+
+  // Fonction de conversion utilisant les vraies données
+  const convertCurrency = (amount, from, to) => {
+    return convertCurrencyFromDB(amount, from, to);
+  };
 
   // Fonction pour actualiser les données
   const refreshData = () => {
@@ -636,7 +673,7 @@ export default function Marche() {
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-xl font-bold text-amani-primary">
-                    Cotations en temps réel ({filteredData.length})
+                    Cotations en temps réel ({filteredData.length}{!showAllIndices && allFilteredData.length > 5 ? ` sur ${allFilteredData.length}` : ''})
                   </h3>
                   <p className="text-gray-600 mt-1">
                     Dernière mise à jour: {new Date().toLocaleTimeString("fr-FR")}
@@ -740,6 +777,259 @@ export default function Marche() {
                   ))}
                 </tbody>
               </table>
+            </div>
+            
+            {/* Bouton Afficher plus */}
+            {!showAllIndices && allFilteredData.length > 5 && (
+              <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
+                <button
+                  onClick={() => setShowAllIndices(true)}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 text-amani-primary hover:text-amani-primary/80 hover:bg-blue-50 rounded-lg transition-colors font-medium"
+                >
+                  <ArrowRight className="w-4 h-4" />
+                  Afficher plus ({allFilteredData.length - 5} autres cotations)
+                </button>
+              </div>
+            )}
+            
+            {/* Bouton Afficher moins */}
+            {showAllIndices && allFilteredData.length > 5 && (
+              <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
+                <button
+                  onClick={() => setShowAllIndices(false)}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors font-medium"
+                >
+                  <X className="w-4 h-4" />
+                  Afficher moins (masquer {allFilteredData.length - 5} cotations)
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Forex Section */}
+      <section className="py-16 bg-gradient-to-br from-green-50 to-blue-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-3xl font-bold text-amani-primary flex items-center gap-3">
+              <DollarSign className="w-8 h-8" />
+              Devises & Forex
+            </h2>
+            <div className="text-sm text-gray-600">
+              Taux contre Franc CFA (XOF)
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Currency Rates Table */}
+            <div className="lg:col-span-2">
+              <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-white/50">
+                <div className="p-6 border-b border-gray-200">
+                  <h3 className="text-xl font-bold text-amani-primary">
+                    Devises Majeures ({displayedCurrencies.length}{!showAllCurrencies && allCurrencies.length > 4 ? ` sur ${allCurrencies.length}` : ''})
+                  </h3>
+                  <p className="text-gray-600 mt-1">
+                    Taux de change en temps réel • Mise à jour: {new Date().toLocaleTimeString("fr-FR")}
+                  </p>
+                </div>
+                
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Devise
+                        </th>
+                        <th className="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Taux (FCFA)
+                        </th>
+                        <th className="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Variation
+                        </th>
+                        <th className="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Volume
+                        </th>
+                        <th className="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Haut/Bas
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {displayedCurrencies.map((currency, index) => (
+                        <tr key={currency.code} className="hover:bg-gray-50 transition-colors">
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center">
+                              <span className="text-2xl mr-3">{currency.flag}</span>
+                              <div>
+                                <div className="text-sm font-bold text-gray-900">{currency.code}/XOF</div>
+                                <div className="text-sm text-gray-500">{currency.name}</div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-right">
+                            <div className="text-sm font-bold text-gray-900">
+                              {currency.rate.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 3 })}
+                            </div>
+                            <div className="text-xs text-gray-500">FCFA</div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-right">
+                            <div className={`flex items-center justify-end gap-1 ${
+                              currency.isPositive ? "text-green-600" : "text-red-600"
+                            }`}>
+                              {currency.isPositive ? (
+                                <TrendingUp className="w-4 h-4" />
+                              ) : (
+                                <TrendingDown className="w-4 h-4" />
+                              )}
+                              <span className="text-sm font-medium">
+                                {currency.changePercent > 0 ? '+' : ''}{currency.changePercent.toFixed(2)}%
+                              </span>
+                            </div>
+                            <div className={`text-xs ${currency.isPositive ? "text-green-600" : "text-red-600"}`}>
+                              {currency.change > 0 ? '+' : ''}{currency.change.toFixed(3)}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900">
+                            {currency.volume}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-right">
+                            <div className="text-xs text-green-600">H: {currency.high.toFixed(3)}</div>
+                            <div className="text-xs text-red-600">B: {currency.low.toFixed(3)}</div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Show More/Less Buttons for Currencies */}
+                {!showAllCurrencies && allCurrencies.length > 4 && (
+                  <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
+                    <button
+                      onClick={() => setShowAllCurrencies(true)}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-3 text-amani-primary hover:text-amani-primary/80 hover:bg-blue-50 rounded-lg transition-colors font-medium"
+                    >
+                      <ArrowRight className="w-4 h-4" />
+                      Afficher plus ({allCurrencies.length - 4} autres devises)
+                    </button>
+                  </div>
+                )}
+                
+                {showAllCurrencies && allCurrencies.length > 4 && (
+                  <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
+                    <button
+                      onClick={() => setShowAllCurrencies(false)}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-3 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors font-medium"
+                    >
+                      <X className="w-4 h-4" />
+                      Afficher moins (masquer {allCurrencies.length - 4} devises)
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Currency Converter */}
+            <div className="lg:col-span-1">
+              <div className="bg-white rounded-xl shadow-lg p-6 border border-white/50 sticky top-8">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="p-2 bg-blue-100 rounded-lg">
+                    <RefreshCw className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <h3 className="text-lg font-bold text-gray-900">Convertisseur</h3>
+                </div>
+
+                <div className="space-y-4">
+                  {/* Amount Input */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Montant
+                    </label>
+                    <input
+                      type="number"
+                      value={converterAmount}
+                      onChange={(e) => setConverterAmount(parseFloat(e.target.value) || 0)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg font-semibold"
+                      placeholder="1.00"
+                      min="0"
+                      step="0.01"
+                    />
+                  </div>
+
+                  {/* From Currency */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      De
+                    </label>
+                    <select
+                      value={fromCurrency}
+                      onChange={(e) => setFromCurrency(e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                    >
+                      <option value="XOF">🇲🇱 Franc CFA (XOF)</option>
+                      {currencies.map(currency => (
+                        <option key={currency.code} value={currency.code}>
+                          {currency.flag_emoji} {currency.name} ({currency.code})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Swap Button */}
+                  <div className="flex justify-center">
+                    <button
+                      onClick={() => {
+                        const temp = fromCurrency;
+                        setFromCurrency(toCurrency);
+                        setToCurrency(temp);
+                      }}
+                      className="p-2 text-gray-500 hover:text-amani-primary hover:bg-blue-50 rounded-full transition-colors"
+                      title="Inverser les devises"
+                    >
+                      <RefreshCw className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  {/* To Currency */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Vers
+                    </label>
+                    <select
+                      value={toCurrency}
+                      onChange={(e) => setToCurrency(e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                    >
+                      <option value="XOF">🇲🇱 Franc CFA (XOF)</option>
+                      {currencies.map(currency => (
+                        <option key={currency.code} value={currency.code}>
+                          {currency.flag_emoji} {currency.name} ({currency.code})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Result */}
+                  <div className="bg-gradient-to-r from-amani-primary/10 to-blue-100 rounded-lg p-4 border-2 border-amani-primary/20">
+                    <div className="text-sm text-gray-600 mb-1">Résultat</div>
+                    <div className="text-2xl font-bold text-amani-primary">
+                      {convertCurrency(converterAmount, fromCurrency, toCurrency).toLocaleString('fr-FR', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 6
+                      })}
+                    </div>
+                    <div className="text-sm text-gray-600 mt-1">
+                      {toCurrency === 'XOF' ? 'Francs CFA' : currencies.find(c => c.code === toCurrency)?.name || toCurrency}
+                    </div>
+                  </div>
+
+                  {/* Exchange Rate Info */}
+                  <div className="text-xs text-gray-500 text-center pt-2 border-t">
+                    1 {fromCurrency} = {convertCurrency(1, fromCurrency, toCurrency).toLocaleString('fr-FR', { maximumFractionDigits: 6 })} {toCurrency}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -57,6 +57,7 @@ const EditPodcast = lazy(() => import("./pages/EditPodcast"));
 const LegacyIndicesDisabled = lazy(() => import("./pages/LegacyIndicesDisabled"));
 const StockIndicesManager = lazy(() => import("./pages/StockIndicesManager"));
 const MarketDataManager = lazy(() => import("./pages/MarketDataManager"));
+const CurrencyManager = lazy(() => import("./pages/CurrencyManager"));
 const CommoditiesManagement = lazy(() => import("./pages/CommoditiesManagement"));
 const IndicesHelp = lazy(() => import("./pages/IndicesHelp"));
 const Analytics = lazy(() => import("./pages/Analytics"));
@@ -65,6 +66,7 @@ const ReportsModeration = lazy(() => import("./pages/ReportsModeration"));
 const Settings = lazy(() => import("./pages/Settings"));
 const Profile = lazy(() => import("./pages/Profile"));
 const PermissionsManager = lazy(() => import("./pages/PermissionsManager"));
+const UserManager = lazy(() => import("./pages/UserManager"));
 const Users = lazy(() => import("./pages/Users"));
 const NewUser = lazy(() => import("./pages/NewUser"));
 const EditUser = lazy(() => import("./pages/EditUser"));
@@ -152,6 +154,7 @@ const AppContent = () => {
           <Route path="indices-management" element={<StockIndicesManager />} />
           <Route path="stock-indices-manager" element={<StockIndicesManager />} />
           <Route path="market-data-manager" element={<MarketDataManager />} />
+          <Route path="currency-manager" element={<CurrencyManager />} />
           <Route path="commodities-management" element={<CommoditiesManagement />} />
           <Route path="indices-help" element={<IndicesHelp />} />
           <Route path="analytics" element={<Analytics />} />
@@ -160,7 +163,7 @@ const AppContent = () => {
           <Route path="settings" element={<Settings />} />
           <Route path="profile" element={<Profile />} />
           <Route path="permissions" element={<PermissionsManager />} />
-          <Route path="users" element={<Users />} />
+          <Route path="users" element={<UserManager />} />
           <Route path="users/new" element={<NewUser />} />
           <Route path="users/new-advanced" element={<NewUserAdvanced />} />
           <Route path="users/edit/:userId" element={<EditUser />} />

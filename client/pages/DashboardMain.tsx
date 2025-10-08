@@ -1,7 +1,9 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useEffect, useMemo, useState } from "react";
-import { supabase } from "../lib/supabase";
+import { useStockIndices } from "../hooks/useStockIndices";
+import { useCurrencies } from "../hooks/useCurrencies";
+import { useArticles } from "../hooks/useArticles";
 import {
   FileText,
   Mic,
@@ -9,499 +11,355 @@ import {
   Users,
   TrendingUp,
   TrendingDown,
-  Eye,
-  MessageSquare,
-  Calendar,
-  Plus,
   Activity,
-  Shield,
-  AlertTriangle,
   CheckCircle,
-  Clock,
-  Star,
-  Globe,
-  Target,
   Zap,
+  DollarSign,
+  LineChart,
+  ArrowRight,
 } from "lucide-react";
 
 export default function DashboardMain() {
   const { user, hasPermission } = useAuth();
   
-  // Dashboard state (from Supabase)
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [stats, setStats] = useState({
-    articles: { total: 0, thisMonth: 0, growth: 0 },
-    podcasts: { total: 0, thisMonth: 0, growth: 0 },
-    indices: { total: 0, thisMonth: 0, growth: 0 },
-    users: { total: 0, thisMonth: 0, growth: 0 },
-    views: { total: 0, thisWeek: 0, growth: 0 },
-    reports: { pending: 0, resolved: 0, total: 0 },
-  });
-  const [recentActivity, setRecentActivity] = useState<Array<{
-    id: string;
-    type: string;
-    title: string;
-    description?: string | null;
-    time: string;
-    user?: string;
-    icon: React.ComponentType<{ className?: string }>;
-    color: string;
-  }>>([]);
-  const [personal, setPersonal] = useState({
-    myArticles: 0,
-    myPodcasts: 0,
-    myIndices: 0,
-  });
-
+  // Hooks pour les données en temps réel
+  const { indices } = useStockIndices();
+  const { currencies, getMajorCurrencies, getCurrencyStats } = useCurrencies();
+  const { articles } = useArticles({ status: 'published', limit: 5 });
+  
+  const [currentTime, setCurrentTime] = useState(new Date());
+  
+  // Mettre à jour l'heure toutes les secondes
   useEffect(() => {
-    let isMounted = true;
-    async function load() {
-      setLoading(true);
-      setError(null);
-      try {
-        // Ensure auth/session ready to satisfy RLS
-        await supabase.auth.getSession();
-
-        // Date helpers for "this month"
-        const now = new Date();
-        const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-
-        // Counts by type
-        const countByType = async (type: string, createdField: string = "created_at") => {
-          const base = supabase
-            .from("contents")
-            .select("id", { count: "exact", head: true })
-            .eq("type", type);
-          const { count: total, error: e1 } = await base;
-          if (e1) throw e1;
-          const { count: thisMonth, error: e2 } = await supabase
-            .from("contents")
-            .select("id", { count: "exact", head: true })
-            .eq("type", type)
-            .gte(createdField, monthStart);
-          if (e2) throw e2;
-          return { total: total || 0, thisMonth: thisMonth || 0 };
-        };
-
-        const [art, pod, ind] = await Promise.all([
-          countByType("article"),
-          countByType("podcast"),
-          countByType("indice"),
-        ]);
-
-        // Users count from profiles (if available)
-        let usersTotal = 0;
-        try {
-          const { count: usersCount } = await supabase
-            .from("profiles")
-            .select("id", { count: "exact", head: true });
-          usersTotal = usersCount || 0;
-        } catch {}
-
-        // Recent activity from contents
-        const { data: recent, error: recentErr } = await supabase
-          .from("contents")
-          .select("id, type, title, summary, created_at")
-          .order("created_at", { ascending: false })
-          .limit(6);
-        if (recentErr) throw recentErr;
-
-        const mapped = (recent || []).map((r) => {
-          const t = r.type as string;
-          const icon = t === "article" ? FileText : t === "podcast" ? Mic : t === "indice" ? BarChart3 : Activity;
-          const color = t === "article" ? "text-blue-600" : t === "podcast" ? "text-purple-600" : t === "indice" ? "text-green-600" : "text-gray-600";
-          const when = new Date(r.created_at);
-          const time = when.toLocaleDateString();
-          return {
-            id: r.id as string,
-            type: t,
-            title: r.title as string,
-            description: (r as any).summary as string | null,
-            time,
-            user: undefined,
-            icon,
-            color,
-          };
-        });
-
-        // Personal stats (by author_id)
-        let myArticles = 0, myPodcasts = 0, myIndices = 0;
-        if (user?.id) {
-          const byMe = async (type: string) => {
-            const { count } = await supabase
-              .from("contents")
-              .select("id", { count: "exact", head: true })
-              .eq("type", type)
-              .eq("author_id", user.id);
-            return count || 0;
-          };
-          [myArticles, myPodcasts, myIndices] = await Promise.all([
-            byMe("article"),
-            byMe("podcast"),
-            byMe("indice"),
-          ]);
-        }
-
-        if (!isMounted) return;
-        setStats((prev) => ({
-          ...prev,
-          articles: { total: art.total, thisMonth: art.thisMonth, growth: 0 },
-          podcasts: { total: pod.total, thisMonth: pod.thisMonth, growth: 0 },
-          indices: { total: ind.total, thisMonth: ind.thisMonth, growth: 0 },
-          users: { total: usersTotal, thisMonth: 0, growth: 0 },
-        }));
-        setRecentActivity(mapped);
-        setPersonal({ myArticles, myPodcasts, myIndices });
-      } catch (e: any) {
-        if (!isMounted) return;
-        setError(e?.message || "Erreur lors du chargement du tableau de bord");
-      } finally {
-        if (isMounted) setLoading(false);
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+  
+  // Statistiques en temps réel
+  const stats = useMemo(() => {
+    const majorCurrencies = getMajorCurrencies();
+    const currencyStats = getCurrencyStats();
+    
+    return {
+      indices: {
+        total: indices.length,
+        gainers: indices.filter(i => (i.change_percent || 0) > 0).length,
+        losers: indices.filter(i => (i.change_percent || 0) < 0).length,
+      },
+      currencies: {
+        total: currencies.length,
+        major: majorCurrencies.length,
+        gainers: currencyStats.gainers,
+        losers: currencyStats.losers,
+      },
+      articles: {
+        total: articles.length,
+        published: articles.filter(a => a.status === 'published').length,
       }
-    }
-    load();
-    return () => { isMounted = false; };
-  }, [user?.id]);
+    };
+  }, [indices, currencies, articles, getMajorCurrencies, getCurrencyStats]);
 
+  // Actions rapides disponibles selon les permissions
   const quickActions = [
     {
-      label: "Nouvel article",
-      path: "/dashboard/articles/new",
+      title: "Nouvel Article",
+      description: "Créer un nouvel article",
       icon: FileText,
-      permission: "create_articles",
       color: "bg-blue-500",
+      link: "/dashboard/articles/new",
+      permission: "create_articles"
     },
     {
-      label: "Nouveau podcast",
-      path: "/dashboard/podcasts/new",
+      title: "Nouveau Podcast",
+      description: "Enregistrer un podcast",
       icon: Mic,
-      permission: "create_podcasts",
       color: "bg-purple-500",
+      link: "/dashboard/podcasts/new",
+      permission: "create_podcasts"
     },
     {
-      label: "Nouvel indice",
-      path: "/dashboard/indices/new",
-      icon: BarChart3,
-      permission: "create_indices",
+      title: "Gérer Indices",
+      description: "Indices boursiers",
+      icon: LineChart,
       color: "bg-green-500",
+      link: "/dashboard/indices-management",
+      permission: "manage_indices"
     },
     {
-      label: "Nouvel utilisateur",
-      path: "/dashboard/users/new",
-      icon: Users,
-      permission: "create_users",
-      color: "bg-amber-500",
+      title: "Gérer Devises",
+      description: "Taux de change",
+      icon: DollarSign,
+      color: "bg-yellow-500",
+      link: "/dashboard/currency-manager",
+      permission: "manage_currencies"
     },
-  ];
-
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return "Bonjour";
-    if (hour < 17) return "Bon après-midi";
-    return "Bonsoir";
-  };
-
-  const renderStatCard = (
-    title: string,
-    value: string | number,
-    change: number,
-    icon: React.ComponentType<{ className?: string }>,
-    permission?: string,
-  ) => {
-    if (permission && !hasPermission(permission)) return null;
-
-    const isPositive = change >= 0;
-    const Icon = icon;
-
-    return (
-      <div className="bg-white rounded-2xl shadow-lg p-6 border border-white/50">
-        <div className="flex items-center justify-between mb-4">
-          <div className="p-2 bg-amani-secondary/20 rounded-lg">
-            <Icon className="w-6 h-6 text-amani-primary" />
-          </div>
-          <div
-            className={`flex items-center gap-1 text-sm ${
-              isPositive ? "text-green-600" : "text-red-600"
-            }`}
-          >
-            {isPositive ? (
-              <TrendingUp className="w-4 h-4" />
-            ) : (
-              <TrendingDown className="w-4 h-4" />
-            )}
-            {Math.abs(change)}%
-          </div>
-        </div>
-        <div>
-          <div className="text-2xl font-bold text-amani-primary mb-1">
-            {typeof value === "number" ? value.toLocaleString() : value}
-          </div>
-          <div className="text-sm text-gray-600">{title}</div>
-        </div>
-      </div>
-    );
-  };
+    {
+      title: "Analytics",
+      description: "Tableaux de bord",
+      icon: BarChart3,
+      color: "bg-indigo-500",
+      link: "/dashboard/analytics",
+      permission: "view_analytics"
+    },
+    {
+      title: "Utilisateurs",
+      description: "Gestion des utilisateurs",
+      icon: Users,
+      color: "bg-red-500",
+      link: "/dashboard/users",
+      permission: "manage_users"
+    }
+  ].filter(action => !action.permission || hasPermission(action.permission));
 
   return (
-    <div className="space-y-8">
-        {loading && (
-          <div className="bg-white rounded-2xl p-6 border border-gray-200 text-sm text-gray-600">Chargement des données...</div>
-        )}
-        {error && (
-          <div className="bg-red-50 text-red-700 border border-red-200 rounded-lg p-4 text-sm">{error}</div>
-        )}
-        {/* Welcome Message & User Roles */}
-        <div className="bg-gradient-to-r from-amani-primary to-amani-primary/80 rounded-2xl p-8 text-white">
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* En-tête dynamique */}
+        <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-2xl font-bold mb-2">
-                {`${getGreeting()}, ${user?.firstName}!`}
-              </h2>
-              <p className="text-white/90 mb-2">
-                {`Voici un aperçu de vos activités sur la plateforme Amani`}
+              <h1 className="text-3xl font-bold text-gray-900">
+                Bonjour, {user?.firstName} ! 👋
+              </h1>
+              <p className="text-gray-600 mt-1">
+                {currentTime.toLocaleDateString('fr-FR', { 
+                  weekday: 'long', 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                })} • {currentTime.toLocaleTimeString('fr-FR')}
               </p>
-              <p className="text-white/80 mb-4">Tableau de bord - {user?.organization}</p>
-              <p className="text-white/90 mb-4">
-                Gérez votre contenu et suivez les performances de la plateforme
-              </p>
-              {user?.roles && user.roles.length > 1 && (
-                <div className="flex flex-wrap gap-2">
-                  <span className="text-sm text-white/80">Vos rôles:</span>
-                  {user.roles.map((role) => (
-                    <span
-                      key={role}
-                      className="bg-white/20 px-3 py-1 rounded-full text-sm font-medium"
-                    >
-                      {role}
-                    </span>
-                  ))}
-                </div>
-              )}
             </div>
-            <div className="hidden lg:block">
-              <div className="w-32 h-32 bg-white/10 rounded-full flex items-center justify-center">
-                <Activity className="w-16 h-16 text-white/80" />
+            <div className="flex items-center gap-3">
+              <div className="text-right">
+                <div className="text-sm text-gray-500">Statut</div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  <span className="text-sm font-medium text-green-600">En ligne</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Statistics Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {renderStatCard(
-            "Articles totaux",
-            stats.articles.total,
-            stats.articles.growth,
-            FileText,
-            "view_analytics",
-          )}
-          {renderStatCard(
-            "Podcasts",
-            stats.podcasts.total,
-            stats.podcasts.growth,
-            Mic,
-            "view_analytics",
-          )}
-          {renderStatCard(
-            "Indices économiques",
-            stats.indices.total,
-            stats.indices.growth,
-            BarChart3,
-            "view_indices",
-          )}
-          {renderStatCard(
-            "Utilisateurs actifs",
-            stats.users.total,
-            stats.users.growth,
-            Users,
-            "view_user_activity",
-          )}
+        {/* Actions rapides */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <Zap className="w-5 h-5 text-yellow-500" />
+            Actions Rapides
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {quickActions.map((action, index) => (
+              <Link
+                key={index}
+                to={action.link}
+                className="group bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md hover:border-gray-300 transition-all duration-200"
+              >
+                <div className="flex items-center gap-4">
+                  <div className={`${action.color} p-3 rounded-lg text-white group-hover:scale-110 transition-transform`}>
+                    <action.icon className="w-6 h-6" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-900 group-hover:text-gray-700">
+                      {action.title}
+                    </h3>
+                    <p className="text-sm text-gray-600">{action.description}</p>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600 group-hover:translate-x-1 transition-all" />
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
 
-        {/* Quick Actions */}
-        <div className="bg-white rounded-2xl shadow-lg p-8 border border-white/50">
-          <h3 className="text-xl font-semibold text-amani-primary mb-6 flex items-center gap-2">
-            <Zap className="w-5 h-5" />
-            Actions rapides
-          </h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {quickActions.map((action) => {
-              if (action.permission && !hasPermission(action.permission)) {
-                return null;
-              }
+        {/* Statistiques en temps réel */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <Activity className="w-5 h-5 text-blue-500" />
+            Aperçu en Temps Réel
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Articles */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Articles</p>
+                  <p className="text-2xl font-bold text-gray-900">{stats.articles.total}</p>
+                  <p className="text-xs text-green-600 mt-1">
+                    {stats.articles.published} publiés
+                  </p>
+                </div>
+                <div className="p-3 bg-blue-100 rounded-lg">
+                  <FileText className="w-6 h-6 text-blue-600" />
+                </div>
+              </div>
+            </div>
 
-              return (
-                <Link
-                  key={action.path}
-                  to={action.path}
-                  className="flex flex-col items-center gap-3 p-6 rounded-xl border border-gray-200 hover:border-amani-primary hover:shadow-md transition-all group"
-                >
-                  <div
-                    className={`w-12 h-12 ${action.color} rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform`}
-                  >
-                    <action.icon className="w-6 h-6 text-white" />
+            {/* Indices */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Indices</p>
+                  <p className="text-2xl font-bold text-gray-900">{stats.indices.total}</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-xs text-green-600">↗ {stats.indices.gainers}</span>
+                    <span className="text-xs text-red-600">↘ {stats.indices.losers}</span>
                   </div>
-                  <span className="text-sm font-medium text-gray-700 group-hover:text-amani-primary">
-                    {action.label}
+                </div>
+                <div className="p-3 bg-green-100 rounded-lg">
+                  <LineChart className="w-6 h-6 text-green-600" />
+                </div>
+              </div>
+            </div>
+
+            {/* Devises */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Devises</p>
+                  <p className="text-2xl font-bold text-gray-900">{stats.currencies.total}</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-xs text-green-600">↗ {stats.currencies.gainers}</span>
+                    <span className="text-xs text-red-600">↘ {stats.currencies.losers}</span>
+                  </div>
+                </div>
+                <div className="p-3 bg-yellow-100 rounded-lg">
+                  <DollarSign className="w-6 h-6 text-yellow-600" />
+                </div>
+              </div>
+            </div>
+
+            {/* Statut système */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Système</p>
+                  <p className="text-2xl font-bold text-green-600">OK</p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Tous services actifs
+                  </p>
+                </div>
+                <div className="p-3 bg-green-100 rounded-lg">
+                  <CheckCircle className="w-6 h-6 text-green-600" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Données financières en direct */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          {/* Indices récents */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Indices Récents</h3>
+              <Link 
+                to="/dashboard/indices-management"
+                className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1"
+              >
+                Voir tout <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+            <div className="space-y-3">
+              {indices.slice(0, 5).map((index) => (
+                <div key={index.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div>
+                    <p className="font-medium text-gray-900">{index.name}</p>
+                    <p className="text-sm text-gray-600">{index.market}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-semibold text-gray-900">{index.current_value}</p>
+                    <div className={`text-sm flex items-center gap-1 ${
+                      (index.change_percent || 0) >= 0 ? 'text-green-600' : 'text-red-600'
+                    }`}>
+                      {(index.change_percent || 0) >= 0 ? (
+                        <TrendingUp className="w-3 h-3" />
+                      ) : (
+                        <TrendingDown className="w-3 h-3" />
+                      )}
+                      {(index.change_percent || 0).toFixed(2)}%
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Devises majeures */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Devises Majeures</h3>
+              <Link 
+                to="/dashboard/currency-manager"
+                className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1"
+              >
+                Voir tout <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+            <div className="space-y-3">
+              {getMajorCurrencies().slice(0, 5).map((currency) => (
+                <div key={currency.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <span className="text-lg">{currency.flag_emoji}</span>
+                    <div>
+                      <p className="font-medium text-gray-900">{currency.code}</p>
+                      <p className="text-sm text-gray-600">{currency.name}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-semibold text-gray-900">
+                      {currency.current_rate.toLocaleString('fr-FR', { maximumFractionDigits: 2 })}
+                    </p>
+                    <div className={`text-sm flex items-center gap-1 ${
+                      (currency.change_percent || 0) >= 0 ? 'text-green-600' : 'text-red-600'
+                    }`}>
+                      {(currency.change_percent || 0) >= 0 ? (
+                        <TrendingUp className="w-3 h-3" />
+                      ) : (
+                        <TrendingDown className="w-3 h-3" />
+                      )}
+                      {(currency.change_percent || 0).toFixed(2)}%
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Articles récents */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">Articles Récents</h3>
+            <Link 
+              to="/dashboard/articles"
+              className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1"
+            >
+              Voir tout <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {articles.slice(0, 6).map((article) => (
+              <div key={article.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow">
+                <h4 className="font-medium text-gray-900 mb-2 line-clamp-2">
+                  {article.title}
+                </h4>
+                <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                  {article.summary || 'Aucun résumé disponible'}
+                </p>
+                <div className="flex items-center justify-between text-xs text-gray-500">
+                  <span>{new Date(article.created_at).toLocaleDateString('fr-FR')}</span>
+                  <span className={`px-2 py-1 rounded-full ${
+                    article.status === 'published' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                  }`}>
+                    {article.status === 'published' ? 'Publié' : 'Brouillon'}
                   </span>
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Recent Activity */}
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-2xl shadow-lg p-8 border border-white/50">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-semibold text-amani-primary flex items-center gap-2">
-                  <Activity className="w-5 h-5" />
-                  Activité récente
-                </h3>
-                <Link
-                  to="/dashboard/activity"
-                  className="text-amani-primary hover:underline text-sm"
-                >
-                  Voir tout →
-                </Link>
-              </div>
-              <div className="space-y-4">
-                {recentActivity.map((activity) => (
-                  <div
-                    key={activity.id}
-                    className="flex items-start gap-4 p-4 hover:bg-gray-50 rounded-lg transition-colors"
-                  >
-                    <div className={`p-2 rounded-lg bg-gray-100`}>
-                      <activity.icon className={`w-4 h-4 ${activity.color}`} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium text-gray-900">
-                        {activity.title}
-                      </div>
-                      <div className="text-sm text-gray-600 truncate">
-                        {activity.description}
-                      </div>
-                      <div className="flex items-center gap-2 mt-1 text-xs text-gray-500">
-                        {activity.user && <span>Par {activity.user}</span>}
-                        {activity.user && <span>•</span>}
-                        <span>{activity.time}</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Right Sidebar */}
-          <div className="space-y-6">
-            {/* Performance Overview */}
-            {hasPermission("view_analytics") && (
-              <div className="bg-white rounded-2xl shadow-lg p-6 border border-white/50">
-                <h3 className="text-lg font-semibold text-amani-primary mb-4 flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5" />
-                  Performance
-                </h3>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">
-                      Vues cette semaine
-                    </span>
-                    <span className="font-bold text-amani-primary">
-                      {stats.views.thisWeek.toLocaleString()}
-                    </span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                      className="bg-amani-primary h-2 rounded-full"
-                      style={{ width: "68%" }}
-                    ></div>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <TrendingUp className="w-4 h-4 text-green-600" />
-                    <span className="text-green-600">
-                      +{stats.views.growth}%
-                    </span>
-                    <span className="text-gray-500">vs semaine dernière</span>
-                  </div>
                 </div>
               </div>
-            )}
-
-            {/* Moderation Tasks */}
-            {hasPermission("moderate_comments") && (
-              <div className="bg-white rounded-2xl shadow-lg p-6 border border-white/50">
-                <h3 className="text-lg font-semibold text-amani-primary mb-4 flex items-center gap-2">
-                  <Shield className="w-5 h-5" />
-                  Modération
-                </h3>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 bg-amber-50 rounded-lg">
-                    <div className="flex items-center gap-2">
-                      <AlertTriangle className="w-4 h-4 text-amber-600" />
-                      <span className="text-sm font-medium">En attente</span>
-                    </div>
-                    <span className="font-bold text-amber-600">
-                      {stats.reports.pending}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-600" />
-                      <span className="text-sm font-medium">Traités</span>
-                    </div>
-                    <span className="font-bold text-green-600">
-                      {stats.reports.resolved}
-                    </span>
-                  </div>
-                  <Link
-                    to="/dashboard/moderation"
-                    className="block w-full text-center py-2 bg-amani-primary text-white rounded-lg hover:bg-amani-primary/90 transition-colors text-sm"
-                  >
-                    Aller à la modération
-                  </Link>
-                </div>
-              </div>
-            )}
-
-            {/* Personal Stats */}
-            <div className="bg-white rounded-2xl shadow-lg p-6 border border-white/50">
-              <h3 className="text-lg font-semibold text-amani-primary mb-4 flex items-center gap-2">
-                <Target className="w-5 h-5" />
-                Mes statistiques
-              </h3>
-              <div className="space-y-3">
-                {hasPermission("create_articles") && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">
-                      Articles créés
-                    </span>
-                    <span className="font-bold text-amani-primary">{personal.myArticles}</span>
-                  </div>
-                )}
-                {hasPermission("create_podcasts") && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">
-                      Podcasts publiés
-                    </span>
-                    <span className="font-bold text-amani-primary">{personal.myPodcasts}</span>
-                  </div>
-                )}
-                {hasPermission("create_indices") && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">
-                      Indices mis à jour
-                    </span>
-                    <span className="font-bold text-amani-primary">{personal.myIndices}</span>
-                  </div>
-                )}
-                {/* Additional personal stats can be added here */}
-              </div>
-            </div>
+            ))}
           </div>
         </div>
+      </div>
     </div>
   );
 }
