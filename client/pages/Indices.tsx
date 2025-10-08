@@ -19,20 +19,27 @@ import {
   Calculator,
   Eye,
 } from "lucide-react";
-import { fetchBRVMData, BRVMData } from "../services/brvmApi";
 import {
   fetchCommoditiesData,
   CommoditiesData,
   getCommodityIcon,
   getCommodityColor,
 } from "../services/commoditiesApi";
+import { useStockIndices } from "../hooks/useStockIndices";
 
 export default function Indices() {
-  const [brvmData, setBrvmData] = React.useState<BRVMData | null>(null);
+  // Utiliser les vraies données des indices du nouveau système
+  const { 
+    indices: stockIndices, 
+    loading: loadingBrvmIndices, 
+    fetchIndices 
+  } = useStockIndices();
+  
+  const [brvmLastUpdate, setBrvmLastUpdate] = React.useState(null);
+
   const [commoditiesData, setCommoditiesData] =
     React.useState<CommoditiesData | null>(null);
   const [loading, setLoading] = React.useState(true);
-  const [lastUpdate, setLastUpdate] = React.useState<Date | null>(null);
   const [selectedCategory, setSelectedCategory] = React.useState<
     "all" | "indices" | "commodities"
   >("all");
@@ -41,13 +48,12 @@ export default function Indices() {
   const loadAllData = async () => {
     try {
       setLoading(true);
-      const [brvm, commodities] = await Promise.all([
-        fetchBRVMData(),
-        fetchCommoditiesData(),
-      ]);
-      setBrvmData(brvm);
+      // Charger les indices depuis le nouveau système
+      await fetchIndices();
+      // Charger les commodités
+      const commodities = await fetchCommoditiesData();
       setCommoditiesData(commodities);
-      setLastUpdate(new Date());
+      setBrvmLastUpdate(new Date());
     } catch (error) {
       console.error("Erreur lors du chargement des données:", error);
     } finally {
@@ -167,10 +173,10 @@ export default function Indices() {
                 Actualiser les données
               </button>
 
-              {lastUpdate && (
+              {brvmLastUpdate && (
                 <p className="text-gray-300 text-sm flex items-center gap-2">
                   <Clock className="w-4 h-4" />
-                  Dernière mise à jour: {lastUpdate.toLocaleTimeString("fr-FR")}
+                  Dernière mise à jour: {brvmLastUpdate.toLocaleTimeString("fr-FR")}
                 </p>
               )}
             </div>
@@ -219,70 +225,53 @@ export default function Indices() {
               </p>
             </div>
 
-            {brvmData && (
+            {stockIndices && stockIndices.length > 0 ? (
               <div className="grid lg:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
-                <MarketItem
-                  name={brvmData.composite.name}
-                  value={brvmData.composite.value}
-                  change={brvmData.composite.change}
-                  changePercent={brvmData.composite.changePercent}
-                  isPositive={brvmData.composite.isPositive}
-                  description="Indice principal de la BRVM, reflète la performance globale du marché ouest-africain"
-                  icon="📊"
-                  source={brvmData.composite.source}
-                />
-
-                <MarketItem
-                  name={brvmData.fcfa_eur.name}
-                  value={brvmData.fcfa_eur.value}
-                  change={brvmData.fcfa_eur.change}
-                  changePercent={brvmData.fcfa_eur.changePercent}
-                  isPositive={brvmData.fcfa_eur.isPositive}
-                  description="Taux de change fixe entre le Franc CFA et l'Euro, ancré à la politique monétaire française"
-                  icon="💱"
-                  source="BCE"
-                />
-
-                <MarketItem
-                  name={brvmData.inflation.name}
-                  value={brvmData.inflation.value}
-                  change={brvmData.inflation.change}
-                  changePercent={brvmData.inflation.changePercent}
-                  isPositive={brvmData.inflation.isPositive}
-                  description="Taux d'inflation dans la zone UEMOA, indicateur clé du coût de la vie"
-                  icon="📈"
-                  source="BCEAO"
-                />
-
-                <MarketItem
-                  name={brvmData.taux_bceao.name}
-                  value={brvmData.taux_bceao.value}
-                  change={brvmData.taux_bceao.change}
-                  changePercent={brvmData.taux_bceao.changePercent}
-                  isPositive={brvmData.taux_bceao.isPositive}
-                  description="Taux directeur de la Banque Centrale, influence les taux d'intérêt dans la zone UEMOA"
-                  icon="🏛️"
-                  source="BCEAO"
-                />
+                {stockIndices.filter(index => index.is_active).map((index, i) => (
+                  <MarketItem
+                    key={index.id}
+                    name={index.name}
+                    value={index.current_value ? `${index.current_value} ${index.unit}` : 'N/A'}
+                    change={index.change_amount ? `${index.change_amount > 0 ? '+' : ''}${index.change_amount}` : '0'}
+                    changePercent={index.change_percent ? `${index.change_percent > 0 ? '+' : ''}${index.change_percent}%` : '0%'}
+                    isPositive={index.change_percent ? index.change_percent > 0 : false}
+                    description={index.description || `Indice ${index.name} sur le marché ${index.market}`}
+                    icon="📊"
+                    source={index.market}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <BarChart3 className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-gray-600 mb-2">Aucun indice configuré</h3>
+                <p className="text-gray-500 mb-6">Les indices boursiers seront affichés ici une fois configurés.</p>
+                <Link 
+                  to="/stock-indices-manager" 
+                  className="inline-flex items-center gap-2 bg-amani-primary text-white px-6 py-3 rounded-lg hover:bg-opacity-90"
+                >
+                  <BarChart3 className="w-5 h-5" />
+                  Gérer les indices
+                </Link>
               </div>
             )}
 
-            {/* Indices sectoriels */}
-            {brvmData?.sectoriels && brvmData.sectoriels.length > 0 && (
+            {/* Indices inactifs ou secondaires */}
+            {stockIndices && stockIndices.filter(index => !index.show_on_homepage && index.is_active).length > 0 && (
               <div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-6">
-                  Indices Sectoriels
+                  Autres Indices
                 </h3>
                 <div className="grid lg:grid-cols-3 gap-6">
-                  {brvmData.sectoriels.map((index, i) => (
+                  {stockIndices.filter(index => !index.show_on_homepage && index.is_active).map((index) => (
                     <MarketItem
-                      key={i}
+                      key={index.id}
                       name={index.name}
-                      value={index.value}
-                      change={index.change}
-                      changePercent={index.changePercent}
-                      isPositive={index.isPositive}
-                      description={`Performance du secteur ${index.name.toLowerCase()} sur la BRVM`}
+                      value={index.current_value ? `${index.current_value} ${index.unit}` : 'N/A'}
+                      change={index.change_amount ? `${index.change_amount > 0 ? '+' : ''}${index.change_amount}` : '0'}
+                      changePercent={index.change_percent ? `${index.change_percent > 0 ? '+' : ''}${index.change_percent}%` : '0%'}
+                      isPositive={index.change_percent ? index.change_percent > 0 : false}
+                      description={index.description || `Performance de l'indice ${index.name} sur ${index.market}`}
                       icon="🏢"
                     />
                   ))}

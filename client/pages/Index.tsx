@@ -39,6 +39,7 @@ import {
   CommoditiesData,
   getCommodityIcon,
 } from "../services/commoditiesApi";
+import { useStockIndices } from "../hooks/useStockIndices";
 
 // Feature flags for market widgets (BRVM & Commodities)
 // - ENABLE_MARKET_WIDGET: controls rendering of the section
@@ -49,12 +50,20 @@ import { useArticles } from "../hooks/useArticles";
 import { usePodcasts } from "../hooks/usePodcasts";
 
 export default function Index() {
-  // État pour les données BRVM et commodités en temps réel
-  const [brvmData, setBrvmData] = React.useState<BRVMData | null>(null);
+  // Données des indices boursiers depuis le nouveau système
+  const { 
+    indices: allIndices, 
+    loading: loadingBrvmIndices, 
+    fetchHomepageIndices 
+  } = useStockIndices();
+  
+  const [homepageIndices, setHomepageIndices] = React.useState([]);
+  const [brvmLastUpdate, setBrvmLastUpdate] = React.useState(null);
+
+  // État pour les commodités (gardé pour l'instant)
   const [commoditiesData, setCommoditiesData] =
     React.useState<CommoditiesData | null>(null);
   const [loading, setLoading] = React.useState(true);
-  const [lastUpdate, setLastUpdate] = React.useState<Date | null>(null);
 
   // Données réelles: articles et podcasts publiés depuis Supabase
   const { articles, loading: loadingArticles } = useArticles({ status: 'published', limit: 4, offset: 0 });
@@ -80,92 +89,74 @@ export default function Index() {
   const { articles: insightsArticles, loading: loadingInsights } = useArticles({ status: 'published', limit: 4, offset: 0, category: 'insights' });
   const { articles: techArticles, loading: loadingTech } = useArticles({ status: 'published', limit: 4, offset: 0, category: 'technologie' });
 
-  // Fonction pour charger toutes les données (BRVM + Commodités)
-  const loadAllData = async () => {
+  // Fonction pour charger les commodités seulement (BRVM géré par le hook)
+  const loadCommoditiesData = async () => {
     try {
       setLoading(true);
-      const [brvmResponse, commoditiesResponse] = await Promise.allSettled([
-        fetchBRVMData(),
-        fetchCommoditiesData(),
-      ]);
-
-      if (brvmResponse.status === "fulfilled") {
-        setBrvmData(brvmResponse.value);
-      } else {
-        console.error("Erreur BRVM:", brvmResponse.reason);
-      }
-
-      if (commoditiesResponse.status === "fulfilled") {
-        setCommoditiesData(commoditiesResponse.value);
-      } else {
-        console.error("Erreur commodités:", commoditiesResponse.reason);
-      }
-
-      setLastUpdate(new Date());
+      const commoditiesResponse = await fetchCommoditiesData();
+      setCommoditiesData(commoditiesResponse);
     } catch (error) {
-      console.error("Erreur lors du chargement des données:", error);
+      console.error("Erreur commodités:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  // Charger les données au démarrage et toutes les 5 minutes (désactivé si fetch OFF)
+  // Charger les commodités au démarrage si activé
   React.useEffect(() => {
     if (!ENABLE_MARKET_FETCH) return;
-    loadAllData();
-    const interval = setInterval(loadAllData, 5 * 60 * 1000); // 5 minutes
+    loadCommoditiesData();
+    const interval = setInterval(loadCommoditiesData, 5 * 60 * 1000); // 5 minutes
     return () => clearInterval(interval);
   }, []);
 
-  // Convertir les données BRVM pour l'affichage
+  // Charger les indices pour la page d'accueil
+  const loadHomepageIndices = React.useCallback(async () => {
+    try {
+      console.log('🔄 Chargement des indices pour la page d\'accueil...');
+      const indices = await fetchHomepageIndices();
+      console.log('📊 Indices récupérés:', indices);
+      setHomepageIndices(indices || []);
+      setBrvmLastUpdate(new Date());
+    } catch (error) {
+      console.error('❌ Erreur lors du chargement des indices:', error);
+    }
+  }, [fetchHomepageIndices]);
+
+  React.useEffect(() => {
+    loadHomepageIndices();
+  }, [loadHomepageIndices]);
+
+  // Convertir les données des indices pour l'affichage
   const keyIndices = React.useMemo(() => {
-    if (!brvmData) {
-      // Données de fallback
+    console.log('🔄 Conversion des indices pour affichage:', homepageIndices);
+    
+    if (!homepageIndices || homepageIndices.length === 0) {
+      console.log('⚠️ Aucun indice configuré, utilisation des données de fallback');
+      // Données de fallback si aucun indice n'est configuré
       return [
         { name: "BRVM", value: "185.42", change: "+2.3%", isPositive: true },
-        {
-          name: "FCFA/EUR",
-          value: "655.957",
-          change: "-0.1%",
-          isPositive: false,
-        },
-        {
-          name: "Inflation",
-          value: "4.2%",
-          change: "+0.5%",
-          isPositive: false,
-        },
+        { name: "FCFA/EUR", value: "655.957", change: "-0.1%", isPositive: false },
+        { name: "Inflation", value: "4.2%", change: "+0.5%", isPositive: false },
         { name: "Taux BCEAO", value: "3.5%", change: "0%", isPositive: true },
       ];
     }
 
-    return [
-      {
-        name: "BRVM",
-        value: brvmData.composite.value,
-        change: brvmData.composite.changePercent,
-        isPositive: brvmData.composite.isPositive,
-      },
-      {
-        name: "FCFA/EUR",
-        value: brvmData.fcfa_eur.value,
-        change: brvmData.fcfa_eur.changePercent,
-        isPositive: brvmData.fcfa_eur.isPositive,
-      },
-      {
-        name: "Inflation",
-        value: brvmData.inflation.value,
-        change: brvmData.inflation.changePercent,
-        isPositive: brvmData.inflation.isPositive,
-      },
-      {
-        name: "Taux BCEAO",
-        value: brvmData.taux_bceao.value,
-        change: brvmData.taux_bceao.changePercent,
-        isPositive: brvmData.taux_bceao.isPositive,
-      },
-    ];
-  }, [brvmData]);
+    // Utiliser les vraies données du nouveau système, limiter à 4 indices
+    const convertedIndices = homepageIndices.slice(0, 4).map(indice => ({
+      name: indice.symbol || indice.name,
+      value: indice.current_value ? 
+        `${indice.current_value}${indice.unit === "percent" ? "%" : ""}` : 
+        "N/A",
+      change: indice.change_percent ? 
+        `${Number(indice.change_percent) > 0 ? "+" : ""}${indice.change_percent}%` : 
+        "0%",
+      isPositive: indice.change_percent && Number(indice.change_percent) > 0
+    }));
+    
+    console.log('✅ Indices convertis pour affichage:', convertedIndices);
+    return convertedIndices;
+  }, [homepageIndices]);
 
   // Dérivés pour l'affichage public
   const heroArticle = React.useMemo(() => articles?.[0], [articles]);
@@ -219,11 +210,11 @@ export default function Index() {
               <h2 className="text-2xl font-bold text-amani-primary">
                 Indices BRVM en temps réel
               </h2>
-              {lastUpdate && (
+              {brvmLastUpdate && (
                 <p className="text-sm text-gray-500 mt-1">
-                  Dernière mise à jour: {lastUpdate.toLocaleTimeString("fr-FR")}
+                  Dernière mise à jour: {brvmLastUpdate.toLocaleTimeString("fr-FR")}
                   <span className="ml-2 text-xs bg-green-100 text-green-600 px-2 py-1 rounded-full">
-                    Simulation
+                    Nouveau système
                   </span>
                 </p>
               )}
@@ -231,18 +222,17 @@ export default function Index() {
             <div className="flex items-center gap-4">
               <button
                 onClick={() => {
+                  // Actualiser les données des indices depuis le nouveau système
+                  loadHomepageIndices();
                   if (ENABLE_MARKET_FETCH) {
-                    loadAllData();
-                  } else {
-                    // Pas d'appel API: juste mettre à jour l'horodatage pour l'UX
-                    setLastUpdate(new Date());
+                    loadCommoditiesData();
                   }
                 }}
-                disabled={loading}
+                disabled={loadingBrvmIndices}
                 className="flex items-center gap-2 text-amani-primary hover:underline disabled:opacity-50"
               >
                 <RefreshCw
-                  className={`w-4 h-4 ${loading ? "animate-spin" : ""}`}
+                  className={`w-4 h-4 ${loadingBrvmIndices ? "animate-spin" : ""}`}
                 />
                 Actualiser
               </button>
@@ -254,13 +244,33 @@ export default function Index() {
               </Link>
             </div>
           </div>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {keyIndices.map((index, i) => (
+          {(!homepageIndices || homepageIndices.length === 0) ? (
+            <div className="col-span-full text-center py-8">
+              <div className="bg-blue-50 rounded-lg p-6">
+                <BarChart3 className="w-12 h-12 text-blue-500 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-blue-900 mb-2">
+                  Aucun indice configuré pour la page d'accueil
+                </h3>
+                <p className="text-blue-700 mb-4">
+                  Créez des indices et activez leur affichage sur la page d'accueil via le gestionnaire.
+                </p>
+                <Link 
+                  to="/stock-indices-manager" 
+                  className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                >
+                  <BarChart3 className="w-4 h-4" />
+                  Gérer les indices
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              {keyIndices.map((index, i) => (
               <div
                 key={i}
-                className={`bg-[#E5DDD2] p-4 rounded-lg relative transition-all duration-300 ${loading ? "opacity-50" : "opacity-100"}`}
+                className={`bg-[#E5DDD2] p-4 rounded-lg relative transition-all duration-300 ${loadingBrvmIndices ? "opacity-50" : "opacity-100"}`}
               >
-                {loading && (
+                {loadingBrvmIndices && (
                   <div className="absolute inset-0 flex items-center justify-center bg-white/50 rounded-lg">
                     <RefreshCw className="w-5 h-5 animate-spin text-amani-primary" />
                   </div>
@@ -284,12 +294,13 @@ export default function Index() {
                 {/* Indicateur temps réel */}
                 <div className="absolute top-2 right-2">
                   <div
-                    className={`w-2 h-2 rounded-full ${loading ? "bg-yellow-500" : "bg-green-500"} animate-pulse`}
+                    className={`w-2 h-2 rounded-full ${loadingBrvmIndices ? "bg-yellow-500" : "bg-green-500"} animate-pulse`}
                   ></div>
                 </div>
               </div>
             ))}
-          </div>
+            </div>
+          )}
         </div>
       </section>
       )}

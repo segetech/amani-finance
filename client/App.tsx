@@ -55,7 +55,8 @@ const PodcastsManager = lazy(() => import("./pages/PodcastsManager"));
 const NewPodcast = lazy(() => import("./pages/NewPodcast"));
 const EditPodcast = lazy(() => import("./pages/EditPodcast"));
 const LegacyIndicesDisabled = lazy(() => import("./pages/LegacyIndicesDisabled"));
-const BrvmIndicesManagement = lazy(() => import("./pages/BrvmIndicesManagement"));
+const StockIndicesManager = lazy(() => import("./pages/StockIndicesManager"));
+const MarketDataManager = lazy(() => import("./pages/MarketDataManager"));
 const CommoditiesManagement = lazy(() => import("./pages/CommoditiesManagement"));
 const IndicesHelp = lazy(() => import("./pages/IndicesHelp"));
 const Analytics = lazy(() => import("./pages/Analytics"));
@@ -122,6 +123,11 @@ const AppContent = () => {
         <Route path="/tech" element={<Tech />} />
         <Route path="/test-media" element={<TestMedia />} />
         <Route path="/test-article-form" element={<TestArticleForm />} />
+        <Route path="/stock-indices-manager" element={
+          <ProtectedRoute>
+            <StockIndicesManager />
+          </ProtectedRoute>
+        } />
 
         {/* Protected Dashboard Routes (persistent layout with nested routes) */}
         <Route
@@ -143,7 +149,9 @@ const AppContent = () => {
           <Route path="indices" element={<LegacyIndicesDisabled />} />
           <Route path="indices/new" element={<LegacyIndicesDisabled />} />
           <Route path="indices/edit/:id" element={<LegacyIndicesDisabled />} />
-          <Route path="indices-management" element={<BrvmIndicesManagement />} />
+          <Route path="indices-management" element={<StockIndicesManager />} />
+          <Route path="stock-indices-manager" element={<StockIndicesManager />} />
+          <Route path="market-data-manager" element={<MarketDataManager />} />
           <Route path="commodities-management" element={<CommoditiesManagement />} />
           <Route path="indices-help" element={<IndicesHelp />} />
           <Route path="analytics" element={<Analytics />} />

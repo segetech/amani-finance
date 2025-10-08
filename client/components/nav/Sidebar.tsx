@@ -67,10 +67,17 @@ const SECTIONS: Section[] = [
       {
         label: "Indices",
         icon: LineChart,
-        permission: "create_indices",
+        permission: "manage_indices",
         children: [
-          { label: "Tous les indices", to: "/dashboard/indices-management", icon: LineChart, permission: "create_indices" },
-          { label: "Nouvel indice", to: "/dashboard/indices/new", icon: Plus, permission: "create_indices" },
+          { label: "Gestion des indices", to: "/dashboard/indices-management", icon: LineChart, permission: "manage_indices" },
+        ],
+      },
+      {
+        label: "Données de Marché",
+        icon: BarChart3,
+        permission: "manage_market_data",
+        children: [
+          { label: "Actions & Prix", to: "/dashboard/market-data-manager", icon: BarChart3, permission: "manage_market_data" },
         ],
       },
     ],

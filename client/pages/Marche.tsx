@@ -1,6 +1,23 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Footer from '../components/Footer';
+import { useStockIndices } from "../hooks/useStockIndices";
+import { useArticles } from "../hooks/useArticles";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Area,
+  AreaChart,
+  ReferenceLine,
+  Brush,
+  ComposedChart,
+  Bar
+} from 'recharts';
 import {
   TrendingUp,
   TrendingDown,
@@ -15,18 +32,66 @@ import {
   Activity,
   Briefcase,
   PieChart,
-  LineChart,
+  LineChart as LineChartIcon,
   RefreshCw,
   Clock,
   Target,
   Zap,
+  X,
 } from "lucide-react";
 
 export default function Marche() {
   const [selectedMarket, setSelectedMarket] = useState("all");
   const [selectedTimeframe, setSelectedTimeframe] = useState("1d");
+  const [selectedIndex, setSelectedIndex] = useState(null);
+  const [showChart, setShowChart] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
+  const [chartPeriod, setChartPeriod] = useState('1J');
+  
+  // Récupérer les indices depuis la base de données
+  const { indices, loading: loadingIndices, fetchIndices } = useStockIndices();
+  
+  // Récupérer les articles liés au marché et à l'économie
+  const { articles, loading: loadingArticles } = useArticles({ 
+    status: 'published', 
+    limit: 20, // Augmenté pour avoir plus d'articles à filtrer
+    offset: 0
+  });
 
-  const marketData = [
+  // Charger les données au montage du composant
+  useEffect(() => {
+    fetchIndices();
+  }, [fetchIndices]);
+
+  // Convertir les indices en format compatible avec l'affichage
+  const marketData = indices?.filter(index => index.is_active).map(index => ({
+    name: index.name,
+    value: index.current_value?.toString() || "N/A",
+    change: index.change_percent ? 
+      `${index.change_percent > 0 ? "+" : ""}${index.change_percent}%` : 
+      "0%",
+    changeValue: index.change_amount ? 
+      `${index.change_amount > 0 ? "+" : ""}${index.change_amount}` : 
+      "0",
+    isPositive: index.change_percent ? index.change_percent > 0 : false,
+    volume: "N/A", // À implémenter plus tard
+    category: index.market === "BRVM" ? "Indice" : 
+              index.unit === "currency" ? "Devise" : 
+              "Indice",
+    high: index.previous_value ? 
+      Math.max(index.current_value || 0, index.previous_value).toString() : 
+      index.current_value?.toString() || "N/A",
+    low: index.previous_value ? 
+      Math.min(index.current_value || 0, index.previous_value).toString() : 
+      index.current_value?.toString() || "N/A",
+    marketCap: "N/A", // À implémenter plus tard
+    symbol: index.symbol,
+    currency: index.currency || "FCFA",
+    unit: index.unit
+  })) || [];
+
+  // Données de fallback si aucun indice n'est disponible
+  const fallbackData = [
     {
       name: "BRVM Composite",
       value: "185.42",
@@ -38,94 +103,42 @@ export default function Marche() {
       high: "187.12",
       low: "183.45",
       marketCap: "12.5T FCFA",
-    },
-    {
-      name: "BRVM 30",
-      value: "98.76",
-      change: "+1.8%",
-      changeValue: "+1.74",
-      isPositive: true,
-      volume: "1.2M FCFA",
-      category: "Indice",
-      high: "99.21",
-      low: "97.83",
-      marketCap: "8.2T FCFA",
-    },
-    {
-      name: "USD/FCFA",
-      value: "602.50",
-      change: "-0.8%",
-      changeValue: "-4.85",
-      isPositive: false,
-      volume: "45.6M USD",
-      category: "Devise",
-      high: "605.20",
-      low: "601.75",
-      marketCap: "N/A",
-    },
-    {
-      name: "EUR/FCFA",
-      value: "655.96",
-      change: "-0.5%",
-      changeValue: "-3.28",
-      isPositive: false,
-      volume: "23.1M EUR",
-      category: "Devise",
-      high: "658.45",
-      low: "654.12",
-      marketCap: "N/A",
-    },
-    {
-      name: "Banque Atlantique",
-      value: "4,250",
-      change: "+3.2%",
-      changeValue: "+131",
-      isPositive: true,
-      volume: "156K FCFA",
-      category: "Action",
-      high: "4,285",
-      low: "4,120",
-      marketCap: "425B FCFA",
-    },
-    {
-      name: "Ecobank Transnational",
-      value: "7,800",
-      change: "-1.1%",
-      changeValue: "-87",
-      isPositive: false,
-      volume: "234K FCFA",
-      category: "Action",
-      high: "7,920",
-      low: "7,750",
-      marketCap: "780B FCFA",
-    },
-    {
-      name: "Orange Côte d'Ivoire",
-      value: "12,500",
-      change: "+2.7%",
-      changeValue: "+329",
-      isPositive: true,
-      volume: "89K FCFA",
-      category: "Action",
-      high: "12,650",
-      low: "12,200",
-      marketCap: "1.25T FCFA",
-    },
-    {
-      name: "SONATEL",
-      value: "15,200",
-      change: "+1.9%",
-      changeValue: "+283",
-      isPositive: true,
-      volume: "67K FCFA",
-      category: "Action",
-      high: "15,350",
-      low: "14,950",
-      marketCap: "1.52T FCFA",
-    },
+      symbol: "BRVM10",
+      currency: "FCFA",
+      unit: "points"
+    }
   ];
 
-  const recentNews = [
+  // Utiliser les vraies données ou les données de fallback
+  const displayData = marketData.length > 0 ? marketData : fallbackData;
+
+  // Filtrer et utiliser les vrais articles liés au marché et à l'économie
+  const marketArticles = articles?.filter(article => {
+    const title = article.title.toLowerCase();
+    const content = article.content?.toLowerCase() || '';
+    
+    // Mots-clés liés au marché et à l'économie
+    const marketKeywords = [
+      'brvm', 'bourse', 'marché', 'économie', 'finance', 'banque', 'action', 
+      'indice', 'devise', 'fcfa', 'dollar', 'euro', 'investissement', 'trading',
+      'capitalisation', 'volume', 'cotation', 'entreprise', 'secteur', 'croissance',
+      'inflation', 'taux', 'change', 'obligation', 'dividende', 'résultat'
+    ];
+    
+    return marketKeywords.some(keyword => 
+      title.includes(keyword) || content.includes(keyword)
+    );
+  }) || [];
+
+  const recentNews = marketArticles.map(article => ({
+    id: article.id,
+    title: article.title,
+    excerpt: article.content?.substring(0, 80) + "..." || "Extrait non disponible",
+    category: "Marché", 
+    publishedAt: article.created_at,
+    readTime: `${Math.ceil((article.content?.length || 500) / 200)} min`,
+    image: article.featured_image || "/placeholder.svg",
+  })) || [
     {
       id: "1",
       title: "BRVM : Performance exceptionnelle du secteur bancaire",
@@ -156,11 +169,11 @@ export default function Marche() {
   ];
 
   const marketSummary = {
-    gainers: marketData.filter(item => item.isPositive).length,
-    losers: marketData.filter(item => !item.isPositive).length,
-    unchanged: 2,
-    totalVolume: "125.8M FCFA",
-    marketCap: "45.2T FCFA",
+    gainers: displayData.filter(item => item.isPositive).length,
+    losers: displayData.filter(item => !item.isPositive).length,
+    unchanged: displayData.filter(item => item.change === "0%" || item.change === "0.00%").length,
+    totalVolume: "125.8M FCFA", // À calculer dynamiquement plus tard
+    marketCap: "45.2T FCFA", // À calculer dynamiquement plus tard
   };
 
   const categories = ["all", "Indice", "Action", "Devise", "Obligation"];
@@ -173,8 +186,319 @@ export default function Marche() {
   ];
 
   const filteredData = selectedMarket === "all" 
-    ? marketData 
-    : marketData.filter(item => item.category === selectedMarket);
+    ? displayData 
+    : displayData.filter(item => item.category === selectedMarket);
+
+  // Fonction pour actualiser les données
+  const refreshData = () => {
+    fetchIndices();
+  };
+
+  // Fonctions pour gérer les actions
+  const handleShowChart = (item) => {
+    setSelectedIndex(item);
+    setShowChart(true);
+  };
+
+  const handleShowDetails = (item) => {
+    setSelectedIndex(item);
+    setShowDetails(true);
+  };
+
+  // Générer des données de graphique réalistes basées sur l'indice
+  const generateChartData = (index, period = '1J') => {
+    const currentValue = parseFloat(index.value) || 100;
+    const changePercent = parseFloat(index.change.replace('%', '').replace('+', '')) || 0;
+    
+    let dataPoints, timeFormat, startHour;
+    
+    switch (period) {
+      case '1J':
+        dataPoints = 48; // Toutes les 15 minutes de 9h à 17h
+        timeFormat = (i) => {
+          const totalMinutes = 9 * 60 + i * 10; // Toutes les 10 minutes
+          const hours = Math.floor(totalMinutes / 60);
+          const minutes = totalMinutes % 60;
+          return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+        };
+        break;
+      case '5J':
+        dataPoints = 5;
+        timeFormat = (i) => {
+          const days = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven'];
+          return days[i] || `J${i + 1}`;
+        };
+        break;
+      case '1M':
+        dataPoints = 30;
+        timeFormat = (i) => `${i + 1}`;
+        break;
+      case '3M':
+        dataPoints = 90;
+        timeFormat = (i) => `S${Math.floor(i / 7) + 1}`;
+        break;
+      case '1A':
+        dataPoints = 12;
+        timeFormat = (i) => {
+          const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'];
+          return months[i] || `M${i + 1}`;
+        };
+        break;
+      default:
+        dataPoints = 48;
+        timeFormat = (i) => `${9 + Math.floor(i / 4)}:${(i % 4) * 15}`.padEnd(5, '0');
+    }
+    
+    const data = [];
+    const baseValue = currentValue - (currentValue * changePercent / 100);
+    const volatility = period === '1J' ? 0.005 : period === '5J' ? 0.02 : 0.05; // Volatilité selon la période
+    
+    let previousValue = baseValue;
+    
+    for (let i = 0; i < dataPoints; i++) {
+      const progress = i / (dataPoints - 1);
+      
+      // Tendance générale vers la valeur actuelle
+      const trendValue = baseValue + (currentValue - baseValue) * progress;
+      
+      // Mouvement brownien pour plus de réalisme
+      const randomWalk = (Math.random() - 0.5) * volatility * currentValue;
+      const meanReversion = (trendValue - previousValue) * 0.3; // Retour vers la tendance
+      
+      const finalValue = Math.max(0, previousValue + randomWalk + meanReversion);
+      previousValue = finalValue;
+      
+      // Calculer les volumes simulés (plus élevés en début et fin de journée pour 1J)
+      let volume = 1000 + Math.random() * 2000;
+      if (period === '1J') {
+        const hourFactor = Math.sin((i / dataPoints) * Math.PI) + 0.5; // Plus de volume au milieu
+        volume *= hourFactor;
+      }
+      
+      data.push({
+        time: timeFormat(i),
+        value: parseFloat(finalValue.toFixed(2)),
+        volume: Math.floor(volume),
+        high: parseFloat((finalValue * (1 + Math.random() * 0.01)).toFixed(2)),
+        low: parseFloat((finalValue * (1 - Math.random() * 0.01)).toFixed(2)),
+        open: i === 0 ? baseValue : data[i - 1]?.value || finalValue,
+        close: finalValue
+      });
+    }
+    
+    return data;
+  };
+
+  // Composant Tooltip personnalisé pour Recharts
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload;
+      return (
+        <div className="bg-black text-white p-3 rounded shadow-lg text-xs">
+          <p className="font-semibold mb-1">{label}</p>
+          <div className="space-y-1">
+            <p><span className="text-gray-300">O:</span> {data.open?.toFixed(2)}</p>
+            <p><span className="text-green-400">H:</span> {data.high?.toFixed(2)}</p>
+            <p><span className="text-red-400">L:</span> {data.low?.toFixed(2)}</p>
+            <p><span className="text-white">C:</span> {data.close?.toFixed(2)}</p>
+            <p><span className="text-blue-400">Vol:</span> {data.volume?.toLocaleString()}</p>
+          </div>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  // Composant graphique financier professionnel (version simplifiée pour éviter les erreurs Recharts)
+  const FinancialChart = ({ data, selectedIndex }: any) => {
+    if (!data || data.length === 0) {
+      return (
+        <div className="w-full bg-white rounded-lg p-8 text-center">
+          <p className="text-gray-500">Aucune donnée disponible</p>
+        </div>
+      );
+    }
+
+    const isPositive = selectedIndex.isPositive;
+    const mainColor = isPositive ? "#F59E0B" : "#EF4444";
+    
+    // Calculer les valeurs min/max pour le graphique SVG
+    const values = data.map((d: any) => d.close || d.value || 0);
+    const maxValue = Math.max(...values);
+    const minValue = Math.min(...values);
+    const range = maxValue - minValue;
+    const padding = range * 0.1;
+    
+    const adjustedMax = maxValue + padding;
+    const adjustedMin = minValue - padding;
+    const adjustedRange = adjustedMax - adjustedMin;
+    
+    const width = 800;
+    const height = 300;
+    const volumeHeight = 60;
+    
+    // Créer les points du graphique
+    const points = data.map((point: any, index: number) => {
+      const x = (index / (data.length - 1)) * width;
+      const y = height - ((point.close - adjustedMin) / adjustedRange) * height;
+      return { x, y, ...point };
+    });
+    
+    const pathData = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+    const areaData = `${pathData} L ${width} ${height} L 0 ${height} Z`;
+    
+    return (
+      <div className="w-full bg-white rounded-lg border border-gray-200">
+        {/* En-tête avec informations */}
+        <div className="p-4 border-b border-gray-200 bg-gray-50">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-4">
+              <h3 className="text-lg font-bold text-gray-800">{selectedIndex.name}</h3>
+              <div className="text-sm text-gray-600">
+                VARIATION PÉRIODE: {selectedIndex.change}
+              </div>
+            </div>
+            <div className="text-sm font-mono bg-white px-2 py-1 rounded border">
+              {new Date().toLocaleDateString('fr-FR')}
+            </div>
+          </div>
+          
+          {/* Statistiques OHLC */}
+          <div className="flex items-center gap-6 text-sm">
+            <div className="flex items-center gap-1">
+              <span className="text-gray-600">O:</span>
+              <span className="font-mono font-semibold">{data[0]?.open?.toFixed(2) || data[0]?.close?.toFixed(2) || 'N/A'}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="text-gray-600">H:</span>
+              <span className="font-mono font-semibold text-green-600">
+                {Math.max(...data.map((d: any) => d.high || d.close || 0)).toFixed(2)}
+              </span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="text-gray-600">L:</span>
+              <span className="font-mono font-semibold text-red-600">
+                {Math.min(...data.map((d: any) => d.low || d.close || 0)).toFixed(2)}
+              </span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="text-gray-600">C:</span>
+              <span className="font-mono font-semibold">{data[data.length - 1]?.close?.toFixed(2) || 'N/A'}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className={`font-mono font-semibold ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
+                {selectedIndex.change}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Graphique SVG personnalisé */}
+        <div className="relative bg-white p-4">
+          <div className="text-xs text-gray-500 font-semibold mb-2">📊 COURS</div>
+          
+          {/* Zone de prix */}
+          <div className="mb-4">
+            <svg width="100%" height={height} viewBox={`0 0 ${width} ${height}`} className="border border-gray-100 rounded">
+              {/* Grille de fond */}
+              <defs>
+                <pattern id="grid" width="80" height="40" patternUnits="userSpaceOnUse">
+                  <path d="M 80 0 L 0 0 0 40" fill="none" stroke="#f1f5f9" strokeWidth="1"/>
+                </pattern>
+                <linearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stopColor={mainColor} stopOpacity="0.4" />
+                  <stop offset="100%" stopColor={mainColor} stopOpacity="0.1" />
+                </linearGradient>
+              </defs>
+              <rect width="100%" height="100%" fill="url(#grid)" />
+              
+              {/* Zone sous la courbe */}
+              <path
+                d={areaData}
+                fill="url(#areaGradient)"
+                stroke="none"
+              />
+              
+              {/* Ligne de prix */}
+              <path
+                d={pathData}
+                fill="none"
+                stroke={mainColor}
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              
+              {/* Points interactifs */}
+              {points.map((point, index) => (
+                <circle
+                  key={index}
+                  cx={point.x}
+                  cy={point.y}
+                  r="3"
+                  fill={mainColor}
+                  className="opacity-0 hover:opacity-100 transition-opacity cursor-pointer"
+                >
+                  <title>{`${point.time}: ${point.close?.toFixed(2) || point.value?.toFixed(2)}`}</title>
+                </circle>
+              ))}
+              
+              {/* Axes */}
+              <line x1="0" y1={height} x2={width} y2={height} stroke="#e5e7eb" strokeWidth="1"/>
+              <line x1={width} y1="0" x2={width} y2={height} stroke="#e5e7eb" strokeWidth="1"/>
+              
+              {/* Labels des prix */}
+              <text x={width - 5} y="15" textAnchor="end" className="text-xs fill-gray-500">
+                {adjustedMax.toFixed(1)}
+              </text>
+              <text x={width - 5} y={height - 5} textAnchor="end" className="text-xs fill-gray-500">
+                {adjustedMin.toFixed(1)}
+              </text>
+            </svg>
+          </div>
+          
+          {/* Séparateur */}
+          <div className="h-px bg-gray-200 mb-4"></div>
+          
+          {/* Zone de volume */}
+          <div className="text-xs text-gray-500 font-semibold mb-2">
+            📈 VOLUME ({data.reduce((sum: number, d: any) => sum + (d.volume || 0), 0).toLocaleString()})
+          </div>
+          <div>
+            <svg width="100%" height={volumeHeight} viewBox={`0 0 ${width} ${volumeHeight}`} className="border border-gray-100 rounded">
+              {data.map((point: any, index: number) => {
+                const x = (index / (data.length - 1)) * width;
+                const maxVolume = Math.max(...data.map((d: any) => d.volume || 0));
+                const barHeight = ((point.volume || 0) / maxVolume) * volumeHeight;
+                const y = volumeHeight - barHeight;
+                
+                return (
+                  <rect
+                    key={index}
+                    x={x - 2}
+                    y={y}
+                    width="4"
+                    height={barHeight}
+                    fill={mainColor}
+                    opacity="0.7"
+                  >
+                    <title>{`${point.time}: ${(point.volume || 0).toLocaleString()}`}</title>
+                  </rect>
+                );
+              })}
+            </svg>
+          </div>
+          
+          {/* Labels temporels */}
+          <div className="flex justify-between text-xs text-gray-500 mt-2">
+            <span>{data[0]?.time}</span>
+            <span>Temps</span>
+            <span>{data[data.length - 1]?.time}</span>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-[#E5DDD2]">
@@ -244,9 +568,13 @@ export default function Marche() {
                   </button>
                 ))}
               </div>
-              <button className="flex items-center gap-2 px-4 py-2 bg-amani-primary text-white rounded-lg hover:bg-amani-primary/90 transition-colors">
-                <RefreshCw className="w-4 h-4" />
-                Actualiser
+              <button 
+                onClick={refreshData}
+                disabled={loadingIndices}
+                className="flex items-center gap-2 px-4 py-2 bg-amani-primary text-white rounded-lg hover:bg-amani-primary/90 transition-colors disabled:opacity-50"
+              >
+                <RefreshCw className={`w-4 h-4 ${loadingIndices ? 'animate-spin' : ''}`} />
+                {loadingIndices ? 'Actualisation...' : 'Actualiser'}
               </button>
             </div>
           </div>
@@ -305,10 +633,22 @@ export default function Marche() {
           {/* Market Data Table */}
           <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-white/50">
             <div className="p-6 border-b border-gray-200">
-              <h3 className="text-xl font-bold text-amani-primary">
-                Cotations en temps réel ({filteredData.length})
-              </h3>
-              <p className="text-gray-600 mt-1">Dernière mise à jour: {new Date().toLocaleTimeString("fr-FR")}</p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-xl font-bold text-amani-primary">
+                    Cotations en temps réel ({filteredData.length})
+                  </h3>
+                  <p className="text-gray-600 mt-1">
+                    Dernière mise à jour: {new Date().toLocaleTimeString("fr-FR")}
+                    {loadingIndices && (
+                      <span className="ml-2 text-blue-600 text-sm">
+                        <RefreshCw className="w-4 h-4 inline animate-spin mr-1" />
+                        Actualisation en cours...
+                      </span>
+                    )}
+                  </p>
+                </div>
+              </div>
             </div>
             
             <div className="overflow-x-auto">
@@ -348,7 +688,11 @@ export default function Marche() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right">
                         <div className="text-sm font-bold text-gray-900">{item.value}</div>
-                        <div className="text-xs text-gray-500">FCFA</div>
+                        <div className="text-xs text-gray-500">
+                          {item.unit === 'percent' ? '%' : 
+                           item.unit === 'currency' ? item.currency : 
+                           item.currency || 'FCFA'}
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right">
                         <div className={`flex items-center justify-end gap-1 ${
@@ -376,10 +720,18 @@ export default function Marche() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center">
                         <div className="flex items-center justify-center gap-2">
-                          <button className="text-amani-primary hover:text-amani-primary/80">
-                            <LineChart className="w-4 h-4" />
+                          <button 
+                            onClick={() => handleShowChart(item)}
+                            className="text-amani-primary hover:text-amani-primary/80 p-1 rounded hover:bg-blue-50 transition-colors"
+                            title="Voir le graphique"
+                          >
+                            <LineChartIcon className="w-4 h-4" />
                           </button>
-                          <button className="text-gray-600 hover:text-gray-800">
+                          <button 
+                            onClick={() => handleShowDetails(item)}
+                            className="text-gray-600 hover:text-gray-800 p-1 rounded hover:bg-gray-50 transition-colors"
+                            title="Voir les détails"
+                          >
                             <Eye className="w-4 h-4" />
                           </button>
                         </div>
@@ -396,69 +748,87 @@ export default function Marche() {
       {/* Market News */}
       <section className="py-16 bg-white/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-amani-primary mb-8 flex items-center gap-3">
-            <Zap className="w-8 h-8" />
-            Actualités des marchés
-          </h2>
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-3xl font-bold text-amani-primary flex items-center gap-3">
+              <Zap className="w-8 h-8" />
+              Actualités des marchés
+            </h2>
+            {loadingArticles && (
+              <span className="text-blue-600 text-sm flex items-center gap-2">
+                <RefreshCw className="w-4 h-4 animate-spin" />
+                Chargement des actualités...
+              </span>
+            )}
+          </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {recentNews.map((news) => (
+          {recentNews.length === 0 && !loadingArticles ? (
+            <div className="text-center py-12">
+              <div className="bg-blue-50 rounded-lg p-8 max-w-md mx-auto">
+                <Zap className="w-12 h-12 text-blue-500 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-blue-900 mb-2">
+                  Aucune actualité économique trouvée
+                </h3>
+                <p className="text-blue-700 mb-4">
+                  Publiez des articles contenant des mots-clés liés au marché (BRVM, bourse, économie, finance, etc.) pour les voir apparaître ici.
+                </p>
+                <Link 
+                  to="/dashboard/articles/new" 
+                  className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                >
+                  <Zap className="w-4 h-4" />
+                  Publier une actualité
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
+              {recentNews.map((news) => (
               <article key={news.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
-                <div className="relative">
-                  <img
-                    src={news.image}
-                    alt={news.title}
-                    className="w-full h-48 object-cover"
-                  />
-                  <div className="absolute top-4 left-4">
-                    <span className="bg-amani-primary text-white px-3 py-1 rounded-full text-sm font-medium">
-                      {news.category}
-                    </span>
+                <Link to={`/article/${news.id}`} className="block">
+                  <div className="relative">
+                    <img
+                      src={news.image}
+                      alt={news.title}
+                      className="w-full h-48 object-cover hover:scale-105 transition-transform duration-300"
+                      loading="lazy"
+                      onError={(e) => {
+                        e.currentTarget.src = "/placeholder.svg";
+                      }}
+                    />
+                    <div className="absolute top-4 left-4">
+                      <span className="bg-amani-primary text-white px-3 py-1 rounded-full text-sm font-medium">
+                        {news.category}
+                      </span>
+                    </div>
                   </div>
-                </div>
+                </Link>
                 
                 <div className="p-6">
-                  <h3 className="text-lg font-bold text-amani-primary mb-3 leading-tight">
-                    {news.title}
-                  </h3>
+                  <Link to={`/article/${news.id}`}>
+                    <h3 className="text-lg font-bold text-amani-primary mb-3 leading-tight hover:text-amani-primary/80 transition-colors cursor-pointer">
+                      {news.title}
+                    </h3>
+                  </Link>
                   
                   <p className="text-gray-600 mb-4 leading-relaxed">
                     {news.excerpt}
                   </p>
                   
-                  <div className="flex items-center justify-between text-sm text-gray-500">
-                    <div className="flex items-center gap-4">
-                      <span className="flex items-center gap-1">
-                        <Calendar className="w-4 h-4" />
-                        {new Date(news.publishedAt).toLocaleDateString("fr-FR")}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-4 h-4" />
-                        {news.readTime}
-                      </span>
-                    </div>
-                    
-                    <Link
-                      to={`/article/${news.id}`}
-                      className="flex items-center gap-1 text-amani-primary hover:text-amani-primary/80 font-medium"
-                    >
-                      Lire <ArrowRight className="w-4 h-4" />
-                    </Link>
+                  <div className="flex items-center gap-4 text-sm text-gray-500">
+                    <span className="flex items-center gap-1">
+                      <Calendar className="w-4 h-4" />
+                      {new Date(news.publishedAt).toLocaleDateString("fr-FR")}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Clock className="w-4 h-4" />
+                      {news.readTime}
+                    </span>
                   </div>
                 </div>
               </article>
             ))}
-          </div>
-          
-          <div className="text-center mt-8">
-            <Link
-              to="/marche/actualites"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-amani-primary text-white rounded-lg hover:bg-amani-primary/90 transition-colors font-medium"
-            >
-              Voir toutes les actualités
-              <ArrowRight className="w-5 h-5" />
-            </Link>
-          </div>
+            </div>
+          )}
         </div>
       </section>
 
@@ -491,6 +861,163 @@ export default function Marche() {
       </section>
 
       <Footer />
+
+      {/* Modal Graphique */}
+      {showChart && selectedIndex && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setShowChart(false)} />
+          <div className="relative bg-white rounded-xl shadow-xl w-full max-w-6xl p-6 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-amani-primary">
+                Graphique - {selectedIndex.name}
+              </h2>
+              <button 
+                onClick={() => setShowChart(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            
+            <div className="space-y-6">
+              {/* Statistiques rapides */}
+              <div className="grid grid-cols-4 gap-4">
+                <div className="bg-gray-50 p-4 rounded-lg text-center">
+                  <p className="text-sm text-gray-600 mb-1">Valeur actuelle</p>
+                  <p className="text-xl font-bold text-amani-primary">{selectedIndex.value}</p>
+                </div>
+                <div className="bg-gray-50 p-4 rounded-lg text-center">
+                  <p className="text-sm text-gray-600 mb-1">Variation</p>
+                  <p className={`text-xl font-bold ${selectedIndex.isPositive ? 'text-green-600' : 'text-red-600'}`}>
+                    {selectedIndex.change}
+                  </p>
+                </div>
+                <div className="bg-gray-50 p-4 rounded-lg text-center">
+                  <p className="text-sm text-gray-600 mb-1">Plus haut</p>
+                  <p className="text-xl font-bold text-green-600">{selectedIndex.high}</p>
+                </div>
+                <div className="bg-gray-50 p-4 rounded-lg text-center">
+                  <p className="text-sm text-gray-600 mb-1">Plus bas</p>
+                  <p className="text-xl font-bold text-red-600">{selectedIndex.low}</p>
+                </div>
+              </div>
+
+              {/* Graphique financier professionnel */}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <div className="mb-4 text-center">
+                  <p className="text-sm text-gray-600 mb-2">
+                    Période: {chartPeriod} | Données: {generateChartData(selectedIndex, chartPeriod).length} points
+                  </p>
+                </div>
+                <FinancialChart 
+                  data={generateChartData(selectedIndex, chartPeriod)} 
+                  selectedIndex={selectedIndex}
+                />
+              </div>
+
+              {/* Contrôles de période */}
+              <div className="flex items-center justify-center gap-2">
+                {['1J', '5J', '1M', '3M', '1A'].map((period) => (
+                  <button
+                    key={period}
+                    onClick={() => setChartPeriod(period)}
+                    className={`px-3 py-1 text-sm rounded transition-colors ${
+                      period === chartPeriod 
+                        ? 'bg-amani-primary text-white' 
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
+                  >
+                    {period}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Détails */}
+      {showDetails && selectedIndex && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setShowDetails(false)} />
+          <div className="relative bg-white rounded-xl shadow-xl w-full max-w-2xl p-6 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-amani-primary">
+                Détails - {selectedIndex.name}
+              </h2>
+              <button 
+                onClick={() => setShowDetails(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h3 className="font-semibold text-gray-700 mb-2">Informations générales</h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Nom:</span>
+                      <span className="font-medium">{selectedIndex.name}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Catégorie:</span>
+                      <span className="font-medium">{selectedIndex.category}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Symbole:</span>
+                      <span className="font-medium">{selectedIndex.symbol || 'N/A'}</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h3 className="font-semibold text-gray-700 mb-2">Valeurs</h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Valeur actuelle:</span>
+                      <span className="font-medium">{selectedIndex.value}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Variation:</span>
+                      <span className={`font-medium ${selectedIndex.isPositive ? 'text-green-600' : 'text-red-600'}`}>
+                        {selectedIndex.change}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Volume:</span>
+                      <span className="font-medium">{selectedIndex.volume}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h3 className="font-semibold text-gray-700 mb-2">Plage du jour</h3>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Plus haut:</span>
+                    <span className="font-medium text-green-600">{selectedIndex.high}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Plus bas:</span>
+                    <span className="font-medium text-red-600">{selectedIndex.low}</span>
+                  </div>
+                </div>
+              </div>
+              
+              {selectedIndex.marketCap && selectedIndex.marketCap !== 'N/A' && (
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h3 className="font-semibold text-gray-700 mb-2">Capitalisation</h3>
+                  <p className="text-lg font-bold text-amani-primary">{selectedIndex.marketCap}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

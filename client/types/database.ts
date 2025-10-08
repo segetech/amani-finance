@@ -150,6 +150,40 @@ export interface Database {
           >
         >;
       };
+
+      // ===== INDICES BOURSIERS =====
+      stock_indices: {
+        Row: {
+          id: string;
+          name: string;
+          symbol: string;
+          market: string;
+          country: string;
+          current_value: number | null;
+          previous_value: number | null;
+          change_amount: number | null;
+          change_percent: number | null;
+          is_active: boolean;
+          show_on_homepage: boolean;
+          display_order: number;
+          unit: string;
+          currency: string;
+          description: string | null;
+          last_updated: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Omit<
+          Database["public"]["Tables"]["stock_indices"]["Row"],
+          "id" | "created_at" | "updated_at" | "last_updated"
+        >;
+        Update: Partial<
+          Omit<
+            Database["public"]["Tables"]["stock_indices"]["Row"],
+            "id" | "created_at" | "updated_at" | "last_updated"
+          >
+        >;
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;

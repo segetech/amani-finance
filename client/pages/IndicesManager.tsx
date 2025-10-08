@@ -1,13 +1,18 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
-import { useIndices, Indice } from "../hooks/useIndices";
 import {
   BarChart3,
   TrendingUp,
   TrendingDown,
   Plus,
+  Edit,
+  Trash2,
+  Eye,
+  EyeOff,
+  RefreshCw,
+  Save,
+  X,
   Search,
   Filter,
   Edit,

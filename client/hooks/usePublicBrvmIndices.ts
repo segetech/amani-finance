@@ -41,7 +41,7 @@ export function usePublicBrvmIndices() {
       }
 
       // Récupérer les derniers points pour chaque indice
-      const indiceIds = indices.map(i => i.id);
+      const indiceIds = (indices as any[]).map((i: any) => i.id);
       const { data: points, error: pointsError } = await supabase
         .from("brvm_index_points")
         .select("*")
@@ -53,13 +53,13 @@ export function usePublicBrvmIndices() {
       // Mapper les derniers points par indice
       const latestByIndex = new Map();
       for (const point of (points || [])) {
-        if (!latestByIndex.has(point.indice_id)) {
-          latestByIndex.set(point.indice_id, point);
+        if (!latestByIndex.has((point as any).indice_id)) {
+          latestByIndex.set((point as any).indice_id, point);
         }
       }
 
       // Construire les données finales
-      const publicIndices: PublicBrvmIndex[] = indices.map(indice => {
+      const publicIndices: PublicBrvmIndex[] = (indices as any[]).map((indice: any) => {
         const metadata = indice.metadata || {};
         const latestPoint = latestByIndex.get(indice.id);
 
@@ -69,10 +69,10 @@ export function usePublicBrvmIndices() {
           code: indice.code,
           unit: metadata.unit || "points",
           latest: latestPoint ? {
-            close: Number(latestPoint.close) || 0,
-            change_percent: latestPoint.change_percent,
-            direction: latestPoint.direction || "neutral",
-            created_at: latestPoint.created_at
+            close: Number((latestPoint as any).close) || 0,
+            change_percent: (latestPoint as any).change_percent,
+            direction: (latestPoint as any).direction || "neutral",
+            created_at: (latestPoint as any).created_at
           } : undefined
         };
       });
