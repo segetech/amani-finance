@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 
 // Context Providers
 import { AuthProvider, useAuth } from "./context/AuthContext";
@@ -194,6 +195,7 @@ const App = () => {
           <ToastProvider>
             <Toaster />
             <Sonner />
+            <SpeedInsights />
             <AppContent />
           </ToastProvider>
         </AuthProvider>

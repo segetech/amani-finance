@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
@@ -15,6 +15,7 @@ export default function BrvmIndicesManagement() {
   const [showCreateGroup, setShowCreateGroup] = useState(false);
   const [showCreateIndex, setShowCreateIndex] = useState(false);
   const [showAddPointFor, setShowAddPointFor] = useState<BrvmIndexWithLatest | null>(null);
+  const [showBulkEntry, setShowBulkEntry] = useState(false);
 
   const loadAll = async () => {
     setErr(null);
@@ -80,6 +81,9 @@ export default function BrvmIndicesManagement() {
           </button>
           <button onClick={() => setShowCreateIndex(true)} className="inline-flex items-center gap-2 px-3 py-2 rounded bg-amani-primary text-white text-sm hover:bg-amani-primary/90">
             <Plus className="w-4 h-4" /> Nouvel indice
+          </button>
+          <button onClick={() => setShowBulkEntry(true)} className="inline-flex items-center gap-2 px-3 py-2 rounded bg-green-600 text-white text-sm hover:bg-green-700">
+            <BarChart3 className="w-4 h-4" /> Saisie rapide
           </button>
           <Link to="/dashboard/indices-help" className="inline-flex items-center gap-2 px-3 py-2 rounded bg-amani-primary text-white text-sm hover:bg-amani-primary/90">
             <Plus className="w-4 h-4" /> Aide indices
@@ -198,6 +202,18 @@ export default function BrvmIndicesManagement() {
           await addPoint(showAddPointFor.id, payload as any);
           await loadAll();
           setShowAddPointFor(null);
+        }}
+      />
+      <BulkEntryModal
+        open={showBulkEntry}
+        onClose={() => setShowBulkEntry(false)}
+        indices={items}
+        onAdd={async (entries) => {
+          for (const entry of entries) {
+            await addPoint(entry.indiceId, { close: entry.value, created_at: entry.date });
+          }
+          await loadAll();
+          setShowBulkEntry(false);
         }}
       />
     </div>
@@ -345,6 +361,32 @@ function AddPointModal({ open, onClose, indice, onAdd }: { open: boolean; onClos
   const [saving, setSaving] = useState(false);
   const { success, error } = useToast();
 
+  // Calcul automatique du pourcentage de changement
+  const previousValue = indice?.latest?.close ? Number(indice.latest.close) : null;
+  const currentValue = closeVal ? Number(closeVal) : null;
+  const changePercent = previousValue && currentValue ? 
+    (((currentValue - previousValue) / previousValue) * 100).toFixed(2) : null;
+
+  // Déterminer la direction
+  const direction = previousValue && currentValue ? 
+    (currentValue > previousValue ? "up" : currentValue < previousValue ? "down" : "neutral") : null;
+
+  // Définir la date par défaut à maintenant
+  const setCurrentDateTime = () => {
+    const now = new Date();
+    const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+      .toISOString()
+      .slice(0, 16);
+    setCreatedAt(localDateTime);
+  };
+
+  // Initialiser avec la date actuelle quand le modal s'ouvre
+  React.useEffect(() => {
+    if (open && !createdAt) {
+      setCurrentDateTime();
+    }
+  }, [open]);
+
   const submit = async () => {
     setSaving(true);
     try {
@@ -353,7 +395,7 @@ function AddPointModal({ open, onClose, indice, onAdd }: { open: boolean; onClos
         close: Number(closeVal),
         created_at: createdAt ? new Date(createdAt).toISOString() : undefined,
       });
-      success("Point ajouté");
+      success("Point ajouté avec succès");
       onClose();
       setCloseVal(""); setCreatedAt("");
     } catch (e: any) {
@@ -362,22 +404,249 @@ function AddPointModal({ open, onClose, indice, onAdd }: { open: boolean; onClos
   };
 
   return (
-    <Modal open={open} onClose={onClose} title={`Ajouter un point ${indice?.name ? `— ${indice.name}` : ""}`}>
-      <div className="space-y-3">
+    <Modal open={open} onClose={onClose} title={`Saisie manuelle — ${indice?.name || "Indice"}`}>
+      <div className="space-y-4">
+        {/* Informations contextuelles */}
+        {indice?.latest && (
+          <div className="bg-gray-50 rounded-lg p-3">
+            <div className="text-sm text-gray-600 mb-1">Dernière valeur enregistrée :</div>
+            <div className="font-semibold text-lg">{indice.latest.close} {indice.unit === "percent" ? "%" : "pts"}</div>
+            <div className="text-xs text-gray-500">
+              {indice.latest.created_at ? new Date(indice.latest.created_at).toLocaleString('fr-FR') : "Date inconnue"}
+            </div>
+          </div>
+        )}
+
+        {/* Saisie de la nouvelle valeur */}
         <div>
-          <label className="block text-sm text-gray-600 mb-1">Dernier (close)</label>
-          <input value={closeVal} onChange={(e) => setCloseVal(e.target.value)} type="number" step="0.01" className="w-full border rounded px-3 py-2" />
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Nouvelle valeur de clôture *
+          </label>
+          <div className="relative">
+            <input 
+              value={closeVal} 
+              onChange={(e) => setCloseVal(e.target.value)} 
+              type="number" 
+              step="0.01" 
+              className="w-full border rounded-lg px-3 py-2 pr-12 focus:ring-2 focus:ring-amani-primary focus:border-amani-primary" 
+              placeholder="Ex: 150.25"
+            />
+            <span className="absolute right-3 top-2 text-gray-500 text-sm">
+              {indice?.unit === "percent" ? "%" : "pts"}
+            </span>
+          </div>
         </div>
+
+        {/* Aperçu du changement */}
+        {changePercent && (
+          <div className={`rounded-lg p-3 ${
+            direction === "up" ? "bg-green-50 text-green-800" : 
+            direction === "down" ? "bg-red-50 text-red-800" : 
+            "bg-gray-50 text-gray-800"
+          }`}>
+            <div className="flex items-center gap-2">
+              {direction === "up" && <TrendingUp className="w-4 h-4" />}
+              {direction === "down" && <TrendingDown className="w-4 h-4" />}
+              {direction === "neutral" && <Minus className="w-4 h-4" />}
+              <span className="font-medium">
+                Variation : {Number(changePercent) > 0 ? "+" : ""}{changePercent}%
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Date et heure */}
         <div>
-          <label className="block text-sm text-gray-600 mb-1">Date (optionnel)</label>
-          <input value={createdAt} onChange={(e) => setCreatedAt(e.target.value)} type="datetime-local" className="w-full border rounded px-3 py-2" />
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Date et heure
+          </label>
+          <div className="flex gap-2">
+            <input 
+              value={createdAt} 
+              onChange={(e) => setCreatedAt(e.target.value)} 
+              type="datetime-local" 
+              className="flex-1 border rounded-lg px-3 py-2 focus:ring-2 focus:ring-amani-primary focus:border-amani-primary" 
+            />
+            <button 
+              type="button"
+              onClick={setCurrentDateTime}
+              className="px-3 py-2 text-sm border rounded-lg hover:bg-gray-50"
+            >
+              Maintenant
+            </button>
+          </div>
+          <div className="text-xs text-gray-500 mt-1">
+            Laissez vide pour utiliser l'heure actuelle
+          </div>
         </div>
-        <div className="flex justify-end gap-2">
-          <button onClick={onClose} className="px-3 py-2 rounded border">Annuler</button>
-          <button onClick={submit} disabled={saving} className="px-3 py-2 rounded bg-amani-primary text-white disabled:opacity-50">{saving ? "Enregistrement…" : "Ajouter"}</button>
+
+        {/* Actions */}
+        <div className="flex justify-end gap-3 pt-4 border-t">
+          <button 
+            onClick={onClose} 
+            className="px-4 py-2 rounded-lg border hover:bg-gray-50"
+          >
+            Annuler
+          </button>
+          <button 
+            onClick={submit} 
+            disabled={saving || !closeVal} 
+            className="px-4 py-2 rounded-lg bg-amani-primary text-white hover:bg-amani-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {saving ? "Enregistrement…" : "Ajouter le point"}
+          </button>
         </div>
       </div>
     </Modal>
   );
 }
 
+// Modal de saisie rapide pour plusieurs indices
+function BulkEntryModal({ 
+  open, 
+  onClose, 
+  indices, 
+  onAdd 
+}: { 
+  open: boolean; 
+  onClose: () => void; 
+  indices: BrvmIndexWithLatest[]; 
+  onAdd: (entries: { indiceId: string; value: number; date?: string }[]) => Promise<void>;
+}) {
+  const [entries, setEntries] = useState<{ [key: string]: string }>({});
+  const [commonDate, setCommonDate] = useState("");
+  const [saving, setSaving] = useState(false);
+  const { success, error } = useToast();
+
+  // Initialiser la date commune avec l'heure actuelle
+  React.useEffect(() => {
+    if (open && !commonDate) {
+      const now = new Date();
+      const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+        .toISOString()
+        .slice(0, 16);
+      setCommonDate(localDateTime);
+    }
+  }, [open]);
+
+  const handleValueChange = (indiceId: string, value: string) => {
+    setEntries(prev => ({ ...prev, [indiceId]: value }));
+  };
+
+  const submit = async () => {
+    setSaving(true);
+    try {
+      const validEntries = Object.entries(entries)
+        .filter(([_, value]) => value && !isNaN(Number(value)))
+        .map(([indiceId, value]) => ({
+          indiceId,
+          value: Number(value),
+          date: commonDate ? new Date(commonDate).toISOString() : undefined
+        }));
+
+      if (validEntries.length === 0) {
+        throw new Error("Veuillez saisir au moins une valeur valide");
+      }
+
+      await onAdd(validEntries);
+      success(`${validEntries.length} point(s) ajouté(s) avec succès`);
+      onClose();
+      setEntries({});
+      setCommonDate("");
+    } catch (e: any) {
+      error("Erreur", e?.message || "Impossible d'ajouter les points");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const filledCount = Object.values(entries).filter(v => v && !isNaN(Number(v))).length;
+
+  return (
+    <Modal open={open} onClose={onClose} title="Saisie rapide des indices BRVM">
+      <div className="space-y-4 max-h-96 overflow-y-auto">
+        {/* Date commune */}
+        <div className="sticky top-0 bg-white border-b pb-3">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Date et heure commune
+          </label>
+          <div className="flex gap-2">
+            <input 
+              value={commonDate} 
+              onChange={(e) => setCommonDate(e.target.value)} 
+              type="datetime-local" 
+              className="flex-1 border rounded-lg px-3 py-2 focus:ring-2 focus:ring-amani-primary focus:border-amani-primary" 
+            />
+            <button 
+              type="button"
+              onClick={() => {
+                const now = new Date();
+                const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+                  .toISOString()
+                  .slice(0, 16);
+                setCommonDate(localDateTime);
+              }}
+              className="px-3 py-2 text-sm border rounded-lg hover:bg-gray-50"
+            >
+              Maintenant
+            </button>
+          </div>
+          {filledCount > 0 && (
+            <div className="text-sm text-green-600 mt-2">
+              {filledCount} indice(s) rempli(s)
+            </div>
+          )}
+        </div>
+
+        {/* Liste des indices */}
+        <div className="space-y-3">
+          {indices.map((indice) => (
+            <div key={indice.id} className="flex items-center gap-3 p-3 border rounded-lg">
+              <div className="flex-1">
+                <div className="font-medium text-sm">{indice.name}</div>
+                {indice.code && (
+                  <div className="text-xs text-gray-500">{indice.code}</div>
+                )}
+                {indice.latest && (
+                  <div className="text-xs text-gray-400">
+                    Dernier: {indice.latest.close} {indice.unit === "percent" ? "%" : "pts"}
+                  </div>
+                )}
+              </div>
+              <div className="w-32">
+                <input
+                  type="number"
+                  step="0.01"
+                  placeholder="Valeur"
+                  value={entries[indice.id] || ""}
+                  onChange={(e) => handleValueChange(indice.id, e.target.value)}
+                  className="w-full border rounded px-2 py-1 text-sm focus:ring-1 focus:ring-amani-primary focus:border-amani-primary"
+                />
+              </div>
+              <div className="text-xs text-gray-500 w-8">
+                {indice.unit === "percent" ? "%" : "pts"}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Actions */}
+        <div className="flex justify-end gap-3 pt-4 border-t sticky bottom-0 bg-white">
+          <button 
+            onClick={onClose} 
+            className="px-4 py-2 rounded-lg border hover:bg-gray-50"
+          >
+            Annuler
+          </button>
+          <button 
+            onClick={submit} 
+            disabled={saving || filledCount === 0} 
+            className="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {saving ? "Enregistrement…" : `Ajouter ${filledCount} point(s)`}
+          </button>
+        </div>
+      </div>
+    </Modal>
+  );
+}

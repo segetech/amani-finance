@@ -70,12 +70,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             ? (profileData?.roles as string[])
             : [];
           const isAdmin =
-            profileRoles.includes("admin") || session.user.role === "admin";
-          const safePermissions: string[] = Array.isArray(
-            session.user.user_metadata?.permissions,
-          )
-            ? (session.user.user_metadata?.permissions as string[])
-            : [];
+            profileRoles.includes("admin") || 
+            session.user.role === "admin" ||
+            session.user.user_metadata?.role === "admin";
+          
+          // Permissions par défaut pour tous les utilisateurs authentifiés
+          const defaultPermissions = [
+            "view_dashboard",
+            "create_articles",
+            "edit_own_articles",
+            "view_analytics"
+          ];
+          
+          // Permissions admin complètes
+          const adminPermissions = [
+            "view_dashboard",
+            "create_articles",
+            "edit_articles",
+            "delete_articles",
+            "publish_articles",
+            "create_podcasts",
+            "edit_podcasts",
+            "delete_podcasts",
+            "publish_podcasts",
+            "create_economic_reports",
+            "create_indices",
+            "manage_users",
+            "view_analytics",
+            "manage_settings"
+          ];
+          
+          const safePermissions: string[] = isAdmin ? adminPermissions : defaultPermissions;
+          
+          console.log("🔐 Permissions assignées:", { isAdmin, permissions: safePermissions });
+          
           const userData = {
             id: session.user.id,
             email: session.user.email || "",
@@ -169,12 +197,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             ? (profileData?.roles as string[])
             : [];
           const isAdmin =
-            profileRoles.includes("admin") || session.user.role === "admin";
-          const safePermissions: string[] = Array.isArray(
-            session.user.user_metadata?.permissions,
-          )
-            ? (session.user.user_metadata?.permissions as string[])
-            : [];
+            profileRoles.includes("admin") || 
+            session.user.role === "admin" ||
+            session.user.user_metadata?.role === "admin";
+          
+          // Permissions par défaut pour tous les utilisateurs authentifiés
+          const defaultPermissions = [
+            "view_dashboard",
+            "create_articles",
+            "edit_own_articles",
+            "view_analytics"
+          ];
+          
+          // Permissions admin complètes
+          const adminPermissions = [
+            "view_dashboard",
+            "create_articles",
+            "edit_articles",
+            "delete_articles",
+            "publish_articles",
+            "create_podcasts",
+            "edit_podcasts",
+            "delete_podcasts",
+            "publish_podcasts",
+            "create_economic_reports",
+            "create_indices",
+            "manage_users",
+            "view_analytics",
+            "manage_settings"
+          ];
+          
+          const safePermissions: string[] = isAdmin ? adminPermissions : defaultPermissions;
+          
+          console.log("🔐 Permissions assignées (onAuthStateChange):", { isAdmin, permissions: safePermissions });
 
           const userData = {
             id: session.user.id,
