@@ -1,7 +1,7 @@
 // Script de test pour la Edge Function create-user
 // Exécuter avec: node test-edge-function.js
 
-const SUPABASE_URL = 'https://your-project-id.supabase.co'; // Remplacez par votre URL
+const SUPABASE_URL = 'https://rrhcctylbczzahgiqoub.supabase.co'; // Remplacez par votre URL
 const ACCESS_TOKEN = 'your-access-token'; // Remplacez par votre token
 
 async function testCreateUser() {

@@ -4,6 +4,7 @@ import Footer from '../components/Footer';
 import { useStockIndices } from "../hooks/useStockIndices";
 import { useArticles } from "../hooks/useArticles";
 import { useCurrencies } from "../hooks/useCurrencies";
+import CommoditiesSection from '../components/commodities/CommoditiesSection';
 import {
   LineChart,
   Line,
@@ -567,6 +568,93 @@ export default function Marche() {
         </div>
       </section>
 
+      {/* Market News */}
+      <section className="py-16 bg-white/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-3xl font-bold text-amani-primary flex items-center gap-3">
+              <Zap className="w-8 h-8" />
+              Actualités des marchés
+            </h2>
+            {loadingArticles && (
+              <span className="text-blue-600 text-sm flex items-center gap-2">
+                <RefreshCw className="w-4 h-4 animate-spin" />
+                Chargement des actualités...
+              </span>
+            )}
+          </div>
+          
+          {recentNews.length === 0 && !loadingArticles ? (
+            <div className="text-center py-12">
+              <div className="bg-blue-50 rounded-lg p-8 max-w-md mx-auto">
+                <Zap className="w-12 h-12 text-blue-500 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-blue-900 mb-2">
+                  Aucune actualité économique trouvée
+                </h3>
+                <p className="text-blue-700 mb-4">
+                  Publiez des articles contenant des mots-clés liés au marché (BRVM, bourse, économie, finance, etc.) pour les voir apparaître ici.
+                </p>
+                <Link 
+                  to="/dashboard/articles/new" 
+                  className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                >
+                  <Zap className="w-4 h-4" />
+                  Publier une actualité
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
+              {recentNews.map((news) => (
+              <article key={news.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+                <Link to={`/article/${news.id}`} className="block">
+                  <div className="relative">
+                    <img
+                      src={news.image}
+                      alt={news.title}
+                      className="w-full h-48 object-cover hover:scale-105 transition-transform duration-300"
+                      loading="lazy"
+                      onError={(e) => {
+                        e.currentTarget.src = "/placeholder.svg";
+                      }}
+                    />
+                    <div className="absolute top-4 left-4">
+                      <span className="bg-amani-primary text-white px-3 py-1 rounded-full text-sm font-medium">
+                        {news.category}
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+                
+                <div className="p-6">
+                  <Link to={`/article/${news.id}`}>
+                    <h3 className="text-lg font-bold text-amani-primary mb-3 leading-tight hover:text-amani-primary/80 transition-colors cursor-pointer">
+                      {news.title}
+                    </h3>
+                  </Link>
+                  
+                  <p className="text-gray-600 mb-4 leading-relaxed">
+                    {news.excerpt}
+                  </p>
+                  
+                  <div className="flex items-center gap-4 text-sm text-gray-500">
+                    <span className="flex items-center gap-1">
+                      <Calendar className="w-4 h-4" />
+                      {new Date(news.publishedAt).toLocaleDateString("fr-FR")}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Clock className="w-4 h-4" />
+                      {news.readTime}
+                    </span>
+                  </div>
+                </div>
+              </article>
+            ))}
+            </div>
+          )}
+        </div>
+      </section>
+
       {/* Market Overview */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1036,91 +1124,8 @@ export default function Marche() {
       </section>
 
       {/* Market News */}
-      <section className="py-16 bg-white/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-bold text-amani-primary flex items-center gap-3">
-              <Zap className="w-8 h-8" />
-              Actualités des marchés
-            </h2>
-            {loadingArticles && (
-              <span className="text-blue-600 text-sm flex items-center gap-2">
-                <RefreshCw className="w-4 h-4 animate-spin" />
-                Chargement des actualités...
-              </span>
-            )}
-          </div>
-          
-          {recentNews.length === 0 && !loadingArticles ? (
-            <div className="text-center py-12">
-              <div className="bg-blue-50 rounded-lg p-8 max-w-md mx-auto">
-                <Zap className="w-12 h-12 text-blue-500 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-blue-900 mb-2">
-                  Aucune actualité économique trouvée
-                </h3>
-                <p className="text-blue-700 mb-4">
-                  Publiez des articles contenant des mots-clés liés au marché (BRVM, bourse, économie, finance, etc.) pour les voir apparaître ici.
-                </p>
-                <Link 
-                  to="/dashboard/articles/new" 
-                  className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-                >
-                  <Zap className="w-4 h-4" />
-                  Publier une actualité
-                </Link>
-              </div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
-              {recentNews.map((news) => (
-              <article key={news.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
-                <Link to={`/article/${news.id}`} className="block">
-                  <div className="relative">
-                    <img
-                      src={news.image}
-                      alt={news.title}
-                      className="w-full h-48 object-cover hover:scale-105 transition-transform duration-300"
-                      loading="lazy"
-                      onError={(e) => {
-                        e.currentTarget.src = "/placeholder.svg";
-                      }}
-                    />
-                    <div className="absolute top-4 left-4">
-                      <span className="bg-amani-primary text-white px-3 py-1 rounded-full text-sm font-medium">
-                        {news.category}
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-                
-                <div className="p-6">
-                  <Link to={`/article/${news.id}`}>
-                    <h3 className="text-lg font-bold text-amani-primary mb-3 leading-tight hover:text-amani-primary/80 transition-colors cursor-pointer">
-                      {news.title}
-                    </h3>
-                  </Link>
-                  
-                  <p className="text-gray-600 mb-4 leading-relaxed">
-                    {news.excerpt}
-                  </p>
-                  
-                  <div className="flex items-center gap-4 text-sm text-gray-500">
-                    <span className="flex items-center gap-1">
-                      <Calendar className="w-4 h-4" />
-                      {new Date(news.publishedAt).toLocaleDateString("fr-FR")}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-4 h-4" />
-                      {news.readTime}
-                    </span>
-                  </div>
-                </div>
-              </article>
-            ))}
-            </div>
-          )}
-        </div>
-      </section>
+      {/* Commodities Section */}
+      <CommoditiesSection showTitle={true} maxItems={8} showFilters={true} />
 
       {/* Call to Action */}
       <section className="py-16 bg-gradient-to-r from-amani-primary/10 to-amani-secondary/10">

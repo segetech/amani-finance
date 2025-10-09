@@ -20,6 +20,7 @@ import {
   LogOut,
   ChevronDown,
   ChevronRight,
+  Globe,
 } from "lucide-react";
 
 export interface SidebarProps {
@@ -82,9 +83,10 @@ const SECTIONS: Section[] = [
         children: [
           { label: "Actions & Prix", to: "/dashboard/market-data-manager", icon: BarChart3, permission: "manage_market_data" },
           { label: "Devises & Forex", to: "/dashboard/currency-manager", icon: DollarSign, permission: "manage_currencies" },
+          { label: "Matières premières", to: "/dashboard/commodities-management", icon: Layers, permission: "create_indices" },
+          { label: "Données économiques", to: "/dashboard/economic-data-management", icon: Globe, permission: "manage_market_data" },
         ],
       },
-      { label: "Matières premières", to: "/dashboard/commodities-management", icon: Layers, permission: "create_indices" },
     ],
   },
   {
