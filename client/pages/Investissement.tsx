@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
-import { Search, Filter, TrendingUp, DollarSign, BarChart3, Shield, Globe, Users, ArrowUpRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { useArticles } from '../hooks/useArticles';
+import { useInvestmentData } from '../hooks/useInvestmentData';
+import { Search, Filter, TrendingUp, DollarSign, BarChart3, Shield, Globe, Users, ArrowUpRight, Calendar, Eye, ArrowRight, BookOpen } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Badge } from '../components/ui/badge';
@@ -9,132 +12,166 @@ const Investissement = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
 
-  const investmentStats = [
+  // Hook pour récupérer les articles
+  const { articles, loading: articlesLoading } = useArticles({ 
+    status: 'published',
+    limit: 50
+  });
+
+  // Hook pour récupérer les données d'investissement
+  const { 
+    opportunities, 
+    metrics, 
+    trends, 
+    categories,
+    loading: investmentLoading 
+  } = useInvestmentData({ is_active: true });
+
+  // Filtrer les articles liés à l'investissement
+  const investmentArticles = articles?.filter(article => {
+    const title = article.title.toLowerCase();
+    const content = article.content?.toLowerCase() || '';
+    const summary = article.summary?.toLowerCase() || '';
+    
+    // Mots-clés investissement
+    const investmentKeywords = [
+      'investissement', 'investment', 'capital', 'financement', 'funding',
+      'venture capital', 'private equity', 'startup', 'levée de fonds',
+      'bourse', 'stock market', 'actions', 'obligations', 'bonds',
+      'portefeuille', 'portfolio', 'rendement', 'return', 'roi',
+      'dividende', 'dividend', 'crypto', 'blockchain', 'bitcoin',
+      'immobilier', 'real estate', 'fonds', 'fund', 'etf',
+      'angel investor', 'business angel', 'crowdfunding', 'ico',
+      'ipo', 'introduction en bourse', 'valorisation', 'valuation',
+      'due diligence', 'risk management', 'gestion des risques'
+    ];
+    
+    return investmentKeywords.some(keyword => 
+      title.includes(keyword) || 
+      content.includes(keyword) || 
+      summary.includes(keyword)
+    );
+  }) || [];
+
+  // Articles de fallback pour l'investissement
+  const fallbackInvestmentArticles = [
     {
-      title: "Capitaux Investis",
-      value: "€125M",
-      change: "+15.3%",
-      description: "Ce trimestre",
-      icon: DollarSign,
-      color: "text-green-600"
+      id: "inv-1",
+      title: "Fintech africaine : 2.5 milliards USD levés en 2024",
+      summary: "Les startups fintech ouest-africaines battent des records de levées de fonds avec des investisseurs internationaux.",
+      content: "Analyse des investissements dans la fintech africaine...",
+      featured_image: "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=400",
+      featured_image_alt: "Investissement fintech Afrique",
+      country: "Nigeria",
+      published_at: new Date().toISOString(),
+      created_at: new Date().toISOString(),
+      views: 3200,
+      read_time: 7,
+      slug: "fintech-africaine-levees-fonds-2024",
+      author: {
+        id: "1",
+        first_name: "Adaora",
+        last_name: "Okafor",
+        email: "adaora@amani.com"
+      }
     },
     {
-      title: "Rendement Moyen",
-      value: "12.8%",
-      change: "+2.1%",
-      description: "Performance annuelle",
-      icon: BarChart3,
-      color: "text-blue-600"
+      id: "inv-2",
+      title: "Énergie solaire : Les investissements privés explosent",
+      summary: "Le secteur de l'énergie renouvelable attire massivement les capitaux privés avec des rendements attractifs.",
+      content: "Panorama des investissements dans l'énergie solaire...",
+      featured_image: "https://images.unsplash.com/photo-1466611653911-95081537e5b7?w=400",
+      featured_image_alt: "Investissement énergie solaire",
+      country: "Maroc",
+      published_at: new Date(Date.now() - 86400000).toISOString(),
+      created_at: new Date(Date.now() - 86400000).toISOString(),
+      views: 2800,
+      read_time: 5,
+      slug: "energie-solaire-investissements-prives",
+      author: {
+        id: "2",
+        first_name: "Youssef",
+        last_name: "Benali",
+        email: "youssef@amani.com"
+      }
     },
     {
-      title: "Projets Financés",
-      value: "384",
-      change: "+28",
-      description: "Nouveaux projets",
-      icon: Globe,
-      color: "text-purple-600"
-    },
-    {
-      title: "Investisseurs Actifs",
-      value: "2,450",
-      change: "+185",
-      description: "Investisseurs engagés",
-      icon: Users,
-      color: "text-orange-600"
+      id: "inv-3",
+      title: "Immobilier commercial : Opportunités d'investissement en hausse",
+      summary: "Le marché immobilier commercial ouest-africain offre des perspectives de rendement intéressantes pour les investisseurs.",
+      content: "Guide d'investissement immobilier commercial...",
+      featured_image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400",
+      featured_image_alt: "Immobilier commercial investissement",
+      country: "Côte d'Ivoire",
+      published_at: new Date(Date.now() - 172800000).toISOString(),
+      created_at: new Date(Date.now() - 172800000).toISOString(),
+      views: 2150,
+      read_time: 6,
+      slug: "immobilier-commercial-investissement-afrique",
+      author: {
+        id: "3",
+        first_name: "Aminata",
+        last_name: "Koné",
+        email: "aminata@amani.com"
+      }
     }
   ];
 
+  // Utiliser les vrais articles s'il y en a assez, sinon compléter avec les fallbacks
+  const displayInvestmentArticles = investmentArticles.length >= 3 ? investmentArticles : [...investmentArticles, ...fallbackInvestmentArticles].slice(0, 6);
+
+  // Convertir les métriques de la base de données en format d'affichage
+  const investmentStats = metrics.map(metric => {
+    // Mapper les icônes
+    const iconMap: { [key: string]: any } = {
+      'DollarSign': DollarSign,
+      'BarChart3': BarChart3,
+      'Globe': Globe,
+      'Users': Users,
+      'TrendingUp': TrendingUp
+    };
+
+    return {
+      title: metric.metric_name,
+      value: `${metric.metric_value}${metric.metric_unit || ''}`,
+      change: metric.change_value || '',
+      description: metric.change_description || metric.description || '',
+      icon: iconMap[metric.icon_name] || DollarSign,
+      color: metric.color || "text-green-600"
+    };
+  });
+
+  // Convertir les catégories de la base de données
   const investmentCategories = [
     { id: 'all', name: 'Tous les secteurs' },
-    { id: 'tech', name: 'Technologie' },
-    { id: 'energy', name: 'Énergie Renouvelable' },
-    { id: 'agriculture', name: 'Agriculture' },
-    { id: 'healthcare', name: 'Santé' },
-    { id: 'finance', name: 'Services Financiers' },
-    { id: 'infrastructure', name: 'Infrastructure' }
+    ...categories.map(category => ({
+      id: category.name.toLowerCase().replace(/\s+/g, '-'),
+      name: category.name
+    }))
   ];
 
-  const investmentOpportunities = [
-    {
-      id: 1,
-      title: "FinTech Revolution : Solutions de paiement mobile en Afrique",
-      category: "Technologie",
-      riskLevel: "Modéré",
-      expectedReturn: "18-25%",
-      minInvestment: "€50,000",
-      timeHorizon: "3-5 ans",
-      description: "Investissement dans les solutions de paiement mobile qui révolutionnent le secteur financier africain avec une croissance de 40% par an.",
-      highlights: ["Marché en croissance de 40%", "Technologie éprouvée", "Équipe expérimentée"],
-      status: "Ouvert",
-      funded: 65,
-      image: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=250&fit=crop"
-    },
-    {
-      id: 2,
-      title: "Agriculture Durable : Fermes Intelligentes et IoT",
-      category: "Agriculture",
-      riskLevel: "Faible",
-      expectedReturn: "12-18%",
-      minInvestment: "€25,000",
-      timeHorizon: "2-4 ans",
-      description: "Modernisation de l'agriculture africaine avec des technologies IoT pour améliorer les rendements et la durabilité.",
-      highlights: ["Impact social positif", "Technologie innovante", "Marché stable"],
-      status: "Ouvert",
-      funded: 45,
-      image: "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=400&h=250&fit=crop"
-    },
-    {
-      id: 3,
-      title: "Énergie Solaire : Parcs Photovoltaïques Communautaires",
-      category: "Énergie Renouvelable",
-      riskLevel: "Faible",
-      expectedReturn: "15-20%",
-      minInvestment: "€100,000",
-      timeHorizon: "5-7 ans",
-      description: "Développement de parcs solaires communautaires pour fournir une énergie propre et abordable aux zones rurales.",
-      highlights: ["Énergie renouvelable", "Impact environnemental", "Revenus stables"],
-      status: "Bientôt",
-      funded: 0,
-      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=250&fit=crop"
-    },
-    {
-      id: 4,
-      title: "E-commerce B2B : Plateforme de Commerce Interentreprises",
-      category: "Technologie",
-      riskLevel: "Élevé",
-      expectedReturn: "25-35%",
-      minInvestment: "€75,000",
-      timeHorizon: "3-6 ans",
-      description: "Plateforme digitale connectant les entreprises africaines pour faciliter le commerce interentreprises à l'échelle continentale.",
-      highlights: ["Marché B2B en expansion", "Technologie scalable", "Potentiel élevé"],
-      status: "Fermé",
-      funded: 100,
-      image: "https://images.unsplash.com/photo-1565793298595-6a879b1d9492?w=400&h=250&fit=crop"
-    }
-  ];
+  // Convertir les opportunités de la base de données en format d'affichage
+  const investmentOpportunities = opportunities.map(opportunity => ({
+    id: opportunity.id,
+    title: opportunity.title,
+    category: opportunity.category_name,
+    riskLevel: opportunity.risk_level,
+    expectedReturn: `${opportunity.expected_return_min}-${opportunity.expected_return_max}%`,
+    minInvestment: `${opportunity.min_investment_unit}${opportunity.min_investment_amount.toLocaleString()}`,
+    timeHorizon: `${opportunity.time_horizon_min}-${opportunity.time_horizon_max} ans`,
+    description: opportunity.description,
+    highlights: opportunity.highlights,
+    status: opportunity.status,
+    funded: opportunity.funded_percentage,
+    image: opportunity.image_url || "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=250&fit=crop"
+  }));
 
-  const marketTrends = [
-    {
-      title: "Intelligence Artificielle",
-      growth: "+45%",
-      description: "L'IA transforme les industries africaines"
-    },
-    {
-      title: "Énergie Verte",
-      growth: "+38%",
-      description: "Transition énergétique accélérée"
-    },
-    {
-      title: "FinTech",
-      growth: "+42%",
-      description: "Innovation financière en croissance"
-    },
-    {
-      title: "E-commerce",
-      growth: "+35%",
-      description: "Commerce électronique en expansion"
-    }
-  ];
+  // Convertir les tendances de la base de données
+  const marketTrends = trends.map(trend => ({
+    title: trend.title,
+    growth: trend.growth_percentage,
+    description: trend.description
+  }));
 
   const getRiskColor = (risk: string) => {
     switch (risk) {
@@ -157,9 +194,23 @@ const Investissement = () => {
   const filteredOpportunities = investmentOpportunities.filter(opportunity => {
     const matchesSearch = opportunity.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          opportunity.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || opportunity.category.toLowerCase().includes(selectedCategory);
+    const matchesCategory = selectedCategory === 'all' || 
+                           opportunity.category.toLowerCase().replace(/\s+/g, '-') === selectedCategory ||
+                           opportunity.category.toLowerCase().includes(selectedCategory.replace('-', ' '));
     return matchesSearch && matchesCategory;
   });
+
+  // Afficher un loader si les données sont en cours de chargement
+  if (investmentLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#373B3A] mx-auto mb-4"></div>
+          <p className="text-gray-600">Chargement des opportunités d'investissement...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -191,7 +242,7 @@ const Investissement = () => {
             Performance du Marché
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {investmentStats.map((stat, index) => (
+            {investmentStats.length > 0 ? investmentStats.map((stat, index) => (
               <Card key={index} className="text-center hover:shadow-lg transition-shadow">
                 <CardContent className="pt-6">
                   <div className="flex justify-center mb-4">
@@ -203,7 +254,11 @@ const Investissement = () => {
                   <span className="text-sm font-medium text-green-600">{stat.change}</span>
                 </CardContent>
               </Card>
-            ))}
+            )) : (
+              <div className="col-span-full text-center py-8">
+                <p className="text-gray-500">Aucune métrique disponible</p>
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -215,7 +270,7 @@ const Investissement = () => {
             Tendances du Marché
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {marketTrends.map((trend, index) => (
+            {marketTrends.length > 0 ? marketTrends.map((trend, index) => (
               <Card key={index} className="text-center hover:shadow-lg transition-shadow">
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-center mb-3">
@@ -226,7 +281,11 @@ const Investissement = () => {
                   <p className="text-sm text-gray-600">{trend.description}</p>
                 </CardContent>
               </Card>
-            ))}
+            )) : (
+              <div className="col-span-full text-center py-8">
+                <p className="text-gray-500">Aucune tendance disponible</p>
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -264,7 +323,7 @@ const Investissement = () => {
 
           {/* Opportunities Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {filteredOpportunities.map((opportunity) => (
+            {filteredOpportunities.length > 0 ? filteredOpportunities.map((opportunity) => (
               <Card key={opportunity.id} className="hover:shadow-lg transition-shadow overflow-hidden">
                 <div className="relative">
                   <img
@@ -342,7 +401,31 @@ const Investissement = () => {
                   </Button>
                 </CardContent>
               </Card>
-            ))}
+            )) : (
+              <div className="col-span-full text-center py-12">
+                <div className="max-w-md mx-auto">
+                  <DollarSign className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    Aucune opportunité disponible
+                  </h3>
+                  <p className="text-gray-600">
+                    {selectedCategory === 'all' 
+                      ? "Aucune opportunité d'investissement n'est actuellement disponible."
+                      : `Aucune opportunité dans la catégorie "${investmentCategories.find(c => c.id === selectedCategory)?.name}".`
+                    }
+                  </p>
+                  {selectedCategory !== 'all' && (
+                    <Button 
+                      variant="outline" 
+                      className="mt-4"
+                      onClick={() => setSelectedCategory('all')}
+                    >
+                      Voir toutes les opportunités
+                    </Button>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -361,6 +444,85 @@ const Investissement = () => {
             ne préjugent pas des performances futures. Il est recommandé de diversifier ses investissements 
             et de consulter un conseiller financier avant toute décision d'investissement.
           </p>
+        </div>
+      </section>
+
+      {/* Articles d'Investissement Récents */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-3xl font-bold text-[#373B3A] flex items-center gap-3">
+              <BookOpen className="w-8 h-8" />
+              Articles d'Investissement Récents
+            </h2>
+            <Link
+              to="/actualites"
+              className="flex items-center gap-2 text-[#373B3A] hover:text-[#373B3A]/80 font-medium"
+            >
+              Voir tous les articles
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          {articlesLoading ? (
+            <div className="flex justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#373B3A]"></div>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {displayInvestmentArticles.slice(0, 6).map((article) => (
+                <article key={article.id} className="bg-white rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-200 group">
+                  <Link to={`/article/${article.id}`} className="block">
+                    <div className="relative">
+                      <img
+                        src={article.featured_image || '/api/placeholder/400/200'}
+                        alt={article.featured_image_alt || article.title}
+                        className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                      <div className="absolute top-3 left-3 flex gap-2">
+                        <span className="bg-[#373B3A] text-white px-3 py-1 rounded-full text-xs font-medium shadow-lg">
+                          💰 Investissement
+                        </span>
+                        <span className="bg-black/20 text-white px-2 py-1 rounded-full text-xs backdrop-blur-sm">
+                          {article.country}
+                        </span>
+                      </div>
+                      <div className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 text-xs text-gray-700">
+                        {article.read_time || 5} min
+                      </div>
+                    </div>
+                  </Link>
+                  
+                  <div className="p-5">
+                    <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
+                      <Calendar className="w-4 h-4" />
+                      <span>{new Date(article.published_at || article.created_at).toLocaleDateString('fr-FR', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric'
+                      })}</span>
+                      <div className="flex items-center gap-1 ml-auto">
+                        <Eye className="w-4 h-4" />
+                        <span>{article.views.toLocaleString()}</span>
+                      </div>
+                    </div>
+                    
+                    <Link to={`/article/${article.id}`}>
+                      <h3 className="font-bold text-gray-900 mb-3 line-clamp-2 group-hover:text-[#373B3A] transition-colors text-lg leading-tight hover:text-[#373B3A]">
+                        {article.title}
+                      </h3>
+                    </Link>
+                    
+                    {article.summary && (
+                      <p className="text-gray-600 text-sm mb-4 line-clamp-2 leading-relaxed">
+                        {article.summary.substring(0, 100)}...
+                      </p>
+                    )}
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
         </div>
       </section>
     </div>

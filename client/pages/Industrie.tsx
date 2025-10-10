@@ -1,112 +1,82 @@
 import React, { useState } from 'react';
-import { Search, Filter, Grid, List, TrendingUp, Factory, Zap, Users, DollarSign } from 'lucide-react';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Badge } from '../components/ui/badge';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Link } from 'react-router-dom';
+import { useArticles } from '../hooks/useArticles';
+import { useIndustrialData } from '../hooks/useIndustrialData';
+import { Factory, Zap, Users, DollarSign, Calendar, Eye, ArrowRight, BookOpen, TrendingUp, Building } from 'lucide-react';
 
 const Industrie = () => {
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedSector, setSelectedSector] = useState('all');
-
-  const industrialStats = [
-    {
-      title: "Production Industrielle",
-      value: "+12.5%",
-      description: "Croissance annuelle",
-      icon: Factory,
-      color: "text-green-600"
-    },
-    {
-      title: "Emplois Créés",
-      value: "45,000",
-      description: "Nouveaux postes",
-      icon: Users,
-      color: "text-blue-600"
-    },
-    {
-      title: "Investissements",
-      value: "€2.8M",
-      description: "Capital investi",
-      icon: DollarSign,
-      color: "text-purple-600"
-    },
-    {
-      title: "Efficacité Énergétique",
-      value: "+23%",
-      description: "Amélioration",
-      icon: Zap,
-      color: "text-yellow-600"
-    }
-  ];
-
-  const sectors = [
-    { id: 'all', name: 'Tous les secteurs' },
-    { id: 'manufacturing', name: 'Manufacture' },
-    { id: 'energy', name: 'Énergie' },
-    { id: 'automotive', name: 'Automobile' },
-    { id: 'aerospace', name: 'Aérospatiale' },
-    { id: 'pharma', name: 'Pharmaceutique' },
-    { id: 'food', name: 'Agroalimentaire' }
-  ];
-
-  const industrialNews = [
-    {
-      id: 1,
-      title: "L'industrie automobile africaine en pleine transformation digitale",
-      summary: "Les constructeurs automobiles investissent massivement dans l'innovation technologique et l'automatisation pour rester compétitifs sur le marché mondial.",
-      sector: "Automobile",
-      image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=250&fit=crop",
-      date: "2024-03-15",
-      readTime: "5 min",
-      trending: true
-    },
-    {
-      id: 2,
-      title: "Révolution verte : L'industrie énergétique mise sur les renouvelables",
-      summary: "Les entreprises énergétiques accélèrent leur transition vers les sources d'énergie renouvelable, créant de nouveaux emplois et opportunités d'investissement.",
-      sector: "Énergie",
-      image: "https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?w=400&h=250&fit=crop",
-      date: "2024-03-14",
-      readTime: "7 min",
-      trending: false
-    },
-    {
-      id: 3,
-      title: "L'industrie pharmaceutique : Innovation et accessibilité au cœur des défis",
-      summary: "Face aux enjeux de santé publique, l'industrie pharmaceutique développe de nouvelles approches pour améliorer l'accès aux médicaments.",
-      sector: "Pharmaceutique",
-      image: "https://images.unsplash.com/photo-1565793298595-6a879b1d9492?w=400&h=250&fit=crop",
-      date: "2024-03-13",
-      readTime: "6 min",
-      trending: true
-    },
-    {
-      id: 4,
-      title: "Agroalimentaire : La sécurité alimentaire à l'ère du développement durable",
-      summary: "L'industrie agroalimentaire innove pour répondre aux défis de la sécurité alimentaire tout en respectant les principes du développement durable.",
-      sector: "Agroalimentaire",
-      image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=400&h=250&fit=crop",
-      date: "2024-03-12",
-      readTime: "4 min",
-      trending: false
-    }
-  ];
-
-  const featuredCompanies = [
-    { name: "TechCorp Industries", sector: "Technology", growth: "+18%", employees: "2,500" },
-    { name: "GreenEnergy Solutions", sector: "Énergie", growth: "+25%", employees: "1,200" },
-    { name: "AutoMotive Plus", sector: "Automobile", growth: "+15%", employees: "3,800" },
-    { name: "PharmaCare Africa", sector: "Pharmaceutique", growth: "+22%", employees: "1,800" }
-  ];
-
-  const filteredNews = industrialNews.filter(article => {
-    const matchesSearch = article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         article.summary.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesSector = selectedSector === 'all' || article.sector.toLowerCase().includes(selectedSector);
-    return matchesSearch && matchesSector;
+  // Hook pour récupérer les données industrielles
+  const { metrics, companies, loading: industrialLoading } = useIndustrialData({ is_active: true });
+  
+  // Hook pour récupérer les articles
+  const { articles, loading: articlesLoading } = useArticles({ 
+    status: 'published',
+    limit: 50
   });
+
+  // Filtrer les articles liés à l'industrie
+  const industrialArticles = articles?.filter(article => {
+    const title = article.title.toLowerCase();
+    const content = article.content?.toLowerCase() || '';
+    const summary = article.summary?.toLowerCase() || '';
+    
+    const industrialKeywords = [
+      'industrie', 'industrial', 'manufacture', 'manufacturing', 'production',
+      'usine', 'factory', 'automation', 'robotique', 'robotics',
+      'énergie', 'energy', 'automobile', 'automotive', 'aérospatiale', 'aerospace',
+      'pharmaceutique', 'pharma', 'chimie', 'chemical', 'métallurgie', 'metallurgy',
+      'textile', 'agroalimentaire', 'food processing', 'innovation industrielle',
+      'industrie 4.0', 'smart factory', 'iot industriel', 'supply chain'
+    ];
+    
+    return industrialKeywords.some(keyword => 
+      title.includes(keyword) || 
+      content.includes(keyword) || 
+      summary.includes(keyword)
+    );
+  }) || [];
+
+  // Articles de fallback
+  const fallbackIndustrialArticles = [
+    {
+      id: "ind-1",
+      title: "Industrie 4.0 : La révolution numérique des usines ouest-africaines",
+      summary: "Les entreprises industrielles adoptent massivement l'IoT et l'automatisation pour optimiser leur production.",
+      featured_image: "https://images.unsplash.com/photo-1565514020179-026b92b84bb6?w=400",
+      country: "Côte d'Ivoire",
+      published_at: new Date().toISOString(),
+      created_at: new Date().toISOString(),
+      views: 1850,
+      read_time: 5,
+      author: { id: "1", first_name: "Koffi", last_name: "Asante", email: "koffi@amani.com" }
+    },
+    {
+      id: "ind-2",
+      title: "Secteur automobile : Les investissements atteignent 8 milliards USD",
+      summary: "L'industrie automobile ouest-africaine connaît un boom sans précédent avec l'arrivée de nouveaux constructeurs.",
+      featured_image: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=400",
+      country: "Ghana",
+      published_at: new Date(Date.now() - 86400000).toISOString(),
+      created_at: new Date(Date.now() - 86400000).toISOString(),
+      views: 2340,
+      read_time: 6,
+      author: { id: "2", first_name: "Ama", last_name: "Osei", email: "ama@amani.com" }
+    },
+    {
+      id: "ind-3",
+      title: "Énergie renouvelable : L'industrie solaire en pleine expansion",
+      summary: "Les capacités de production d'énergie solaire industrielle ont triplé en 2024 dans la région.",
+      featured_image: "https://images.unsplash.com/photo-1509391366360-2e959784a276?w=400",
+      country: "Sénégal",
+      published_at: new Date(Date.now() - 172800000).toISOString(),
+      created_at: new Date(Date.now() - 172800000).toISOString(),
+      views: 1920,
+      read_time: 4,
+      author: { id: "3", first_name: "Moussa", last_name: "Diop", email: "moussa@amani.com" }
+    }
+  ];
+
+  const displayIndustrialArticles = industrialArticles.length >= 3 ? industrialArticles : [...industrialArticles, ...fallbackIndustrialArticles].slice(0, 6);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -115,7 +85,7 @@ const Industrie = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-5xl font-bold mb-6">
-              Industrie & Innovation
+              🏭 Industrie & Innovation
             </h1>
             <p className="text-xl max-w-3xl mx-auto leading-relaxed">
               Découvrez les dernières tendances industrielles, les innovations technologiques 
@@ -131,20 +101,36 @@ const Industrie = () => {
           <h2 className="text-3xl font-bold text-center mb-12 text-[#373B3A]">
             Indicateurs Industriels
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {industrialStats.map((stat, index) => (
-              <Card key={index} className="text-center hover:shadow-lg transition-shadow">
-                <CardContent className="pt-6">
-                  <div className="flex justify-center mb-4">
-                    <stat.icon className={`h-12 w-12 ${stat.color}`} />
+          
+          {industrialLoading ? (
+            <div className="flex justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#373B3A]"></div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {metrics.map((metric) => {
+                const IconComponent = metric.icon_name === 'Factory' ? Factory :
+                                   metric.icon_name === 'Users' ? Users :
+                                   metric.icon_name === 'DollarSign' ? DollarSign :
+                                   metric.icon_name === 'Zap' ? Zap :
+                                   Factory;
+                
+                return (
+                  <div key={metric.id} className="text-center bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+                    <div className="flex justify-center mb-4">
+                      <IconComponent className={`h-12 w-12 ${metric.color}`} />
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">{metric.metric_value}{metric.metric_unit}</h3>
+                    <p className="text-lg font-semibold text-gray-700 mb-1">{metric.metric_name}</p>
+                    <p className="text-sm text-gray-500">{metric.description}</p>
+                    {metric.change_value && (
+                      <p className="text-sm text-green-600 mt-2">{metric.change_value} {metric.change_description}</p>
+                    )}
                   </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">{stat.value}</h3>
-                  <p className="text-lg font-semibold text-gray-700 mb-1">{stat.title}</p>
-                  <p className="text-sm text-gray-500">{stat.description}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </section>
 
@@ -154,120 +140,113 @@ const Industrie = () => {
           <h2 className="text-3xl font-bold text-center mb-12 text-[#373B3A]">
             Entreprises en Vedette
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredCompanies.map((company, index) => (
-              <Card key={index} className="hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
+          
+          {industrialLoading ? (
+            <div className="flex justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#373B3A]"></div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {companies.filter(company => company.is_featured).map((company) => (
+                <div key={company.id} className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
                   <h3 className="font-bold text-lg mb-2">{company.name}</h3>
-                  <p className="text-gray-600 mb-3">{company.sector}</p>
+                  <p className="text-gray-600 mb-3">{company.sector_name}</p>
                   <div className="flex justify-between items-center">
                     <div>
                       <p className="text-sm text-gray-500">Croissance</p>
-                      <p className="font-semibold text-green-600">{company.growth}</p>
+                      <p className="font-semibold text-green-600">+{company.growth_rate}%</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Employés</p>
-                      <p className="font-semibold">{company.employees}</p>
+                      <p className="font-semibold">{company.employee_count?.toLocaleString()}</p>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                  {company.country && (
+                    <p className="text-xs text-gray-400 mt-2">{company.country}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
-      {/* News and Articles Section */}
+      {/* Articles Industriels Récents */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-3xl font-bold text-[#373B3A]">Actualités Industrielles</h2>
-            <div className="flex gap-4">
-              <Button
-                variant={viewMode === 'grid' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setViewMode('grid')}
-              >
-                <Grid className="h-4 w-4 mr-2" />
-                Grille
-              </Button>
-              <Button
-                variant={viewMode === 'list' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setViewMode('list')}
-              >
-                <List className="h-4 w-4 mr-2" />
-                Liste
-              </Button>
-            </div>
-          </div>
-
-          {/* Search and Filters */}
-          <div className="flex flex-col md:flex-row gap-4 mb-8">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <Input
-                placeholder="Rechercher des articles industriels..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-            <select
-              value={selectedSector}
-              onChange={(e) => setSelectedSector(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#373B3A] focus:border-transparent"
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-3xl font-bold text-[#373B3A] flex items-center gap-3">
+              <BookOpen className="w-8 h-8" />
+              Articles Industriels Récents
+            </h2>
+            <Link
+              to="/actualites"
+              className="flex items-center gap-2 text-[#373B3A] hover:text-[#373B3A]/80 font-medium"
             >
-              {sectors.map(sector => (
-                <option key={sector.id} value={sector.id}>
-                  {sector.name}
-                </option>
-              ))}
-            </select>
+              Voir tous les articles
+              <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
 
-          {/* Articles Grid/List */}
-          <div className={viewMode === 'grid' 
-            ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" 
-            : "space-y-6"
-          }>
-            {filteredNews.map((article) => (
-              <Card key={article.id} className="hover:shadow-lg transition-shadow cursor-pointer">
-                <div className={viewMode === 'list' ? "flex" : ""}>
-                  <div className={viewMode === 'list' ? "w-48 flex-shrink-0" : ""}>
-                    <img
-                      src={article.image}
-                      alt={article.title}
-                      className={`w-full h-48 object-cover ${viewMode === 'grid' ? 'rounded-t-lg' : 'rounded-l-lg'}`}
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <CardHeader>
-                      <div className="flex justify-between items-start mb-2">
-                        <Badge variant="secondary">{article.sector}</Badge>
-                        {article.trending && (
-                          <div className="flex items-center text-orange-500">
-                            <TrendingUp className="h-4 w-4 mr-1" />
-                            <span className="text-xs font-medium">Tendance</span>
-                          </div>
-                        )}
+          {articlesLoading ? (
+            <div className="flex justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#373B3A]"></div>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {displayIndustrialArticles.slice(0, 6).map((article) => (
+                <article key={article.id} className="bg-white rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-200 group">
+                  <Link to={`/article/${article.id}`} className="block">
+                    <div className="relative">
+                      <img
+                        src={article.featured_image || '/api/placeholder/400/200'}
+                        alt={article.title}
+                        className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                      <div className="absolute top-3 left-3 flex gap-2">
+                        <span className="bg-[#373B3A] text-white px-3 py-1 rounded-full text-xs font-medium shadow-lg">
+                          🏭 Industrie
+                        </span>
+                        <span className="bg-black/20 text-white px-2 py-1 rounded-full text-xs backdrop-blur-sm">
+                          {article.country}
+                        </span>
                       </div>
-                      <CardTitle className="text-lg">{article.title}</CardTitle>
-                      <CardDescription className="text-sm text-gray-600">
-                        {article.summary}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex justify-between items-center text-sm text-gray-500">
-                        <span>{new Date(article.date).toLocaleDateString('fr-FR')}</span>
-                        <span>{article.readTime} de lecture</span>
+                      <div className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 text-xs text-gray-700">
+                        {article.read_time || 5} min
                       </div>
-                    </CardContent>
+                    </div>
+                  </Link>
+                  
+                  <div className="p-5">
+                    <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
+                      <Calendar className="w-4 h-4" />
+                      <span>{new Date(article.published_at || article.created_at).toLocaleDateString('fr-FR', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric'
+                      })}</span>
+                      <div className="flex items-center gap-1 ml-auto">
+                        <Eye className="w-4 h-4" />
+                        <span>{article.views.toLocaleString()}</span>
+                      </div>
+                    </div>
+                    
+                    <Link to={`/article/${article.id}`}>
+                      <h3 className="font-bold text-gray-900 mb-3 line-clamp-2 group-hover:text-[#373B3A] transition-colors text-lg leading-tight hover:text-[#373B3A]">
+                        {article.title}
+                      </h3>
+                    </Link>
+                    
+                    {article.summary && (
+                      <p className="text-gray-600 text-sm mb-4 line-clamp-2 leading-relaxed">
+                        {article.summary.substring(0, 100)}...
+                      </p>
+                    )}
                   </div>
-                </div>
-              </Card>
-            ))}
-          </div>
+                </article>
+              ))}
+            </div>
+          )}
         </div>
       </section>
     </div>

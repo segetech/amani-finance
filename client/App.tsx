@@ -60,6 +60,8 @@ const MarketDataManager = lazy(() => import("./pages/MarketDataManager"));
 const CurrencyManager = lazy(() => import("./pages/CurrencyManager"));
 const CommoditiesManagement = lazy(() => import("./pages/CommoditiesManagement"));
 const EconomicDataManagement = lazy(() => import("./pages/EconomicDataManagement"));
+const IndustrialDataManagement = lazy(() => import("./pages/IndustrialDataManagement"));
+const InvestmentDataManagement = lazy(() => import("./pages/InvestmentDataManagement"));
 const IndicesHelp = lazy(() => import("./pages/IndicesHelp"));
 const Analytics = lazy(() => import("./pages/Analytics"));
 const Moderation = lazy(() => import("./pages/Moderation"));
@@ -158,6 +160,8 @@ const AppContent = () => {
           <Route path="currency-manager" element={<CurrencyManager />} />
           <Route path="commodities-management" element={<CommoditiesManagement />} />
           <Route path="economic-data-management" element={<EconomicDataManagement />} />
+          <Route path="industrial-data-management" element={<IndustrialDataManagement />} />
+          <Route path="investment-data-management" element={<InvestmentDataManagement />} />
           <Route path="indices-help" element={<IndicesHelp />} />
           <Route path="analytics" element={<Analytics />} />
           <Route path="moderation" element={<Moderation />} />

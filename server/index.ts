@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express from "express";
 import cors from "cors";
 import { handleDemo } from "./routes/demo";
@@ -23,14 +24,47 @@ import {
   updateRegionalMetric,
   deleteRegionalMetric
 } from "./routes/economic-data";
+import {
+  getIndustrialSectors,
+  createIndustrialSector,
+  updateIndustrialSector,
+  deleteIndustrialSector,
+  getIndustrialCompanies,
+  createIndustrialCompany,
+  updateIndustrialCompany,
+  deleteIndustrialCompany,
+  getIndustrialMetrics,
+  createIndustrialMetric,
+  updateIndustrialMetric,
+  deleteIndustrialMetric
+} from "./routes/industrial-data";
+import {
+  getInvestmentCategories,
+  createInvestmentCategory,
+  updateInvestmentCategory,
+  deleteInvestmentCategory,
+  getInvestmentOpportunities,
+  createInvestmentOpportunity,
+  updateInvestmentOpportunity,
+  deleteInvestmentOpportunity,
+  getInvestmentMetrics,
+  createInvestmentMetric,
+  updateInvestmentMetric,
+  deleteInvestmentMetric,
+  getMarketTrends,
+  createMarketTrend,
+  updateMarketTrend,
+  deleteMarketTrend
+} from "./routes/investment-data";
 
 export function createServer() {
   const app = express();
 
   // Middleware
   app.use(cors());
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: true }));
+  // Augmenter la limite de taille pour les uploads d'images (50MB)
+  app.use(express.json({ limit: '50mb' }));
+  app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
   // Example API routes
   app.get("/api/ping", (_req, res) => {
@@ -66,6 +100,38 @@ export function createServer() {
   app.post("/api/economic-data/metrics", createRegionalMetric);
   app.put("/api/economic-data/metrics/:id", updateRegionalMetric);
   app.delete("/api/economic-data/metrics/:id", deleteRegionalMetric);
+
+  // Industrial data routes
+  app.get("/api/industrial-data/sectors", getIndustrialSectors);
+  app.post("/api/industrial-data/sectors", createIndustrialSector);
+  app.put("/api/industrial-data/sectors/:id", updateIndustrialSector);
+  app.delete("/api/industrial-data/sectors/:id", deleteIndustrialSector);
+  app.get("/api/industrial-data/companies", getIndustrialCompanies);
+  app.post("/api/industrial-data/companies", createIndustrialCompany);
+  app.put("/api/industrial-data/companies/:id", updateIndustrialCompany);
+  app.delete("/api/industrial-data/companies/:id", deleteIndustrialCompany);
+  app.get("/api/industrial-data/metrics", getIndustrialMetrics);
+  app.post("/api/industrial-data/metrics", createIndustrialMetric);
+  app.put("/api/industrial-data/metrics/:id", updateIndustrialMetric);
+  app.delete("/api/industrial-data/metrics/:id", deleteIndustrialMetric);
+
+  // Investment data routes
+  app.get("/api/investment-data/categories", getInvestmentCategories);
+  app.post("/api/investment-data/categories", createInvestmentCategory);
+  app.put("/api/investment-data/categories/:id", updateInvestmentCategory);
+  app.delete("/api/investment-data/categories/:id", deleteInvestmentCategory);
+  app.get("/api/investment-data/opportunities", getInvestmentOpportunities);
+  app.post("/api/investment-data/opportunities", createInvestmentOpportunity);
+  app.put("/api/investment-data/opportunities/:id", updateInvestmentOpportunity);
+  app.delete("/api/investment-data/opportunities/:id", deleteInvestmentOpportunity);
+  app.get("/api/investment-data/metrics", getInvestmentMetrics);
+  app.post("/api/investment-data/metrics", createInvestmentMetric);
+  app.put("/api/investment-data/metrics/:id", updateInvestmentMetric);
+  app.delete("/api/investment-data/metrics/:id", deleteInvestmentMetric);
+  app.get("/api/investment-data/trends", getMarketTrends);
+  app.post("/api/investment-data/trends", createMarketTrend);
+  app.put("/api/investment-data/trends/:id", updateMarketTrend);
+  app.delete("/api/investment-data/trends/:id", deleteMarketTrend);
 
   return app;
 }
